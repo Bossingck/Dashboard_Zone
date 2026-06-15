@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WW · Ticket Over Due Dashboard · มิ.ย. 2026</title>
+<title>WW · SLA KPI Dashboard · </title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -244,7 +244,7 @@ body.day .mcard-stats span{background:rgba(255,255,255,.7)}
   <div class="brand">
     <div class="logo">WW</div>
     <div class="brand-tx">
-      <div class="co">Way &amp; Wireless Co., Ltd.</div>
+      <div class="co">Wire &amp; Wireless Co., Ltd.</div>
       <div class="ttl">Ticket Over Due — มิ.ย. 2026</div>
     </div>
   </div>
@@ -1549,7 +1549,7 @@ function getFilteredTeams(){
 function teamRow(t, n, isWorst){
   const c = t.od_rate>=.4?'var(--crit)':t.od_rate>=.25?'var(--high)':t.od_rate>=.1?'var(--med)':'var(--ok)';
   return `<tr>
-    <td style="text-align:center;font-size:13px">${n<=3?(isWorst?['🥇','🥈','🥉'][n-1]:['🏅','🎖️','⭐'][n-1]):n}</td>
+    <td style="text-align:center;font-size:13px">${n<=3?(isWorst?['1','2','3'][n-1]:['🥇','🥈','🥉'][n-1]):n}</td>
     <td class="tid">${t.TeamID}</td>
     <td style="color:var(--tm);font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis">${(t.Name||'—').replace(/_WW$/,'').replace(/_/g,' ')}</td>
     <td>${t.ProvThai||t.Province}</td>
@@ -1607,11 +1607,11 @@ function renderTop10(){
   let labelEl = document.getElementById('t10-label');
   if(t10WB==='worst'){
     rows = [...teams].sort((a,b)=>b.od_rate-a.od_rate).slice(0,10);
-    if(labelEl) labelEl.textContent = `🔴 Over Due สูงสุด (แย่) — ${skillLabel}`;
+    if(labelEl) labelEl.textContent = `🔴 Over Due สูงสุด — ${skillLabel}`;
     if(labelEl) labelEl.style.color = 'var(--crit)';
   } else {
     rows = [...teams].filter(t=>t.tickets>=5).sort((a,b)=>a.od_rate-b.od_rate).slice(0,10);
-    if(labelEl) labelEl.textContent = `🟢 Over Due ต่ำสุด (ดีสุด, tickets≥5) — ${skillLabel}`;
+    if(labelEl) labelEl.textContent = `🟢 Over Due ต่ำสุด — ${skillLabel}`;
     if(labelEl) labelEl.style.color = 'var(--ok)';
   }
 
