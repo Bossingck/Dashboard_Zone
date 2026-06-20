@@ -471,7 +471,7 @@ body.day .mcard-stats span{background:rgba(255,255,255,.7)}
 // Google Sheet: https://docs.google.com/spreadsheets/d/1ZrzpJBnpQ65qlVRUhZ_Y7bXe5q4lR-gb6liCN5l-CYU
 // Sheet name: RAW_Data  |  Columns: Work Order ID, Region, Province, Skill, Team ...
 // วาง App Script Web App URL ด้านล่าง หลังจาก Deploy แล้ว:
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwSpiknPPggwIuaST2YhjOr5hskZkPy-3MwSbs7wZFX9yfZxVbr54UhbALsPz5dO_fCqQ/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxqTzaNVcc4YuTJBo9YC6xhcUhUdYKq4hH0ugnW8zOkGNiQdVfEQi-ghvAcdWiNel9CdQ/exec';
 
 // ── SharePoint (placeholder — implement later) ───────────────────
 /* TODO: SharePoint / Excel Online integration — uncomment when ready
@@ -1751,7 +1751,7 @@ function getFilteredTeams(){
       const id = r.TeamID;
       if(!id) continue;
       if(!byTeam[id]){
-        byTeam[id] = {...r, tickets:0, od:0, dep:0, pdtWeight:0, manHourWeight:0, man_hour_count:0, workdays:0};
+        byTeam[id] = {...r, tickets:0, od:0, dep:0, pdtWeight:0, manHourWeight:0, man_hour_count:0, workdays:0, subRootAcc:{}, arriveSumAcc:0, arriveDaysAcc:0};
       }
       byTeam[id].tickets += Number(r.tickets)||0;
       byTeam[id].od      += Number(r.od)||0;
@@ -1760,6 +1760,13 @@ function getFilteredTeams(){
       byTeam[id].manHourWeight += (Number(r.man_hour)||0) * (Number(r.man_hour_count)||0);
       byTeam[id].man_hour_count += Number(r.man_hour_count)||0;
       byTeam[id].workdays += Number(r.workdays)||0;
+      // รวม Sub Root Cause / Avg. Arrived ข้ามสัปดาห์ที่ตรงตัวกรอง (เดือน/สัปดาห์ที่เลือก)
+      // — แต่ละวันอยู่แค่สัปดาห์เดียวเสมอ จึงรวมแบบนี้แล้วผลจะตรงเป๊ะกับคำนวณรวดเดียวแบบ all-time
+      for(const [cause,count] of Object.entries(r.sub_root_counts||{})){
+        byTeam[id].subRootAcc[cause] = (byTeam[id].subRootAcc[cause]||0) + count;
+      }
+      byTeam[id].arriveSumAcc  += Number(r.arrive_sum)||0;
+      byTeam[id].arriveDaysAcc += Number(r.arrive_days)||0;
     }
     teams = Object.values(byTeam).map(t=>{
       const rate = t.tickets>0 ? t.od/t.tickets : 0;
@@ -1770,6 +1777,8 @@ function getFilteredTeams(){
         od_rate: rate,
         dep_rate: t.tickets>0 ? t.dep/t.tickets : 0,
         severity: rate>=.4?'critical':rate>=.25?'high':rate>=.1?'medium':'ok',
+        sub_root_top3: Object.entries(t.subRootAcc).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([cause,count])=>({cause,count})),
+        avg_arrive: t.arriveDaysAcc>0 ? Math.round((t.arriveSumAcc/t.arriveDaysAcc)*100)/100 : null,
       };
     });
   }
