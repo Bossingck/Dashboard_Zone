@@ -346,8 +346,8 @@ body.day .mcard-stats span{background:rgba(255,255,255,.7)}
   </div>
   <div class="tw">
     <div class="tsc" style="max-height:420px"><table><thead><tr>
-      <th>#</th><th>Team ID</th><th>ชื่อช่าง</th><th>จังหวัด</th><th>Zone</th><th>Skill</th><th>Sup</th>
-      <th>Total Ticket</th><th>Within SLA</th><th style="min-width:130px">เทรนด์</th><th style="min-width:170px">Sub Root Cause</th><th>Avg. Arrived</th><th>สถานะ</th>
+      <th>#</th><th>Team ID</th><th>NAME</th><th>PROVINCE</th><th>REGION</th><th>Skill</th><th>Sup</th>
+      <th>Total Ticket</th><th>Within SLA</th><th style="min-width:130px">เทรนด์</th><th style="min-width:170px">Sub Root Cause</th><th>Avg. Arrived</th><th>Repeat Team</th><th>STATUS</th>
     </tr></thead><tbody id="top10-body"></tbody></table></div>
   </div>
 </div>
@@ -472,7 +472,7 @@ body.day .mcard-stats span{background:rgba(255,255,255,.7)}
 // Google Sheet: https://docs.google.com/spreadsheets/d/1ZrzpJBnpQ65qlVRUhZ_Y7bXe5q4lR-gb6liCN5l-CYU
 // Sheet name: RAW_Data  |  Columns: Work Order ID, Region, Province, Skill, Team ...
 // วาง App Script Web App URL ด้านล่าง หลังจาก Deploy แล้ว:
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxqTzaNVcc4YuTJBo9YC6xhcUhUdYKq4hH0ugnW8zOkGNiQdVfEQi-ghvAcdWiNel9CdQ/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbybXmMWlWSinxCsYUi9hoz6nL0f7WqQ67HSxL5FB9Grr1PljrUaQDDymkyDtG0v43OGEg/exec';
 
 // ── SharePoint (placeholder — implement later) ───────────────────
 /* TODO: SharePoint / Excel Online integration — uncomment when ready
@@ -757,15 +757,52 @@ const PDT_SKILLS  = [...new Set(PDT_TEAMS.map(r=>r.Skill).filter(Boolean))].sort
 // โครงสร้างองค์กรจริง (Manager/Supervisor ชื่อจริง) จากไฟล์ Roster ด้านบน
 // — แทนที่การจัดกลุ่มแบบเดิมที่อิง ManagerCode (B/C/E/S = รหัสโซน ไม่ใช่ชื่อ Manager จริง)
 let _realHierCache = null, _realHierKey = null;
+// ตัดเลขลงท้าย TeamID ออก เพื่อหาว่าทีมไหน "ตระกูลเดียวกัน" (เช่น KT-BE-BE1-OFC-016 กับ -001 → prefix เดียวกัน)
+function idPrefix(teamId){ return String(teamId||'').replace(/\d+$/, ''); }
+
+// แผนที่ prefix → roster entry ของทีมที่ "รู้ Manager/Supervisor ชัดเจน" อยู่แล้ว
+// ใช้เป็นตัวเทียบเผื่อเจอทีมที่ไม่มีใน Roster ตรงๆ แต่ prefix ตรงกับทีมที่รู้จักอยู่แล้ว
+let _prefixRosterMap = null;
+function getPrefixRosterMap(){
+  if(_prefixRosterMap) return _prefixRosterMap;
+  const map = {};
+  PDT_TEAMS.forEach(r=>{
+    if(!r.TeamID || !r.Manager || !r.Supervisor) return;
+    const p = idPrefix(r.TeamID);
+    if(!map[p]) map[p] = r; // เก็บตัวแรกที่เจอของแต่ละ prefix (ปกติทีมใน prefix เดียวกันควรอยู่ Sup เดียวกันอยู่แล้ว)
+  });
+  _prefixRosterMap = map;
+  return map;
+}
+
 function buildRealHierarchy(){
   const key = selMonth+'|'+compareWeeks.map(c=>c.year+'-'+c.wkNum).sort().join(',')+'|'+(D.teams?D.teams.length:0)+'|'+(D.week_team?D.week_team.length:0);
   if(_realHierCache && _realHierKey===key) return _realHierCache;
+  const prefixMap = getPrefixRosterMap();
   const mgrMap = {};
   for(const t of getPeriodTeams()){
     const r = rosterOf(t.TeamID);
-    const mgrName = (r && r.Manager) ? r.Manager : 'ไม่ระบุ Manager';
-    const supName = (r && r.Supervisor) ? r.Supervisor : 'ไม่ระบุ Sup';
-    const region   = (r && r.Region) ? r.Region : (t.ZoneGroup||'—');
+    let mgrName, supName, region;
+    if(r && r.Manager && r.Supervisor){
+      // เจอตรงๆ ใน Roster — ใช้ตามนั้น
+      mgrName = r.Manager; supName = r.Supervisor; region = r.Region || (t.ZoneGroup||'—');
+    } else {
+      // ไม่เจอตรงๆ (หรือเจอแต่ไม่มี Sup) → ลองเทียบ prefix ของ TeamID กับทีมตระกูลเดียวกันที่รู้ Sup อยู่แล้ว
+      const prefix = idPrefix(t.TeamID);
+      const inferred = prefixMap[prefix];
+      if(inferred){
+        // เจอทีมตระกูลเดียวกันที่รู้ Sup อยู่แล้ว — ใช้เติมเฉพาะส่วนที่ยังไม่รู้ ไม่ทับของเดิมที่มีอยู่แล้ว (เช่น Manager รู้แล้วแต่ Sup ว่าง)
+        mgrName = (r && r.Manager) ? r.Manager : inferred.Manager;
+        supName = inferred.Supervisor;
+        region  = (r && r.Region) ? r.Region : (inferred.Region || (t.ZoneGroup||'—'));
+      } else {
+        // หาไม่เจอจริงๆ — แยกกลุ่ม "ไม่ระบุ Sup" ตาม prefix แทนที่จะรวมทุกทีมที่ไม่รู้จักไว้ก้อนเดียว
+        // (กันทีมจากคนละพื้นที่/คนละ Sup จริง ถูกเหมารวมเป็น Sup เดียวกันผิดๆ)
+        mgrName = (r && r.Manager) ? r.Manager : 'ไม่ระบุ Manager';
+        supName = `ไม่ระบุ Sup (${prefix})`;
+        region  = (r && r.Region) ? r.Region : (t.ZoneGroup||'—');
+      }
+    }
     if(!mgrMap[mgrName]) mgrMap[mgrName] = {Manager:mgrName, Region:region, tickets:0, od:0, teamSet:new Set(), supervisors:{}};
     const M = mgrMap[mgrName];
     M.tickets += Number(t.tickets)||0;
@@ -1267,7 +1304,7 @@ function normSeries(series, globalMin, globalMax){
 
 // ── Draw ONE polyline with fill on canvas ctx ─────────────────────
 // pts: [{x,y}] in [0..1], progress 0..1 (how much of line to draw)
-function drawLine(ctx, pts, col, progress, W, H, PAD_L, PAD_T, cW, cH, alpha=1, fillAlpha=0.10){
+function drawLine(ctx, pts, col, progress, W, H, PAD_L, PAD_T, cW, cH, alpha=1, fillAlpha=0.10, showLabels=true){
   if(!pts.length) return;
   const n = Math.max(1, Math.round(pts.length * progress));
   const slice = pts.slice(0, n);
@@ -1308,22 +1345,22 @@ function drawLine(ctx, pts, col, progress, W, H, PAD_L, PAD_T, cW, cH, alpha=1, 
   ctx.stroke();
   ctx.restore();
 
-  // Dots + % labels at each point
+  // Dots + % labels at each point (ข้ามตัวเลขกำกับทุกจุดถ้ามีหลายเส้นมาก กันข้อความทับกันจนอ่านไม่ออก)
   slice.forEach((p,i) => {
     if(i < slice.length-1 && progress < 1) return; // only last dot while animating
     // Dot
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.beginPath();
-    ctx.arc(px(p), py(p), 4, 0, Math.PI*2);
+    ctx.arc(px(p), py(p), showLabels?4:2.5, 0, Math.PI*2);
     ctx.fillStyle = col;
     ctx.strokeStyle = 'var(--surf)';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = showLabels?2:1;
     ctx.fill();
     ctx.stroke();
     ctx.restore();
-    // % label at every point (show success rate)
-    if(p.raw && progress >= 1){
+    // % label at every point (show success rate) — ซ่อนเมื่อ showLabels=false
+    if(showLabels && p.raw && progress >= 1){
       const val = sr(p.raw.od_rate);
       const lbl = (val*100).toFixed(1)+'%';
       // Position: above dot, nudge left if last point
@@ -1446,7 +1483,9 @@ function animateMainChart(newSeries, newMin, newMax, newLabels, opts={}){
   const wrap = canvas.parentElement;
   const DPR = window.devicePixelRatio||1;
   const W = wrap.clientWidth||900;
-  const H = 170;
+  // ขยายความสูงอัตโนมัติถ้ามีหลายเส้น (เช่น โชว์ Manager ทุกคน) กัน legend ล้นจอ — ปกติ (≤6 เส้น) ยังคงสูง 170 เท่าเดิม
+  const H = newSeries.length>1 ? Math.max(170, 18 + newSeries.length*22 + 30) : 170;
+  wrap.style.height = H+'px';
   canvas.width  = W * DPR;
   canvas.height = H * DPR;
   canvas.style.width  = W+'px';
@@ -1457,6 +1496,9 @@ function animateMainChart(newSeries, newMin, newMax, newLabels, opts={}){
   const PAD_L=52, PAD_T=18, PAD_B=40, PAD_R=newSeries.length>1?130:24;
   const cW=W-PAD_L-PAD_R, cH=H-PAD_T-PAD_B;
   const isDark = !document.body.classList.contains('day');
+  // เส้นเยอะ (เช่น โชว์ทุก Manager) → ซ่อนตัวเลขกำกับทุกจุด + ลด fill ลง กันทับกันจนอ่านไม่ออก เหลือแค่เส้น+จุดเล็กให้ดูทรง แล้วใช้ legend/hover ดูค่าแทน
+  const manyLines = newSeries.length > 6;
+  const ptFillAlpha = manyLines ? 0.02 : 0.10;
 
   // Cancel ongoing
   if(_anim.main[key]) cancelAnimationFrame(_anim.main[key]);
@@ -1481,7 +1523,7 @@ function animateMainChart(newSeries, newMin, newMax, newLabels, opts={}){
         const inNew = newSeries.find(ns=>ns.grp===s.grp);
         if(inNew) return;
         const npts = normSeries(s.rawSeries, newMin, newMax);
-        drawLine(ctx, npts, resolveColour(s.col), 1, W, H, PAD_L, PAD_T, cW, cH, fadeAlpha*0.8, 0.05);
+        drawLine(ctx, npts, resolveColour(s.col), 1, W, H, PAD_L, PAD_T, cW, cH, fadeAlpha*0.8, 0.05, !manyLines);
       });
     }
 
@@ -1492,7 +1534,7 @@ function animateMainChart(newSeries, newMin, newMax, newLabels, opts={}){
       // For series shared with prev, morph from prev alpha to 1
       const wasInPrev = prev && prev.series.find(ps=>ps.grp===s.grp);
       const alpha = wasInPrev ? 1 : e;
-      drawLine(ctx, npts, resolveColour(s.col), lineProgress, W, H, PAD_L, PAD_T, cW, cH, alpha);
+      drawLine(ctx, npts, resolveColour(s.col), lineProgress, W, H, PAD_L, PAD_T, cW, cH, alpha, ptFillAlpha, !manyLines);
 
       // Legend (multi-zone only)
       if(newSeries.length > 1){
@@ -1532,7 +1574,7 @@ function animateMainChart(newSeries, newMin, newMax, newLabels, opts={}){
       drawXLabels(ctx,newLabels,W,H,PAD_L,PAD_T,cW,cH,isDark);
       newSeries.forEach((s,si)=>{
         const npts=normSeries(s.rawSeries,newMin,newMax);
-        drawLine(ctx,npts,resolveColour(s.col),1,W,H,PAD_L,PAD_T,cW,cH,1);
+        drawLine(ctx,npts,resolveColour(s.col),1,W,H,PAD_L,PAD_T,cW,cH,1,ptFillAlpha,!manyLines);
         if(newSeries.length>1){
           const leg_x=W-PAD_R+14, leg_y=PAD_T+si*22;
           ctx.fillStyle=resolveColour(s.col);
@@ -1906,8 +1948,12 @@ function getFilteredTeams(){
   return teams;
 }
 
-function teamRow(t, n, isWorst){
+function teamRow(t, n, isWorst, repeatIds){
   const c = t.od_rate>=.4?'var(--crit)':t.od_rate>=.25?'var(--high)':t.od_rate>=.1?'var(--med)':'var(--ok)';
+  const isRepeat = repeatIds ? repeatIds.has(t.TeamID) : null;
+  const repeatCell = isRepeat===null ? '<span style="color:var(--tm)">—</span>' : (isRepeat
+    ? '<span style="color:var(--crit);font-weight:700">Yes</span>'
+    : '<span style="color:var(--tm)">No</span>');
   return `<tr>
     <td style="text-align:center;font-size:13px">${n<=3?(isWorst?['1','2','3'][n-1]:['🥇','🥈','🥉'][n-1]):n}</td>
     <td class="tid">${t.TeamID}</td>
@@ -1921,6 +1967,7 @@ function teamRow(t, n, isWorst){
     <td>${spark(t.od_rate, (isWorst?300:400)+n)}</td>
     <td>${subRootCauseCell(t)}</td>
     <td class="mono">${hrFmt(t.avg_arrive)}</td>
+    <td style="text-align:center">${repeatCell}</td>
     <td>${sevPill(t.od_rate)}</td>
   </tr>`;
 }
@@ -1959,6 +2006,57 @@ function setT10Skill(sk, btn){
   renderTop10();
 }
 
+// ═══ REPEAT TEAM (ทีมที่ติด Top10 ซ้ำกับสัปดาห์ก่อนหน้า) ═══
+// หาสัปดาห์ "อ้างอิง" ไว้เช็ค: ถ้าเลือกสัปดาห์เดียวอยู่ใช้สัปดาห์นั้น ถ้าไม่ได้เลือก/เลือกหลายสัปดาห์ ใช้สัปดาห์ล่าสุดที่มีข้อมูล
+function getRepeatRefWeek(){
+  if(compareWeeks.length===1) return compareWeeks[0];
+  if(!Array.isArray(D.week_meta) || !D.week_meta.length) return null;
+  const seen = new Set();
+  const sorted = D.week_meta.filter(w=>{const k=w.Year+'-'+w.WeekNum; if(seen.has(k))return false; seen.add(k); return true;})
+    .sort((a,b)=>Number(a.Year)-Number(b.Year)||Number(a.WeekNum)-Number(b.WeekNum));
+  if(!sorted.length) return null;
+  const last = sorted[sorted.length-1];
+  return { wkNum:Number(last.WeekNum), year:Number(last.Year) };
+}
+// หาสัปดาห์ก่อนหน้าตามลำดับเวลาจริง (ไม่ใช่ wkNum-1 เฉยๆ เผื่อเลขสัปดาห์ข้ามปี/ไม่ต่อเนื่อง)
+function getPriorWeek(refWeek){
+  if(!refWeek || !Array.isArray(D.week_meta)) return null;
+  const seen = new Set();
+  const sorted = D.week_meta.filter(w=>{const k=w.Year+'-'+w.WeekNum; if(seen.has(k))return false; seen.add(k); return true;})
+    .sort((a,b)=>Number(a.Year)-Number(b.Year)||Number(a.WeekNum)-Number(b.WeekNum));
+  const idx = sorted.findIndex(w=>Number(w.WeekNum)===refWeek.wkNum && Number(w.Year)===refWeek.year);
+  if(idx<=0) return null;
+  const prev = sorted[idx-1];
+  return { wkNum:Number(prev.WeekNum), year:Number(prev.Year) };
+}
+// คำนวณ Top10 TeamID (ตาม mode worst/best) ของสัปดาห์ที่ระบุ จาก D.week_team ตรงๆ
+// ใช้ logic เดียวกับ Top10 หลัก: เฉพาะ Skill OFC/NOD, โหมด best ต้องมี tickets>=5
+function getTop10IdsForWeek(wkNum, year, mode){
+  if(!wkNum || !year || !Array.isArray(D.week_team) || !D.week_team.length) return new Set();
+  const rows = D.week_team.filter(r=>Number(r.WeekNum)===wkNum && Number(r.Year)===year && (r.SkillP==='OFC'||r.SkillP==='NOD'));
+  const byTeam = {};
+  rows.forEach(r=>{
+    if(!byTeam[r.TeamID]) byTeam[r.TeamID] = {tickets:0, od:0};
+    byTeam[r.TeamID].tickets += Number(r.tickets)||0;
+    byTeam[r.TeamID].od += Number(r.od)||0;
+  });
+  let arr = Object.entries(byTeam).map(([id,v])=>({TeamID:id, tickets:v.tickets, od_rate: v.tickets>0?v.od/v.tickets:0}));
+  arr = mode==='worst'
+    ? arr.sort((a,b)=>b.od_rate-a.od_rate).slice(0,10)
+    : arr.filter(t=>t.tickets>=5).sort((a,b)=>a.od_rate-b.od_rate).slice(0,10);
+  return new Set(arr.map(t=>t.TeamID));
+}
+// คืน Set ของ TeamID ที่ติด Top10 ของสัปดาห์ก่อนหน้าสัปดาห์อ้างอิง — ใช้เทียบว่าทีมในตารางตอนนี้เป็น "ซ้ำ" หรือไม่
+// คืน null ถ้าเช็คไม่ได้ (ไม่มี week_team หรือไม่มีสัปดาห์อ้างอิง) → คอลัมน์จะโชว์ "—" แทน Yes/No
+function getRepeatTeamIds(mode){
+  if(!Array.isArray(D.week_team) || !D.week_team.length) return null;
+  const ref = getRepeatRefWeek();
+  if(!ref) return null;
+  const prior = getPriorWeek(ref);
+  if(!prior) return new Set(); // ไม่มีสัปดาห์ก่อนหน้าให้เทียบ (เช่นเป็นสัปดาห์แรกสุดของข้อมูลทั้งหมด) → ไม่มีใคร repeat
+  return getTop10IdsForWeek(prior.wkNum, prior.year, mode);
+}
+
 function renderTop10(){
   let teams = getFilteredTeams();
   if(t10Skill !== 'ALL') teams = teams.filter(t=>t.SkillP===t10Skill);
@@ -1973,7 +2071,7 @@ function renderTop10(){
       labelEl.textContent = `ต้อง redeploy Apps Script: ไม่มี week_team สำหรับ ${periodLabel}`;
       labelEl.style.color = 'var(--crit)';
     }
-    document.getElementById('top10-body').innerHTML = `<tr><td colspan="13" class="empty">ข้อมูลจาก GAS ยังไม่มี week_team จึงคำนวณ Top 10 ตามเดือน/สัปดาห์ไม่ได้ กรุณา deploy WW_Dashboard_AppScript.gs เวอร์ชันล่าสุด แล้ว hard refresh หน้าเว็บ</td></tr>`;
+    document.getElementById('top10-body').innerHTML = `<tr><td colspan="14" class="empty">ข้อมูลจาก GAS ยังไม่มี week_team จึงคำนวณ Top 10 ตามเดือน/สัปดาห์ไม่ได้ กรุณา deploy WW_Dashboard_AppScript.gs เวอร์ชันล่าสุด แล้ว hard refresh หน้าเว็บ</td></tr>`;
     return;
   }
   if(t10WB==='worst'){
@@ -1987,7 +2085,8 @@ function renderTop10(){
   }
 
   const isWorst = t10WB==='worst';
-  document.getElementById('top10-body').innerHTML = rows.map((t,i)=>teamRow(t,i+1,isWorst)).join('');
+  const repeatIds = getRepeatTeamIds(t10WB);
+  document.getElementById('top10-body').innerHTML = rows.map((t,i)=>teamRow(t,i+1,isWorst,repeatIds)).join('');
 }
 
 // ═══ REFRESH ALL ══════════════════════════════════════════════════
@@ -2127,14 +2226,10 @@ function initMgrCharts(){
       mainSeries.push({grp:mt.mgr, col:'#3b82f6', rawSeries:mt.series});
       allRates.push(...mt.series.map(x=>sr(x.od_rate)));
     });
-  } else if(mgrZoneF==='ALL'){
-    GRP_ORDER.forEach(g=>{
-      const s=getWeeklyTrend(g);
-      mainSeries.push({grp:g, col:GC[g]||'#7a90a8', rawSeries:s});
-      allRates.push(...s.map(x=>sr(x.od_rate)));
-    });
   } else {
-    const mgrTrends = getManagerWeeklyTrend(mgrZoneF);
+    // ไม่เจาะจงคน → โชว์เส้นแยกตาม Manager ทุกคนในขอบเขตที่เลือก
+    // (ALL = ทุกคนทุกโซน, หรือถ้าเลือกโซนไว้ก็เฉพาะ Manager ในโซนนั้น) — ไม่รวม "ไม่ระบุ Manager"
+    const mgrTrends = getManagerWeeklyTrend(mgrZoneF).filter(t=>t.mgr!=='ไม่ระบุ Manager');
     mgrTrends.forEach((mt,i)=>{
       mainSeries.push({grp:mt.mgr, col:MGR_PALETTE[i%MGR_PALETTE.length], rawSeries:mt.series});
       allRates.push(...mt.series.map(x=>sr(x.od_rate)));
@@ -2151,8 +2246,7 @@ function initMgrCharts(){
   const cmpSuffix = compareWeeks.length ? ` (เทียบ ${compareWeeks.length} สัปดาห์)` : '';
   if(titleEl){
     if(mgrSelF!=='ALL') titleEl.textContent = `เทรนด์ความสำเร็จ (Within SLA %) — ${mgrSelF}${cmpSuffix}`;
-    else if(mgrZoneF==='ALL') titleEl.textContent = `เทรนด์ความสำเร็จ (Within SLA %) ทั้ง 4 โซน${cmpSuffix}`;
-    else titleEl.textContent = `เทรนด์ความสำเร็จ (Within SLA %) ราย Manager — โซน ${mgrZoneF}${cmpSuffix}`;
+    else titleEl.textContent = `เทรนด์ความสำเร็จ (Within SLA %) ราย Manager — ${mgrZoneF==='ALL'?'ทุก Manager':'โซน '+mgrZoneF}${cmpSuffix}`;
   }
   animateMainChart(mainSeries, minR, maxR, wkLabels, {canvasId:'mgr-trend-canvas', tipId:'mgr-tip', key:'manager', highlightWeeks: compareWeeks.map(c=>c.wkNum)});
 
