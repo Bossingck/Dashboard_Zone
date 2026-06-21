@@ -286,10 +286,9 @@ body.day .mcard-stats span{background:rgba(255,255,255,.7)}
 <div class="nav">
   <button class="active" onclick="goTab('ov',this)">📊 ภาพรวม</button>
   <button onclick="goTab('hier',this)">👥 Manager › Sup › Team</button>
-  <button onclick="goTab('pdt',this)">📅 PDT per Month</button>
+  <button onclick="goTab('pdt',this)" style="display:none">📅 PDT per Month</button>
   <button onclick="goTab('prov',this)" style="display:none">🏙️ Province</button>
   <!-- <button onclick="goTab('cause',this)">🔍 สาเหตุ</button> -->
-  <button onclick="goTab('le',this)">⏰ เวลาทำงาน</button>
 </div>
 
 <div class="main">
@@ -314,12 +313,13 @@ body.day .mcard-stats span{background:rgba(255,255,255,.7)}
     </div>
     <div class="mw-date-info" id="mw-date-info">—</div>
   </div>
+  <div style="font-size:11px;color:var(--acc2);margin:4px 0 8px" id="wk-info"></div>
 
   <!-- KPI Cards (5 cards, no region/team) -->
   <div class="kgrid" id="kgrid"></div>
 
   <!-- ══ REGION BIG PANEL ══ -->
-  <div class="sh"><span class="sh-t">🗺️ สรุปรายภูมิภาค</span><div class="sh-l"></div><span class="sh-b" id="zone-sel-badge">ทั้งหมด</span></div>
+  <div class="sh"><span class="sh-t">🗺️ สรุปรายภูมิภาค</span><div class="sh-l"></div><span class="sh-b" id="zone-sel-badge">ALL REGION</span></div>
   <div class="reg-mega" id="reg-mega">
     <!-- Zone Tabs -->
     <div class="reg-zone-tabs" id="reg-zone-tabs"></div>
@@ -347,7 +347,7 @@ body.day .mcard-stats span{background:rgba(255,255,255,.7)}
   <div class="tw">
     <div class="tsc" style="max-height:420px"><table><thead><tr>
       <th>#</th><th>Team ID</th><th>ชื่อช่าง</th><th>จังหวัด</th><th>Zone</th><th>Skill</th><th>Sup</th>
-      <th>Total Ticket</th><th>Whitin SLA</th><th style="min-width:130px">เทรนด์</th><th style="min-width:170px">Sub Root Cause</th><th>Avg. Arrived</th><th>สถานะ</th>
+      <th>Total Ticket</th><th>Within SLA</th><th style="min-width:130px">เทรนด์</th><th style="min-width:170px">Sub Root Cause</th><th>Avg. Arrived</th><th>สถานะ</th>
     </tr></thead><tbody id="top10-body"></tbody></table></div>
   </div>
 </div>
@@ -360,6 +360,7 @@ body.day .mcard-stats span{background:rgba(255,255,255,.7)}
       <button class="htab" id="htab-sup" onclick="setHT('sup',this)">🎖️ Supervisor</button>
       <button class="htab" id="htab-team" onclick="setHT('team',this)">🔧 Team</button>
     </div>
+    <div id="h-period-label" style="font-size:11px;color:var(--tm);padding:10px 14px 0"></div>
     <div class="hbody" id="hbody"></div>
   </div>
 </div>
@@ -755,11 +756,12 @@ const PDT_SKILLS  = [...new Set(PDT_TEAMS.map(r=>r.Skill).filter(Boolean))].sort
 // รวม KPI ระดับทีม (D.teams จาก GAS, มี TeamID/tickets/od/...) เข้ากับ
 // โครงสร้างองค์กรจริง (Manager/Supervisor ชื่อจริง) จากไฟล์ Roster ด้านบน
 // — แทนที่การจัดกลุ่มแบบเดิมที่อิง ManagerCode (B/C/E/S = รหัสโซน ไม่ใช่ชื่อ Manager จริง)
-let _realHierCache = null, _realHierForTeams = null;
+let _realHierCache = null, _realHierKey = null;
 function buildRealHierarchy(){
-  if(_realHierCache && _realHierForTeams===D.teams) return _realHierCache;
+  const key = selMonth+'|'+compareWeeks.map(c=>c.year+'-'+c.wkNum).sort().join(',')+'|'+(D.teams?D.teams.length:0)+'|'+(D.week_team?D.week_team.length:0);
+  if(_realHierCache && _realHierKey===key) return _realHierCache;
   const mgrMap = {};
-  for(const t of (D.teams||[])){
+  for(const t of getPeriodTeams()){
     const r = rosterOf(t.TeamID);
     const mgrName = (r && r.Manager) ? r.Manager : 'ไม่ระบุ Manager';
     const supName = (r && r.Supervisor) ? r.Supervisor : 'ไม่ระบุ Sup';
@@ -779,7 +781,7 @@ function buildRealHierarchy(){
     ...m, teams:m.teamSet.size, od_rate: m.tickets>0?m.od/m.tickets:0,
     supervisors: Object.values(m.supervisors).map(s=>({...s, teamsCount:s.teams.length, od_rate: s.tickets>0?s.od/s.tickets:0}))
   }));
-  _realHierCache = out; _realHierForTeams = D.teams;
+  _realHierCache = out; _realHierKey = key;
   return out;
 }
 function flattenSupervisors(){
@@ -864,10 +866,22 @@ function sparkFromPts(pts, W=80, H=24){
 
 // ═══ FILTER STATE ════════════════════════════════════════════════
 let selMonth = null; // null = ทั้งหมด
-let selWeek  = null; // null = ทั้งหมด
-let selYear  = null; // null = ทั้งหมด (ใช้คู่กับ selWeek เพื่อกัน WeekNum ซ้ำข้ามปี)
 let selZone  = 'ALL'; // ทั้งหมด หรือ ZoneGroup string
 let selSlaSeverities = [];
+
+// คืนข้อความช่วงเวลาที่กำลังดูอยู่ ใช้ร่วมกันทุกจุดที่ต้องโชว์ label (Overview/Top10/Manager)
+function periodLabelText(){
+  if(compareWeeks.length===1){
+    const c=compareWeeks[0];
+    return `W${c.wkNum}/${String(c.year).slice(2)}`;
+  }
+  if(compareWeeks.length>1){
+    const lbls = compareWeeks.slice().sort((a,b)=>a.year-b.year||a.wkNum-b.wkNum).map(c=>'W'+c.wkNum+'/'+String(c.year).slice(2));
+    return `เทียบ ${compareWeeks.length} สัปดาห์ (${lbls.join(', ')})`;
+  }
+  if(selMonth!==null) return MONTH_NAMES[selMonth];
+  return 'ทุกข้อมูล';
+}
 
 // ═══ MONTH/WEEK FILTER ══════════════════════════════════════════
 function buildMWFilter(){
@@ -882,34 +896,57 @@ function buildMWFilter(){
   buildWeekFilter();
 }
 
+// ═══ WEEK FILTER (เลือกได้หลายสัปดาห์ — ใช้ทั้งกรองข้อมูลจริงและไฮไลท์เปรียบเทียบบนกราฟ) ═══
+let compareWeeks = []; // [{wkNum, year}] — selWeek เดิม (เลือกได้ทีละสัปดาห์) ถูกรวมเข้ามาเป็นอันเดียวกันแล้ว
+
 function buildWeekFilter(){
   let wks = D.week_meta;
   if(selMonth!==null) wks = wks.filter(w=>Number(w.Month)===selMonth);
-  // Deduplicate by Year+WeekNum (กันซ้ำข้ามปี)
   const seen = new Set();
   wks = wks.filter(w=>{ const k=`${w.Year}-${w.WeekNum}`; if(seen.has(k)) return false; seen.add(k); return true; });
   wks = wks.sort((a,b)=>Number(a.Year)-Number(b.Year)||Number(a.WeekNum)-Number(b.WeekNum));
-  const wEl = document.getElementById('wk-btns');
-  wEl.innerHTML = [null,...wks].map((w,i) => {
-    if(w===null) return `<button class="mwbtn ${selWeek===null&&selYear===null?'active':''}" onclick="setWeek(null,null)">ทั้งหมด</button>`;
+  const el = document.getElementById('wk-btns');
+  if(!el) return;
+  el.innerHTML = [null,...wks].map(w=>{
+    if(w===null) return `<button class="mwbtn ${compareWeeks.length===0?'active':''}" onclick="clearWeeks()">ทั้งหมด</button>`;
+    const isActive = compareWeeks.some(c=>c.wkNum===Number(w.WeekNum) && c.year===Number(w.Year));
     const lbl = `W${w.WeekNum}/${String(w.Year).slice(2)}`;
     const tip = `ปี ${w.Year} W${w.WeekNum}: ${w.wk_start} (${w.tickets} tickets)`;
-    const isActive = selWeek===Number(w.WeekNum) && selYear===Number(w.Year);
-    return `<button class="mwbtn ${isActive?'active':''}" onclick="setWeek(${w.WeekNum},${w.Year})" title="${tip}">${lbl}</button>`;
+    return `<button class="mwbtn ${isActive?'active':''}" onclick="toggleWeek(${w.WeekNum},${w.Year})" title="${tip}">${lbl}</button>`;
   }).join('');
+  const infoEl = document.getElementById('wk-info');
+  if(infoEl) infoEl.textContent = compareWeeks.length>1 ? `เลือก ${compareWeeks.length} สัปดาห์ — ตัวเลขทุกหน้าจะรวมทุกสัปดาห์ที่เลือก และกราฟจะไฮไลท์เทียบให้` : '';
   updateDateInfo();
 }
 
-function setMonth(m){
-  selMonth=m; selWeek=null; selYear=null;
-  buildMWFilter();
+function toggleWeek(wkNum, year){
+  wkNum=Number(wkNum); year=Number(year);
+  const idx = compareWeeks.findIndex(c=>c.wkNum===wkNum && c.year===year);
+  if(idx>=0) compareWeeks.splice(idx,1);
+  else compareWeeks.push({wkNum, year});
+  buildWeekFilter();
   refreshAll();
 }
-function setWeek(w, yr){
-  selWeek = w; selYear = yr||null;
-  document.querySelectorAll('#wk-btns .mwbtn').forEach(b=>b.classList.remove('active'));
-  event.target.classList.add('active');
-  updateDateInfo();
+
+function clearWeeks(){
+  compareWeeks = [];
+  buildWeekFilter();
+  refreshAll();
+}
+
+// ถ้ามีการเลือกสัปดาห์ไว้ (compareWeeks) → ตัดกราฟให้เหลือแค่สัปดาห์ที่เลือก (เทียบกันตรงๆ ไม่ต้องดูทั้งเส้น)
+// ถ้าไม่ได้เลือกเลย → คืนค่าเดิมครบทุกสัปดาห์ตามปกติ
+function filterToCompareWeeks(series){
+  if(!compareWeeks.length) return series;
+  const wkNums = new Set(compareWeeks.map(c=>c.wkNum));
+  return series
+    .map(s=>({ ...s, rawSeries: s.rawSeries.filter(p=>wkNums.has(p.wkNum)).sort((a,b)=>a.wkNum-b.wkNum) }))
+    .filter(s=>s.rawSeries.length); // ตัดเส้นที่ไม่มีข้อมูลในสัปดาห์ที่เลือกออกไปเลย กันเส้นว่าง
+}
+
+function setMonth(m){
+  selMonth=m; compareWeeks=[];
+  buildMWFilter();
   refreshAll();
 }
 
@@ -989,9 +1026,12 @@ async function reloadDashboardData(){
 
 function updateDateInfo(){
   let info = '';
-  if(selWeek!==null){
-    const wm = D.week_meta.find(w=>Number(w.WeekNum)===selWeek&&(selYear===null||Number(w.Year)===selYear));
+  if(compareWeeks.length===1){
+    const c = compareWeeks[0];
+    const wm = D.week_meta.find(w=>Number(w.WeekNum)===c.wkNum && Number(w.Year)===c.year);
     if(wm) info = `📅 ปี${wm.Year} W${wm.WeekNum}: ${wm.wk_start} (${wm.tickets} tickets)`;
+  } else if(compareWeeks.length>1){
+    info = `📅 เปรียบเทียบ ${compareWeeks.length} สัปดาห์ — ตัวเลขรวมกันทุกหน้า`;
   } else if(selMonth!==null){
     const wks = D.week_meta.filter(w=>Number(w.Month)===selMonth);
     if(wks.length){
@@ -1011,7 +1051,7 @@ function getFilteredZoneData(zoneKey){
   // Filter week_zone by time filters
   let rows = D.week_zone;
   if(selMonth!==null) rows = rows.filter(r=>Number(r.Month)===selMonth);
-  if(selWeek!==null)  rows = rows.filter(r=>Number(r.WeekNum)===selWeek && (selYear===null||Number(r.Year)===selYear));
+  if(compareWeeks.length) rows = rows.filter(r=>compareWeeks.some(c=>c.wkNum===Number(r.WeekNum) && c.year===Number(r.Year)));
 
   // Filter by zone
   if(zoneKey && zoneKey!=='ALL'){
@@ -1029,13 +1069,11 @@ function getFilteredZoneData(zoneKey){
   return { tickets:total, od, od_rate: total>0 ? od/total : 0 };
 }
 
-// Get weekly trend series for a zone
+// Get weekly trend series for a zone — เทรนด์โชว์ทุกสัปดาห์ของเดือนที่เลือกเสมอ
+// (ไม่ตัดตาม compareWeeks ตรงนี้ — การไฮไลท์/ตัดกราฟตามสัปดาห์ที่เลือกไปทำที่ filterToCompareWeeks แทน)
 function getWeeklyTrend(zoneKey){
   let rows = D.week_zone;
   if(selMonth!==null) rows = rows.filter(r=>Number(r.Month)===selMonth);
-  // selWeek filter ใช้ใน getFilteredZoneData แต่ trend ควรแสดงทุก week ในเดือนนั้น
-  // ถ้า selWeek เลือกอยู่ → แสดงเฉพาะสัปดาห์นั้น
-  if(selWeek!==null) rows = rows.filter(r=>Number(r.WeekNum)===selWeek&&(selYear===null||Number(r.Year)===selYear));
   if(zoneKey && zoneKey!=='ALL'){
     if(GRP_ORDER.includes(zoneKey)) rows = rows.filter(r=>r.ZoneGroup===zoneKey);
     else rows = rows.filter(r=>r.NewZone===zoneKey);
@@ -1120,7 +1158,7 @@ function trendChartSVG(series, color='#3b82f6', title='', H=160){
     ${dots}
     ${yLabels}
     ${xLabels}
-    <text x="${PAD_L}" y="${PAD_T-4}" font-size="10" fill="var(--tm)">In Due %</text>
+    <text x="${PAD_L}" y="${PAD_T-4}" font-size="10" fill="var(--tm)">Within SLA %</text>
     <text x="${PAD_L+cW/2}" y="${H-2}" text-anchor="middle" font-size="10" fill="var(--tm)">สัปดาห์ (Week)</text>
   </svg>`;
 }
@@ -1166,7 +1204,7 @@ function multiZoneTrendChartSVG(H=170){
   });
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="width:100%;height:${H}px;overflow:visible">
     ${grid}${lines}${dots}${yLbls}${xLbls}${legends}
-    <text x="${PAD_L}" y="${PAD_T-4}" font-size="10" fill="var(--tm)">In Due %</text>
+    <text x="${PAD_L}" y="${PAD_T-4}" font-size="10" fill="var(--tm)">Within SLA %</text>
     <text x="${PAD_L+cW/2}" y="${H-2}" text-anchor="middle" font-size="10" fill="var(--tm)">สัปดาห์ (Week)</text>
   </svg>`;
 }
@@ -1186,7 +1224,7 @@ function miniChartSVG(series, color, H=90){
     const y=yS(v); yL+=`<text x="${PAD_L-4}" y="${y+3}" text-anchor="end" font-size="8" fill="var(--tm)">${(v*100).toFixed(1)}%</text>`;
     yL+=`<line x1="${PAD_L}" y1="${y}" x2="${W-PAD_R}" y2="${y}" stroke="var(--b)" stroke-width="1" stroke-dasharray="2,2"/>`;
   });
-  const dots=series.map((s,i)=>`<circle cx="${PAD_L+i*xS}" cy="${yS(s.od_rate)}" r="3" fill="${color}" stroke="var(--surf)" stroke-width="1.5"><title>${s.wk}: ${(sr(s.od_rate||0)*100).toFixed(1)}% In Due</title></circle>`).join('');
+  const dots=series.map((s,i)=>`<circle cx="${PAD_L+i*xS}" cy="${yS(s.od_rate)}" r="3" fill="${color}" stroke="var(--surf)" stroke-width="1.5"><title>${s.wk}: ${(sr(s.od_rate||0)*100).toFixed(1)}% Within SLA</title></circle>`).join('');
   return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px;overflow:visible">
     ${yL}<polygon points="${polyPts}" fill="${color}" fill-opacity="0.12"/>
     <polyline points="${pts.join(' ')}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
@@ -1197,7 +1235,7 @@ function miniChartSVG(series, color, H=90){
 // ═══ CANVAS ANIMATED CHART ENGINE ════════════════════════════════
 
 // Shared state for ongoing animations
-const _anim = { main: null, skill: {} };
+const _anim = { main: {}, skill: {} };
 const _prev = { main: null, skill: {} };  // previous series snapshot for morph
 
 // ── colour utils ──────────────────────────────────────────────────
@@ -1348,11 +1386,62 @@ function resolveColour(col){
   return map[col] || col;
 }
 
-// ── MAIN animated chart ───────────────────────────────────────────
-let _mainChartState = null; // {series: [{grp,pts,col}], minR, maxR, wkLabels}
+// ── Highlight selected weeks for comparison: vertical band + bigger dot + value label per series ──
+// ใช้ local index ของแต่ละ series เอง (ไม่ใช่ wkNum เทียบกับแกน X รวม) เพื่อให้จุดไฮไลท์ตรงกับเส้นที่วาดจริงเป๊ะ
+function drawWeekHighlights(ctx, series, highlightWeeks, newMin, newMax, W, H, PAD_L, PAD_T, cW, cH, alpha=1){
+  if(!highlightWeeks || !highlightWeeks.length) return;
+  ctx.save();
+  highlightWeeks.forEach(wkNum=>{
+    // หาตำแหน่ง x จาก series แรกที่มีสัปดาห์นี้ ใช้เป็นตำแหน่งแถบไฮไลท์
+    let bandX = null;
+    for(const s of series){
+      const idx = s.rawSeries.findIndex(p=>p.wkNum===wkNum);
+      if(idx>=0){
+        const npts = normSeries(s.rawSeries, newMin, newMax);
+        bandX = PAD_L + npts[idx].x*cW;
+        break;
+      }
+    }
+    if(bandX===null) return;
+    // แถบพื้นหลังไฮไลท์ + เส้นประแนวตั้ง
+    ctx.save();
+    ctx.globalAlpha = alpha*0.5;
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fillRect(bandX-9, PAD_T, 18, cH);
+    ctx.globalAlpha = alpha*0.6;
+    ctx.setLineDash([3,3]);
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(bandX, PAD_T); ctx.lineTo(bandX, PAD_T+cH); ctx.stroke();
+    ctx.restore();
+    // จุดใหญ่ + label ค่า ของทุกเส้นที่ตำแหน่งสัปดาห์นี้
+    series.forEach(s=>{
+      const idx = s.rawSeries.findIndex(p=>p.wkNum===wkNum);
+      if(idx<0) return;
+      const npts = normSeries(s.rawSeries, newMin, newMax);
+      const npt = npts[idx];
+      const px = PAD_L + npt.x*cW, py = PAD_T + npt.y*cH;
+      const col = resolveColour(s.col);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI*2);
+      ctx.fillStyle = col; ctx.fill();
+      ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke();
+      ctx.font='bold 10px Inter,sans-serif'; ctx.textAlign='center';
+      ctx.fillStyle = col;
+      ctx.fillText((sr(npt.raw.od_rate)*100).toFixed(1)+'%', px, py-11);
+      ctx.restore();
+    });
+  });
+  ctx.restore();
+}
 
-function animateMainChart(newSeries, newMin, newMax, newLabels, dur=420){
-  const canvas = document.getElementById('main-trend-canvas');
+// ── MAIN animated chart ───────────────────────────────────────────
+let _mainChartStates = {}; // {key: {series: [{grp,pts,col}], minR, maxR, wkLabels}}
+
+function animateMainChart(newSeries, newMin, newMax, newLabels, opts={}){
+  const {canvasId='main-trend-canvas', tipId='main-tip', key='main', dur=420, highlightWeeks=[]} = opts;
+  const canvas = document.getElementById(canvasId);
   if(!canvas) return;
   const wrap = canvas.parentElement;
   const DPR = window.devicePixelRatio||1;
@@ -1370,9 +1459,9 @@ function animateMainChart(newSeries, newMin, newMax, newLabels, dur=420){
   const isDark = !document.body.classList.contains('day');
 
   // Cancel ongoing
-  if(_anim.main) cancelAnimationFrame(_anim.main);
+  if(_anim.main[key]) cancelAnimationFrame(_anim.main[key]);
 
-  const prev = _mainChartState;
+  const prev = _mainChartStates[key];
   const start = performance.now();
 
   // For each series, build alpha timeline: prev grps fade out, new grps draw in
@@ -1432,9 +1521,11 @@ function animateMainChart(newSeries, newMin, newMax, newLabels, dur=420){
       }
     });
 
-    if(t < 1){ _anim.main = requestAnimationFrame(frame); }
+    if(highlightWeeks.length && e > 0.6) drawWeekHighlights(ctx, newSeries, highlightWeeks, newMin, newMax, W, H, PAD_L, PAD_T, cW, cH, (e-0.6)/0.4);
+
+    if(t < 1){ _anim.main[key] = requestAnimationFrame(frame); }
     else{
-      _anim.main = null;
+      _anim.main[key] = null;
       // Final clean render
       ctx.clearRect(0,0,W,H);
       drawGrid(ctx,W,H,PAD_L,PAD_T,cW,cH,newMin,newMax,isDark);
@@ -1459,14 +1550,15 @@ function animateMainChart(newSeries, newMin, newMax, newLabels, dur=420){
           }
         }
       });
+      if(highlightWeeks.length) drawWeekHighlights(ctx, newSeries, highlightWeeks, newMin, newMax, W, H, PAD_L, PAD_T, cW, cH, 1);
     }
   }
-  _mainChartState = { series: newSeries, minR: newMin, maxR: newMax, wkLabels: newLabels };
-  _anim.main = requestAnimationFrame(frame);
+  _mainChartStates[key] = { series: newSeries, minR: newMin, maxR: newMax, wkLabels: newLabels };
+  _anim.main[key] = requestAnimationFrame(frame);
 
   // Tooltip
   canvas.onmousemove = function(e){
-    const tip = document.getElementById('main-tip');
+    const tip = document.getElementById(tipId);
     if(!tip) return;
     const rect = canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left;
@@ -1493,7 +1585,7 @@ function animateMainChart(newSeries, newMin, newMax, newLabels, dur=420){
       tip.style.top=(PAD_T+best.p.y*cH-36)+'px';
     } else { tip.style.display='none'; }
   };
-  canvas.onmouseleave=()=>{ const t=document.getElementById('main-tip'); if(t)t.style.display='none'; };
+  canvas.onmouseleave=()=>{ const t=document.getElementById(tipId); if(t)t.style.display='none'; };
 }
 
 // ── SKILL mini animated charts ────────────────────────────────────
@@ -1568,7 +1660,7 @@ function animateSkillChart(canvasEl, tipEl, rawSeries, col, key, dur=380){
     npts.forEach((p,i)=>{ const px=PAD_L+p.x*cW; const d=Math.abs(mx-px); if(d<bd){bd=d;best={p,i};} });
     if(best&&bd<40){
       const r=rawSeries[best.i];
-      tipEl.innerHTML=`<b>${r.wk}</b>: ${((1-r.od_rate)*100).toFixed(1)}%<br>In Due ${r.tickets-r.od}/${r.tickets}`;
+      tipEl.innerHTML=`<b>${r.wk}</b>: ${((1-r.od_rate)*100).toFixed(1)}%<br>Within SLA ${r.tickets-r.od}/${r.tickets}`;
       tipEl.style.display='block';
       tipEl.style.left=(PAD_L+best.p.x*cW+6)+'px';
       tipEl.style.top=(PAD_T+best.p.y*cH-30)+'px';
@@ -1595,6 +1687,9 @@ function initCharts(){
     mainSeries.push({grp:selZone, col, rawSeries:s});
     allRates.push(...s.map(x=>sr(x.od_rate)));
   }
+  // ถ้าเลือกสัปดาห์ไว้เปรียบเทียบ → ตัดกราฟให้เหลือแค่สัปดาห์ที่เลือก
+  mainSeries = filterToCompareWeeks(mainSeries);
+  allRates = mainSeries.flatMap(s=>s.rawSeries.map(x=>sr(x.od_rate)));
   // allRates เก็บ success rate (sr) ไว้แล้ว — ใช้ตรงๆ
   const minR = allRates.length ? Math.max(0, Math.min(...allRates) - .01) : 0;
   const maxR = allRates.length ? Math.min(1, Math.max(...allRates) + .01) : 1;
@@ -1605,10 +1700,14 @@ function initCharts(){
 
   // Update title
   const titleEl=document.getElementById('main-chart-title');
-  if(titleEl) titleEl.textContent=selZone==='ALL'?'เทรนด์ความสำเร็จ (In Due %) ทั้ง 4 โซน':'เทรนด์ความสำเร็จ (In Due %) รวม ('+mainSeries[0].rawSeries.length+' สัปดาห์)';
+  if(titleEl){
+    const zoneLbl = selZone==='ALL' ? 'ALL REGION' : selZone;
+    const cmpSuffix = compareWeeks.length ? ` (เทียบ ${compareWeeks.length} สัปดาห์)` : '';
+    titleEl.textContent = `CLOSED WITHIN SLA — ${zoneLbl}${cmpSuffix}`;
+  }
 
   // Animate main after a brief paint
-  requestAnimationFrame(()=>animateMainChart(mainSeries,minR,maxR,wkLabels));
+  requestAnimationFrame(()=>animateMainChart(mainSeries,minR,maxR,wkLabels,{highlightWeeks: compareWeeks.map(c=>c.wkNum)}));
 
   // Skill charts
   requestAnimationFrame(()=>{
@@ -1633,7 +1732,7 @@ function renderKPI(){
 
   const cards = [
     {l:'Total Tickets', v:fmt(total), s:'ทั้งหมด', c:'acc'},
-    {l:'In Due', v:fmt(indue), s:`${pct(indue/total)}`, c:'ok'},
+    {l:'Within SLA', v:fmt(indue), s:`${pct(indue/total)}`, c:'ok'},
     {l:'Over Due', v:fmt(od), s:`${pct(rate)} OD Rate`, c:'crit'},
   ];
   document.getElementById('kgrid').innerHTML = cards.map((c,i)=>
@@ -1648,7 +1747,7 @@ function renderKPI(){
 // ═══ REGION MEGA PANEL ═══════════════════════════════════════════
 function buildZoneTabs(){
   const tabs = [
-    {k:'ALL', lbl:'🌐 ทั้งหมด'},
+    {k:'ALL', lbl:'🌐 ALL REGION'},
     {k:'BMA', lbl:'BMA'},
     {k:'C&W', lbl:'C&W'},
     {k:'EAS', lbl:'EAS'},
@@ -1665,7 +1764,7 @@ function buildZoneTabs(){
 function setZone(z){
   selZone = z;
   buildZoneTabs();
-  document.getElementById('zone-sel-badge').textContent = z==='ALL'?'ทั้งหมด':(ZONE_LABEL[z]||z);
+  document.getElementById('zone-sel-badge').textContent = z==='ALL'?'ALL REGION':(ZONE_LABEL[z]||z);
   renderRegContent();
   renderKPI();
   renderTop10();
@@ -1677,7 +1776,7 @@ function renderRegContent(){
   const zKey  = selZone==='ALL'?null:selZone;
   const zData = getFilteredZoneData(zKey);
   const col   = selZone==='ALL'?'var(--acc2)':(GRP_ORDER.includes(selZone)?GC[selZone]:ZC[selZone])||'#7a90a8';
-  const lbl   = selZone==='ALL'?'ทั้งหมด':(ZONE_LABEL[selZone]||selZone);
+  const lbl   = selZone==='ALL'?'ALL REGION':(ZONE_LABEL[selZone]||selZone);
   const trend = getWeeklyTrend(zKey);
 
   // Skill trends
@@ -1689,7 +1788,7 @@ function renderRegContent(){
   <div class="reg-header-row">
     <div class="reg-main-stat">
       <div class="reg-zone-badge" style="background:${col}22;color:${col};border:1px solid ${col}44">${lbl}</div>
-      <div style="font-size:11px;color:var(--tm);margin-bottom:4px">สรุปภูมิภาค · ${selWeek?'W'+selWeek:selMonth?MONTH_NAMES[selMonth]:'ทุกข้อมูล'}</div>
+      <div style="font-size:11px;color:var(--tm);margin-bottom:4px">สรุปภูมิภาค · ${periodLabelText()}</div>
       <div class="reg-big-pct" style="color:${col}">${(zData.od_rate*100).toFixed(1)}%</div>
       <div class="reg-od-label">OD Rate</div>
     </div>
@@ -1705,7 +1804,7 @@ function renderRegContent(){
         <div class="rsc-sub">${(zData.od_rate*100).toFixed(1)}% ของทั้งหมด</div>
       </div>
       <div class="rsc">
-        <div class="rsc-lbl">In Due</div>
+        <div class="rsc-lbl">Within SLA</div>
         <div class="rsc-val" style="color:var(--ok)">${fmt(zData.tickets-zData.od)}</div>
         <div class="rsc-sub">${((1-zData.od_rate)*100).toFixed(1)}%</div>
       </div>
@@ -1737,51 +1836,59 @@ function renderRegContent(){
 }
 
 // ═══ TOP 10 (Worst + Best) ════════════════════════════════════════
+// คืน array ของทีม (รูปแบบเดียวกับ D.teams) ที่สะท้อนตัวกรอง Month/Week ปัจจุบัน
+// ถ้าไม่ได้กรอง Month/Week → คืน D.teams ตรงๆ (all-time หลัง Week-1 filter)
+// ถ้ากรองอยู่ → รวมจาก D.week_team เฉพาะสัปดาห์ที่ตรงตัวกรอง (ใช้ร่วมกันทั้ง Top10 และหน้า Manager/Sup/Team)
+function getPeriodTeams(){
+  const needsPeriodTeams = selMonth!==null || compareWeeks.length>0;
+  if(!needsPeriodTeams) return D.teams || [];
+  const hasWeekTeam = Array.isArray(D.week_team) && D.week_team.length;
+  if(!hasWeekTeam) return [];
+  let rows = D.week_team;
+  if(selMonth!==null) rows = rows.filter(r=>Number(r.Month)===selMonth);
+  if(compareWeeks.length) rows = rows.filter(r=>compareWeeks.some(c=>c.wkNum===Number(r.WeekNum) && c.year===Number(r.Year)));
+  const byTeam = {};
+  for(const r of rows){
+    const id = r.TeamID;
+    if(!id) continue;
+    if(!byTeam[id]){
+      byTeam[id] = {...r, tickets:0, od:0, dep:0, pdtWeight:0, manHourWeight:0, man_hour_count:0, workdays:0, subRootAcc:{}, arriveSumAcc:0, arriveDaysAcc:0};
+    }
+    byTeam[id].tickets += Number(r.tickets)||0;
+    byTeam[id].od      += Number(r.od)||0;
+    byTeam[id].dep     += Number(r.dep)||0;
+    byTeam[id].pdtWeight += (Number(r.pdt)||0) * (Number(r.tickets)||0);
+    byTeam[id].manHourWeight += (Number(r.man_hour)||0) * (Number(r.man_hour_count)||0);
+    byTeam[id].man_hour_count += Number(r.man_hour_count)||0;
+    byTeam[id].workdays += Number(r.workdays)||0;
+    // รวม Sub Root Cause / Avg. Arrived ข้ามสัปดาห์ที่ตรงตัวกรอง (เดือน/สัปดาห์ที่เลือก)
+    // — แต่ละวันอยู่แค่สัปดาห์เดียวเสมอ จึงรวมแบบนี้แล้วผลจะตรงเป๊ะกับคำนวณรวดเดียวแบบ all-time
+    for(const [cause,count] of Object.entries(r.sub_root_counts||{})){
+      byTeam[id].subRootAcc[cause] = (byTeam[id].subRootAcc[cause]||0) + count;
+    }
+    byTeam[id].arriveSumAcc  += Number(r.arrive_sum)||0;
+    byTeam[id].arriveDaysAcc += Number(r.arrive_days)||0;
+  }
+  return Object.values(byTeam).map(t=>{
+    const rate = t.tickets>0 ? t.od/t.tickets : 0;
+    return {
+      ...t,
+      pdt: t.tickets>0 ? t.pdtWeight/t.tickets : 0,
+      man_hour: t.man_hour_count>0 ? t.manHourWeight/t.man_hour_count : 0,
+      od_rate: rate,
+      dep_rate: t.tickets>0 ? t.dep/t.tickets : 0,
+      severity: rate>=.4?'critical':rate>=.25?'high':rate>=.1?'medium':'ok',
+      sub_root_top3: Object.entries(t.subRootAcc).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([cause,count])=>({cause,count})),
+      avg_arrive: t.arriveDaysAcc>0 ? Math.round((t.arriveSumAcc/t.arriveDaysAcc)*100)/100 : null,
+    };
+  });
+}
+
 function getFilteredTeams(){
-  let teams = D.teams;
-  const needsPeriodTeams = selMonth!==null || selWeek!==null;
+  const needsPeriodTeams = selMonth!==null || compareWeeks.length>0;
   const hasWeekTeam = Array.isArray(D.week_team) && D.week_team.length;
   if(needsPeriodTeams && !hasWeekTeam) return [];
-  if(needsPeriodTeams && hasWeekTeam){
-    let rows = D.week_team;
-    if(selMonth!==null) rows = rows.filter(r=>Number(r.Month)===selMonth);
-    if(selWeek!==null) rows = rows.filter(r=>Number(r.WeekNum)===selWeek && (selYear===null||Number(r.Year)===selYear));
-    const byTeam = {};
-    for(const r of rows){
-      const id = r.TeamID;
-      if(!id) continue;
-      if(!byTeam[id]){
-        byTeam[id] = {...r, tickets:0, od:0, dep:0, pdtWeight:0, manHourWeight:0, man_hour_count:0, workdays:0, subRootAcc:{}, arriveSumAcc:0, arriveDaysAcc:0};
-      }
-      byTeam[id].tickets += Number(r.tickets)||0;
-      byTeam[id].od      += Number(r.od)||0;
-      byTeam[id].dep     += Number(r.dep)||0;
-      byTeam[id].pdtWeight += (Number(r.pdt)||0) * (Number(r.tickets)||0);
-      byTeam[id].manHourWeight += (Number(r.man_hour)||0) * (Number(r.man_hour_count)||0);
-      byTeam[id].man_hour_count += Number(r.man_hour_count)||0;
-      byTeam[id].workdays += Number(r.workdays)||0;
-      // รวม Sub Root Cause / Avg. Arrived ข้ามสัปดาห์ที่ตรงตัวกรอง (เดือน/สัปดาห์ที่เลือก)
-      // — แต่ละวันอยู่แค่สัปดาห์เดียวเสมอ จึงรวมแบบนี้แล้วผลจะตรงเป๊ะกับคำนวณรวดเดียวแบบ all-time
-      for(const [cause,count] of Object.entries(r.sub_root_counts||{})){
-        byTeam[id].subRootAcc[cause] = (byTeam[id].subRootAcc[cause]||0) + count;
-      }
-      byTeam[id].arriveSumAcc  += Number(r.arrive_sum)||0;
-      byTeam[id].arriveDaysAcc += Number(r.arrive_days)||0;
-    }
-    teams = Object.values(byTeam).map(t=>{
-      const rate = t.tickets>0 ? t.od/t.tickets : 0;
-      return {
-        ...t,
-        pdt: t.tickets>0 ? t.pdtWeight/t.tickets : 0,
-        man_hour: t.man_hour_count>0 ? t.manHourWeight/t.man_hour_count : 0,
-        od_rate: rate,
-        dep_rate: t.tickets>0 ? t.dep/t.tickets : 0,
-        severity: rate>=.4?'critical':rate>=.25?'high':rate>=.1?'medium':'ok',
-        sub_root_top3: Object.entries(t.subRootAcc).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([cause,count])=>({cause,count})),
-        avg_arrive: t.arriveDaysAcc>0 ? Math.round((t.arriveSumAcc/t.arriveDaysAcc)*100)/100 : null,
-      };
-    });
-  }
+  let teams = getPeriodTeams();
   if(selZone!=='ALL'){
     if(GRP_ORDER.includes(selZone)) teams=teams.filter(t=>t.ZoneGroup===selZone);
     else teams=teams.filter(t=>t.NewZone===selZone);
@@ -1857,8 +1964,8 @@ function renderTop10(){
   if(t10Skill !== 'ALL') teams = teams.filter(t=>t.SkillP===t10Skill);
 
   const skillLabel = t10Skill==='ALL'?'ทั้งหมด':t10Skill;
-  const periodLabel = selWeek!==null ? `W${selWeek}/${String(selYear||'').slice(2)}` : (selMonth!==null ? MONTH_NAMES[selMonth] : 'ทุกข้อมูล');
-  const missingWeekTeam = (selMonth!==null || selWeek!==null) && (!Array.isArray(D.week_team) || !D.week_team.length);
+  const periodLabel = periodLabelText();
+  const missingWeekTeam = (selMonth!==null || compareWeeks.length>0) && (!Array.isArray(D.week_team) || !D.week_team.length);
   let rows;
   let labelEl = document.getElementById('t10-label');
   if(missingWeekTeam){
@@ -1890,6 +1997,8 @@ function refreshAll(){
   renderTop10();
   // If on province tab, refresh that too
   if(document.getElementById('tab-prov').classList.contains('active')) renderProv();
+  // If on Manager/Sup/Team tab, refresh that too — ให้ตามตัวกรองเดือน/สัปดาห์ด้วย
+  if(document.getElementById('tab-hier').classList.contains('active')) renderH();
 }
 
 // ═══ HIERARCHY ════════════════════════════════════════════════════
@@ -1900,39 +2009,256 @@ const TV_PER=20;
 
 function setHT(t,btn){ hTab=t; document.querySelectorAll('.htab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderH(); }
 function renderH(){
+  const lblEl = document.getElementById('h-period-label');
+  const needsPeriod = selMonth!==null || compareWeeks.length>0;
+  const hasWeekTeam = Array.isArray(D.week_team) && D.week_team.length;
+  const periodLabel = periodLabelText();
+  if(lblEl){
+    if(needsPeriod && !hasWeekTeam){
+      lblEl.innerHTML = `⚠️ <span style="color:var(--crit)">ต้อง redeploy Apps Script: ไม่มี week_team สำหรับ ${periodLabel}</span>`;
+    } else {
+      lblEl.innerHTML = `📅 กำลังแสดงข้อมูล: <strong style="color:var(--acc2)">${periodLabel}</strong>`;
+    }
+  }
   const b=document.getElementById('hbody');
+  if(needsPeriod && !hasWeekTeam){
+    b.innerHTML = `<div class="empty" style="padding:30px;text-align:center;color:var(--tm)">ข้อมูลจาก GAS ยังไม่มี week_team จึงกรองเดือน/สัปดาห์ในหน้านี้ไม่ได้ กรุณา deploy Backend_KPI.gs เวอร์ชันล่าสุด แล้ว hard refresh หน้าเว็บ</div>`;
+    return;
+  }
   if(hTab==='mgr') renderMgr(b);
   else if(hTab==='sup') renderSup(b);
   else renderTV(b);
 }
 
+// ═══ MANAGER PAGE: zone-tabs + Manager picker + KPI + เทรนด์ (เหมือนหน้าภาพรวม แต่ขอบเขตเป็น Manager) ═══
+let mgrZoneF = 'ALL';
+let mgrSelF  = 'ALL'; // ชื่อ Manager ที่เลือกเจาะจง หรือ 'ALL'
+
+// Total Ticket / OD / Within SLA ของ Manager ในขอบเขตที่เลือก (โซน + เจาะจงคนถ้ามี) — ใช้ buildRealHierarchy ซึ่งตามตัวกรอง Month/Week อยู่แล้ว
+function getMgrZoneData(zoneKey, mgrName){
+  const hier = buildRealHierarchy();
+  let filtered = (!zoneKey || zoneKey==='ALL') ? hier : hier.filter(m=>regionGroupOf(m.Region)===zoneKey);
+  if(mgrName && mgrName!=='ALL') filtered = filtered.filter(m=>m.Manager===mgrName);
+  const tickets = filtered.reduce((s,m)=>s+(Number(m.tickets)||0),0);
+  const od = filtered.reduce((s,m)=>s+(Number(m.od)||0),0);
+  return { tickets, od, od_rate: tickets>0 ? od/tickets : 0 };
+}
+
+// เทรนด์รายสัปดาห์แยกตาม Manager (join D.week_team กับ roster ผ่าน TeamID) — กรองเฉพาะ Manager ในโซนที่ระบุ
+function getManagerWeeklyTrend(zoneKey){
+  let rows = D.week_team || [];
+  if(selMonth!==null) rows = rows.filter(r=>Number(r.Month)===selMonth);
+  const byMgrWeek = {};
+  for(const r of rows){
+    const ros = rosterOf(r.TeamID);
+    const mgrName = (ros && ros.Manager) ? ros.Manager : null;
+    if(!mgrName) continue;
+    if(zoneKey && zoneKey!=='ALL'){
+      const rg = ros.Region ? regionGroupOf(ros.Region) : null;
+      if(rg !== zoneKey) continue;
+    }
+    const k = mgrName+'|'+r.Year+'-W'+r.WeekNum;
+    if(!byMgrWeek[k]) byMgrWeek[k] = {mgr:mgrName, wk:'W'+r.WeekNum, wkNum:Number(r.WeekNum), year:Number(r.Year), tickets:0, od:0};
+    byMgrWeek[k].tickets += Number(r.tickets)||0;
+    byMgrWeek[k].od      += Number(r.od)||0;
+  }
+  const byMgr = {};
+  Object.values(byMgrWeek).forEach(w=>{ if(!byMgr[w.mgr]) byMgr[w.mgr]=[]; byMgr[w.mgr].push(w); });
+  Object.values(byMgr).forEach(arr=>arr.sort((a,b)=>a.year!==b.year?a.year-b.year:a.wkNum-b.wkNum));
+  return Object.entries(byMgr).map(([mgr,series])=>({
+    mgr, series: series.map(w=>({...w, od_rate: w.tickets>0?w.od/w.tickets:0}))
+  }));
+}
+
+// เทรนด์รายสัปดาห์แยกตาม Skill (OFC/NOD) สำหรับขอบเขต Manager ปัจจุบัน (โซน หรือเจาะจงคน)
+function getManagerSkillTrend(zoneKey, mgrName, skill){
+  let rows = (D.week_team || []).filter(r=>r.SkillP===skill);
+  if(selMonth!==null) rows = rows.filter(r=>Number(r.Month)===selMonth);
+  const byWeek = {};
+  for(const r of rows){
+    const ros = rosterOf(r.TeamID);
+    if(!ros || !ros.Manager) continue;
+    if(mgrName && mgrName!=='ALL'){
+      if(ros.Manager !== mgrName) continue;
+    } else if(zoneKey && zoneKey!=='ALL'){
+      const rg = ros.Region ? regionGroupOf(ros.Region) : null;
+      if(rg !== zoneKey) continue;
+    }
+    const k = r.Year+'-W'+r.WeekNum;
+    if(!byWeek[k]) byWeek[k] = {wk:'W'+r.WeekNum, wkNum:Number(r.WeekNum), tickets:0, od:0};
+    byWeek[k].tickets += Number(r.tickets)||0;
+    byWeek[k].od      += Number(r.od)||0;
+  }
+  return Object.values(byWeek).sort((a,b)=>a.wkNum-b.wkNum).map(w=>({...w, od_rate: w.tickets>0?w.od/w.tickets:0}));
+}
+
+const MGR_PALETTE = ['#818cf8','#06b6d4','#f97316','#10b981','#eab308','#ec4899','#a78bfa','#14b8a6','#f43f5e','#84cc16'];
+
+function setMgrZone(z){
+  mgrZoneF = z;
+  mgrSelF  = 'ALL'; // เปลี่ยนโซนแล้วรีเซ็ต Manager ที่เลือกไว้ (กันเลือกค้างข้ามโซน)
+  renderMgr(document.getElementById('hbody'));
+}
+
+function setMgrSel(name){
+  mgrSelF = name;
+  renderMgr(document.getElementById('hbody'));
+}
+
+// รายชื่อ Manager ให้เลือก (กรองตามโซนที่เลือกไว้) เป็นปุ่ม pill เหมือนตัวกรองอื่นๆ ในหน้านี้
+function buildMgrPicker(){
+  const hier = buildRealHierarchy().slice();
+  const scoped = mgrZoneF==='ALL' ? hier : hier.filter(m=>regionGroupOf(m.Region)===mgrZoneF);
+  scoped.sort((a,b)=>b.od_rate-a.od_rate);
+  let html = `<button class="fb ${mgrSelF==='ALL'?'active':''}" onclick="setMgrSel('ALL')">ทั้งหมด (${scoped.length})</button>`;
+  html += scoped.map(m=>{
+    const active = mgrSelF===m.Manager;
+    return `<button class="fb ${active?'active':''}" onclick="setMgrSel('${escAttr(m.Manager)}')">${m.Manager} <span style="opacity:.65">${(m.od_rate*100).toFixed(1)}%</span></button>`;
+  }).join('');
+  return html;
+}
+
+function initMgrCharts(){
+  let mainSeries=[], allRates=[];
+  if(mgrSelF!=='ALL'){
+    // เจาะจง Manager คนเดียว → กราฟเส้นเดียว
+    const trends = getManagerWeeklyTrend(mgrZoneF).filter(t=>t.mgr===mgrSelF);
+    trends.forEach(mt=>{
+      mainSeries.push({grp:mt.mgr, col:'#3b82f6', rawSeries:mt.series});
+      allRates.push(...mt.series.map(x=>sr(x.od_rate)));
+    });
+  } else if(mgrZoneF==='ALL'){
+    GRP_ORDER.forEach(g=>{
+      const s=getWeeklyTrend(g);
+      mainSeries.push({grp:g, col:GC[g]||'#7a90a8', rawSeries:s});
+      allRates.push(...s.map(x=>sr(x.od_rate)));
+    });
+  } else {
+    const mgrTrends = getManagerWeeklyTrend(mgrZoneF);
+    mgrTrends.forEach((mt,i)=>{
+      mainSeries.push({grp:mt.mgr, col:MGR_PALETTE[i%MGR_PALETTE.length], rawSeries:mt.series});
+      allRates.push(...mt.series.map(x=>sr(x.od_rate)));
+    });
+  }
+  // ถ้าเลือกสัปดาห์ไว้เปรียบเทียบ → ตัดกราฟให้เหลือแค่สัปดาห์ที่เลือก
+  mainSeries = filterToCompareWeeks(mainSeries);
+  allRates = mainSeries.flatMap(s=>s.rawSeries.map(x=>sr(x.od_rate)));
+  const minR = allRates.length ? Math.max(0, Math.min(...allRates)-.01) : 0;
+  const maxR = allRates.length ? Math.min(1, Math.max(...allRates)+.01) : 1;
+  const allWkNums=[...new Set(mainSeries.flatMap(s=>s.rawSeries.map(x=>x.wkNum)))].sort((a,b)=>a-b);
+  const wkLabels=allWkNums.map(w=>'W'+w);
+  const titleEl=document.getElementById('mgr-chart-title');
+  const cmpSuffix = compareWeeks.length ? ` (เทียบ ${compareWeeks.length} สัปดาห์)` : '';
+  if(titleEl){
+    if(mgrSelF!=='ALL') titleEl.textContent = `เทรนด์ความสำเร็จ (Within SLA %) — ${mgrSelF}${cmpSuffix}`;
+    else if(mgrZoneF==='ALL') titleEl.textContent = `เทรนด์ความสำเร็จ (Within SLA %) ทั้ง 4 โซน${cmpSuffix}`;
+    else titleEl.textContent = `เทรนด์ความสำเร็จ (Within SLA %) ราย Manager — โซน ${mgrZoneF}${cmpSuffix}`;
+  }
+  animateMainChart(mainSeries, minR, maxR, wkLabels, {canvasId:'mgr-trend-canvas', tipId:'mgr-tip', key:'manager', highlightWeeks: compareWeeks.map(c=>c.wkNum)});
+
+  // Skill charts (OFC/NOD) — ตามขอบเขตโซน/Manager ปัจจุบัน
+  requestAnimationFrame(()=>{
+    document.querySelectorAll('.mgr-skill-canvas').forEach(c=>{
+      const sk=c.dataset.sk;
+      const tip=document.querySelector(`.mgr-skill-tip[data-sk="${sk}"]`);
+      const s=getManagerSkillTrend(mgrZoneF, mgrSelF, sk);
+      const skCol=SKILL_COLORS[sk]||'#7a90a8';
+      const rateEl=document.querySelector(`.mgr-skill-rate-val[data-sk="${sk}"]`);
+      if(rateEl) rateEl.textContent = s.length ? (sr(s[s.length-1].od_rate)*100).toFixed(1)+'%' : '—';
+      animateSkillChart(c,tip,s,skCol,'mgr-'+sk);
+    });
+  });
+}
+
+function buildMgrZoneTabs(){
+  const tabs = [
+    {k:'ALL', lbl:'🌐 ทั้งหมด'},
+    {k:'BMA', lbl:'BMA'},
+    {k:'C&W', lbl:'C&W'},
+    {k:'EAS', lbl:'EAS'},
+    {k:'SOU', lbl:'SOU'},
+  ];
+  return tabs.map(t=>{
+    const col = t.k==='ALL'?'var(--acc2)':GC[t.k]||'#7a90a8';
+    return `<button class="rzt ${t.k===mgrZoneF?'active':''}"
+      style="${t.k===mgrZoneF?`border-bottom-color:${col};color:${col}`:''}"
+      onclick="setMgrZone('${t.k}')">${t.lbl}</button>`;
+  }).join('');
+}
+
+
 function renderMgr(body){
-  const ml=buildRealHierarchy().slice().sort((a,b)=>b.od_rate-a.od_rate);
-  body.innerHTML=`<div style="font-size:11px;color:var(--tm);margin-bottom:11px">💡 กดที่การ์ด Manager เพื่อดู Supervisor และทีม (อิงชื่อจริงจากไฟล์ Region/Manager/Supervisor)</div>
-  <div class="mgrid">${ml.map((m,i)=>{
-    const col=GC[regionGroupOf(m.Region)]||'#7a90a8';
-    return `<div class="mcard" id="mc-${slug(m.Manager)}" style="border-top:3px solid ${col}" onclick="drillMgr('${escAttr(m.Manager)}')">
-      <div class="mcard-lbl" style="color:${col}">${m.Manager}</div>
-      <div class="mcard-rate" style="color:${col}">${(m.od_rate*100).toFixed(1)}%</div>
-      <div style="margin:5px 0">${spark(m.od_rate, 400+i)}</div>
-      <div class="mcard-stats">
-        <span>Total Ticket<br><strong>${fmt(m.tickets)}</strong></span>
-        <span>OD<br><strong style="color:${col}">${fmt(m.od)}</strong></span>
-        <span>Teams<br><strong>${fmt(m.teams)}</strong></span>
-        <span>Region<br><strong>${m.Region}</strong></span>
+  const zData = getMgrZoneData(mgrZoneF, mgrSelF);
+  let zCol, zLbl, badgeStyle;
+  if(mgrSelF!=='ALL'){
+    // หาโซนจริงของ Manager คนที่เลือก (ไม่อิงตาม tab ที่กดอยู่ เผื่อเลือกจากปุ่ม "ทั้งหมด" ตรงๆ)
+    const selObj = buildRealHierarchy().find(m=>m.Manager===mgrSelF);
+    const mgrGrp = selObj ? regionGroupOf(selObj.Region) : null;
+    zCol = mgrGrp ? (GC[mgrGrp]||'#7a90a8') : 'var(--acc2)';
+    zLbl = mgrSelF;
+    badgeStyle = `background:${zCol}22;color:${zCol};border:1px solid ${zCol}44;font-size:30px;padding:7px 18px;letter-spacing:.4px`;
+  } else {
+    zCol = mgrZoneF==='ALL' ? 'var(--acc2)' : (GC[mgrZoneF]||'#7a90a8');
+    zLbl = mgrZoneF==='ALL' ? 'ทั้งหมด' : mgrZoneF;
+    badgeStyle = `background:${zCol}22;color:${zCol};border:1px solid ${zCol}44`;
+  }
+
+  let html = `
+  <div class="reg-zone-tabs" style="margin-bottom:14px;border-radius:var(--rl);overflow:hidden">${buildMgrZoneTabs()}</div>
+  <div style="font-size:11px;color:var(--tm);margin-bottom:8px">👔 เลือก Manager เพื่อเจาะดูเฉพาะคน (อิงชื่อจริงจากไฟล์ Region/Manager/Supervisor)</div>
+  <div class="fg" style="flex-wrap:wrap;margin-bottom:18px">${buildMgrPicker()}</div>
+  <div class="reg-header-row">
+    <div class="reg-main-stat">
+      <div class="reg-zone-badge" style="${badgeStyle}">${zLbl}</div>
+      <div style="font-size:11px;color:var(--tm);margin-bottom:4px">สรุป Manager · ${periodLabelText()}</div>
+      <div class="reg-big-pct" style="color:${zCol}">${(zData.od_rate*100).toFixed(1)}%</div>
+      <div class="reg-od-label">OD Rate</div>
+    </div>
+    <div class="reg-stat-cards">
+      <div class="rsc">
+        <div class="rsc-lbl">Total Ticket</div>
+        <div class="rsc-val">${fmt(zData.tickets)}</div>
+        <div class="rsc-sub">ทั้งหมด</div>
       </div>
-    </div>`;
-  }).join('')}</div>
-  <div id="mgr-drill"></div>`;
-  if(selMgr) drillMgr(selMgr);
+      <div class="rsc">
+        <div class="rsc-lbl">Over Due</div>
+        <div class="rsc-val" style="color:${zCol}">${fmt(zData.od)}</div>
+        <div class="rsc-sub">${(zData.od_rate*100).toFixed(1)}% ของทั้งหมด</div>
+      </div>
+      <div class="rsc">
+        <div class="rsc-lbl">Within SLA</div>
+        <div class="rsc-val" style="color:var(--ok)">${fmt(zData.tickets-zData.od)}</div>
+        <div class="rsc-sub">${((1-zData.od_rate)*100).toFixed(1)}%</div>
+      </div>
+    </div>
+  </div>
+  <div class="reg-chart-area">
+    <div class="reg-chart-title" id="mgr-chart-title"></div>
+    <div class="canvas-chart-wrap" style="height:170px"><canvas id="mgr-trend-canvas" height="170"></canvas><div class="canvas-tooltip" id="mgr-tip"></div></div>
+  </div>
+  <div style="font-size:12px;font-weight:700;color:var(--tx);margin-bottom:10px">แยกตาม Skill</div>
+  <div class="skill-charts">
+    ${['OFC','NOD'].map(sk=>{
+      const skCol = SKILL_COLORS[sk]||'#7a90a8';
+      return `<div class="skill-chart-box">
+        <div class="skill-chart-hdr">
+          <div class="skill-chart-name">${sk}</div>
+          <div class="skill-chart-rate mgr-skill-rate-val" data-sk="${sk}" style="color:${skCol}">—</div>
+        </div>
+        <div class="canvas-chart-wrap" style="height:90px"><canvas class="mgr-skill-canvas" data-sk="${sk}" height="90"></canvas><div class="canvas-tooltip mgr-skill-tip" data-sk="${sk}"></div></div>
+      </div>`;
+    }).join('')}
+  </div>
+  <div id="mgr-drill" style="margin-top:18px"></div>`;
+  body.innerHTML = html;
+  requestAnimationFrame(()=>initMgrCharts());
+  if(mgrSelF!=='ALL') drillMgr(mgrSelF);
 }
 
 function drillMgr(mgrName){
   selMgr=mgrName;
-  document.querySelectorAll('.mcard').forEach(c=>c.classList.remove('selected'));
-  const mc=document.getElementById('mc-'+slug(mgrName)); if(mc) mc.classList.add('selected');
   const m=buildRealHierarchy().find(x=>x.Manager===mgrName);
-  if(!m){ document.getElementById('mgr-drill').innerHTML=''; return; }
+  if(!m){ const el=document.getElementById('mgr-drill'); if(el) el.innerHTML=''; return; }
   const col=GC[regionGroupOf(m.Region)]||'#7a90a8';
   const sups=m.supervisors.slice().sort((a,b)=>b.od_rate-a.od_rate);
   document.getElementById('mgr-drill').innerHTML=`
@@ -1962,8 +2288,8 @@ function drillSup(supName, mgrName){
     <button class="dback" onclick="document.getElementById('sup-drill2').innerHTML=''">✕</button>
   </div>
   <div class="tsc" style="max-height:300px"><table><thead><tr>
-    <th>#</th><th>Team ID</th><th>ชื่อช่าง</th><th>Tel</th><th>Province</th><th>Zone</th><th>Skill</th><th>CT</th>
-    <th>Total Ticket</th><th>OD</th><th style="min-width:110px">เทรนด์</th><th>WDays</th><th>PDT</th><th style="min-width:170px">Sub Root Cause</th><th>Avg. Arrived</th><th>ระดับ</th>
+    <th>#</th><th>Team ID</th><th>ชื่อช่าง</th><th>Tel</th><th>Province</th><th>Zone</th><th>Skill</th>
+    <th>Total Ticket</th><th>OD</th><th style="min-width:110px">เทรนด์</th><th>WDays</th><th style="min-width:170px">Sub Root Cause</th><th>Avg. Arrived</th><th>ระดับ</th>
   </tr></thead><tbody>${teams.map((t,i)=>{
     const c=t.od_rate>=.4?'var(--crit)':t.od_rate>=.2?'var(--high)':'var(--med)';
     return `<tr><td class="mono" style="color:var(--td)">${i+1}</td>
@@ -1971,11 +2297,10 @@ function drillSup(supName, mgrName){
       <td style="color:var(--tm);font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis">${(t.Name||'—').replace(/_WW$/,'').replace(/_/g,' ')}</td>
       <td style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--tm)">${t.Tel||'—'}</td>
       <td>${t.ProvThai||t.Province}</td><td>${zTag(t.NewZone)}</td><td>${skillTag(t.SkillP)}</td>
-      <td><span class="ct-tag">${t.CT||'—'}</span></td>
       <td class="mono">${t.tickets}</td>
       <td class="mono" style="font-weight:700;color:${c}">${t.od}</td>
       <td>${spark(t.od_rate,600+i)}</td>
-      <td class="mono">${t.workdays||'—'}</td><td class="mono">${f2(t.pdt)}</td>
+      <td class="mono">${t.workdays||'—'}</td>
       <td>${subRootCauseCell(t)}</td>
       <td class="mono">${hrFmt(t.avg_arrive)}</td>
       <td>${sevPill(t.od_rate)}</td>
@@ -2073,7 +2398,7 @@ function renderTV(body){
 }
 
 function updateTV(){
-  let d=[...D.teams];
+  let d=[...getPeriodTeams()];
   // กรองทีมที่ไม่มีชื่อจริง
   d=d.filter(t=>{ const n=(t.Name||'').trim().replace(/_WW$/,'').replace(/_/g,' ').trim(); return n&&n!=='-'&&n!=='--'&&n!=='—'&&n!==t.TeamID; });
   if(tvRegF!=='ALL') d=d.filter(t=>{ const r=rosterOf(t.TeamID); return r && r.Region===tvRegF; });
