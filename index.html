@@ -1797,9 +1797,8 @@ function animateMainChart(newSeries, newMin, newMax, newLabels, opts={}){
       const lines=newSeries.length>1
         ? newSeries.map(s=>{
             const match=s.rawSeries.find(x=>x.wkNum===r.wkNum);
-            if(!match) return null;
-            return {pct:sr(match.od_rate), html:`<span style="color:${resolveColour(s.col)};font-weight:700">${s.grp}</span> ${(sr(match.od_rate)*100).toFixed(1)}%  (${match.tickets-match.od}/${match.tickets})`};
-          }).filter(Boolean).sort((a,b)=>b.pct-a.pct).map(x=>x.html).join('<br>')
+            return match?`<span style="color:${resolveColour(s.col)};font-weight:700">${s.grp}</span> ${(sr(match.od_rate)*100).toFixed(1)}%  (${match.tickets-match.od}/${match.tickets})`:'';
+          }).filter(Boolean).join('<br>')
         : `<b>${r.wk}</b>: ${(sr(r.od_rate)*100).toFixed(1)}%<br>✅ ${r.tickets-r.od}/${r.tickets}`;
       tip.innerHTML=`<b>${r.wk||best.p.label}</b><br>${lines}`;
       tip.style.display='block';
@@ -3132,10 +3131,11 @@ function buildMgrPicker(){
   const hier = buildRealHierarchy().slice();
   const scoped = mgrZoneF==='ALL' ? hier : hier.filter(m=>regionGroupOf(m.Region)===mgrZoneF);
   scoped.sort((a,b)=>b.od_rate-a.od_rate);
-  let html = `<button class="fb ${mgrSelF==='ALL'?'active':''}" onclick="setMgrSel('ALL')">ทั้งหมด (${scoped.length})</button>`;
+  const fillStyle = 'width:100%;box-sizing:border-box;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
+  let html = `<button class="fb ${mgrSelF==='ALL'?'active':''}" style="${fillStyle}" onclick="setMgrSel('ALL')">ทั้งหมด (${scoped.length})</button>`;
   html += scoped.map(m=>{
     const active = mgrSelF===m.Manager;
-    return `<button class="fb ${active?'active':''}" onclick="setMgrSel('${escAttr(m.Manager)}')">${m.Manager} <span style="opacity:.65">${(m.od_rate*100).toFixed(1)}%</span></button>`;
+    return `<button class="fb ${active?'active':''}" style="${fillStyle}" onclick="setMgrSel('${escAttr(m.Manager)}')">${m.Manager} <span style="opacity:.65">${(m.od_rate*100).toFixed(1)}%</span></button>`;
   }).join('');
   return html;
 }
@@ -3223,7 +3223,7 @@ function renderMgr(body){
   let html = `
   <div class="reg-zone-tabs" style="margin-bottom:14px;border-radius:var(--rl);overflow:hidden">${buildMgrZoneTabs()}</div>
   <div style="font-size:11px;color:var(--tm);margin-bottom:8px">👔 เลือก Manager เพื่อเจาะดูเฉพาะคน (อิงชื่อจริงจากไฟล์ Region/Manager/Supervisor)</div>
-  <div class="fg" style="flex-wrap:wrap;margin-bottom:18px">${buildMgrPicker()}</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-bottom:18px">${buildMgrPicker()}</div>
   <div class="reg-header-row">
     <div class="reg-main-stat">
       <div class="reg-zone-badge" style="${badgeStyle}">${zLbl}</div>
@@ -4412,10 +4412,15 @@ function computeAbnormalTeams(skill){
   let rows = (D.week_team||[]).filter(r=>r.SkillP===skill);
   if(selZone && selZone!=='ALL') rows = rows.filter(r=>regionGroupOf(r.NewZone)===selZone);
   const byTeamWeek = {};
+  const teamMeta = {}; // ข้อมูล Region/Skill/Province จริงจากตั๋ว — ใช้ fallback เวลา roster หลุด/ไม่มีทีมนั้น
   for(const r of rows){
     const wk = Number(r.WeekNum), yr = Number(r.Year);
     if(!weeks.some(w=>Number(w.WeekNum)===wk && Number(w.Year)===yr)) continue;
     const key = `${r.TeamID}||${yr}W${wk}`;
+    if(!teamMeta[r.TeamID]) teamMeta[r.TeamID] = {};
+    if(r.NewZone) teamMeta[r.TeamID].region = regionGroupOf(r.NewZone) || r.NewZone;
+    if(r.SkillP) teamMeta[r.TeamID].skill = r.SkillP;
+    if(r.Province) teamMeta[r.TeamID].province = r.Province;
     if(!byTeamWeek[key]) byTeamWeek[key] = {
       TeamID:r.TeamID, wk, yr, wkKey:'W'+wk,
       pdtSum:0, workdays:0, arriveHrSum:0, arriveDays:0,
@@ -4498,7 +4503,7 @@ function computeAbnormalTeams(skill){
     return {wkKey:wk, totalTeam, abnormalCount, normalPct, repeatCount, repeatTeamIds, abnormalTeamIds:abnormalTeams};
   });
 
-  return {weeks, weekKeys, perTeamWeek, summaryByWeek, target};
+  return {weeks, weekKeys, perTeamWeek, summaryByWeek, target, teamMeta};
 }
 
 // ── แถบสรุปจำนวนทีมผิดปกติแยกตาม Region (สัปดาห์ล่าสุด) — แสดงเป็นแท่งท่อนๆ 1 ท่อน = 1 ทีม สีแดง = ผิดปกติ ── ใช้คู่กับปุ่มกรอง Region ที่ sync กับ selZone ──
@@ -4799,8 +4804,23 @@ function computeTeamPeriodAvg(tk, weekKeys, perTeamWeek, target){
   return { pdtAvg, arriveAvg, manHourAvg, lastCloseAvg, workHoursAvg, slaPct, workdays, closedCount, overdueCount, pdtFail, arriveFail, manHourFail, isAbnormal };
 }
 
+// เดา Region/Province จาก Code ในตัว Team ID เอง เมื่อไม่มีทั้งใน roster และไม่มีในข้อมูลตั๋วเลย
+// รูปแบบ Team ID: XX-XX-{ProvinceCode}-Skill-NNN — ProvinceCode ขึ้นต้น BE=BMAE, BW=BMAW (ตามด้วยเลข) → Region=BMA
+function inferProvinceRegionFromTeamId(tk){
+  if(!tk) return {};
+  const parts = String(tk).split('-');
+  if(parts.length<3) return {};
+  const code = parts[2]; // เช่น BE2, BW1, CBR, NKR ฯลฯ
+  const m = code.match(/^B([EW])(\d+)$/);
+  if(m){
+    const province = 'BMA'+m[1]+m[2]; // BE2 -> BMAE2, BW1 -> BMAW1
+    return {region:'BMA', province};
+  }
+  return {};
+}
+
 function buildAbnormalDetailHTML(skill){
-  const {weeks, weekKeys, perTeamWeek, summaryByWeek, target} = computeAbnormalTeams(skill);
+  const {weeks, weekKeys, perTeamWeek, summaryByWeek, target, teamMeta} = computeAbnormalTeams(skill);
   if(!weeks.length) return '';
   const lastWk = weekKeys[weekKeys.length-1];
   const isPeriodView = weekKeys.length>1; // เลือกดูหลายสัปดาห์ (เช่น ทั้งเดือน) — ต้อง Avg. ของแต่ละสัปดาห์เข้าด้วยกัน ไม่ใช่โชว์แค่สัปดาห์สุดท้าย
@@ -4882,15 +4902,17 @@ function buildAbnormalDetailHTML(skill){
     const sup = resolveSupName(tk);
     const mgr = resolveMgrName(tk);
     const r = rosterOf(tk) || {};
+    const meta = teamMeta[tk] || {};
+    const codeGuess = inferProvinceRegionFromTeamId(tk);
     const workdayRaw = w.workdays!=null ? w.workdays : (r.WorkDays!=null ? Number(r.WorkDays) : null);
     const streak = abnormalStreak(tk);
     const cellVals = {
-      region:   r.Region   || '—',
+      region:   r.Region   || meta.region   || codeGuess.region   || '—',
       manager:  mgr,
       sup:      sup,
       team:     r.Name ? `${tk}<br><span style="opacity:.65;font-size:9.5px">${r.Name}</span>` : tk,
-      skill:    r.Skill    || '—',
-      province: r.Province || '—',
+      skill:    r.Skill    || meta.skill    || '—',
+      province: r.Province || meta.province || codeGuess.province || '—',
       workday:  workdayRaw!=null ? workdayRaw : '—',
       arrive:   w.arriveAvg!=null ? hrFmt(w.arriveAvg) : '—',
       lastclose:w.lastCloseAvg!=null ? closeTimeFmt(w.lastCloseAvg) : '—',
@@ -5278,15 +5300,6 @@ function drawTTMTChart(canvasId, weekKeys, mtReleaseVals, mtNoReleaseVals, ttVal
 function toggleMtGroup(gid){
   const el = document.getElementById('mtgrp-'+gid);
   const arrow = document.getElementById('mtgrp-arrow-'+gid);
-  if(!el) return;
-  const willShow = el.style.display==='none';
-  el.style.display = willShow ? '' : 'none';
-  if(arrow) arrow.textContent = willShow ? '▾' : '▸';
-}
-
-function toggleCreatorRow(cid){
-  const el = document.getElementById('cf-detail-'+cid);
-  const arrow = document.getElementById('cf-arrow-'+cid);
   if(!el) return;
   const willShow = el.style.display==='none';
   el.style.display = willShow ? '' : 'none';
@@ -5750,96 +5763,41 @@ function renderMTReport(){
     </div>
   </div>`;
 
-  // ── ตาราง Create From: ใครเปิด WO มากที่สุด (ไม่รวม INOC) พร้อม TT หลักที่เกี่ยวข้อง (ขยาย/ย่อได้) ──
-  const isInocCreator = s => /INOC/i.test(String(s||''));
-  const creatorAgg = {};
-  (D.mt_dup_groups||[]).forEach(g=>{
-    (g.mt_tickets||[]).forEach(c=>{
-      if(selZone!=='ALL' && GRP_ORDER.includes(selZone) && c.region!==selZone) return;
-      if(!dateInWeeksRange(c.closed, weeks)) return;
-      const creator = String(c.wo_creator||'').trim();
-      if(!creator || isInocCreator(creator)) return;
-      if(!creatorAgg[creator]) creatorAgg[creator] = {creator, count:0, supCounts:{}, regions:new Set(), sourceTickets:new Set(), records:[]};
-      const a = creatorAgg[creator];
-      a.count++;
-      if(c.team_id){
-        const supN = resolveSupName(c.team_id);
-        a.supCounts[supN] = (a.supCounts[supN]||0) + 1;
-      }
-      if(c.region) a.regions.add(c.region);
-      if(g.source_ticket_id){
-        a.sourceTickets.add(g.source_ticket_id);
-        a.records.push({sourceTicketId:g.source_ticket_id, wo:c.wo, team:c.team_id, closed:c.closed||''});
-      }
-    });
-  });
-  const creatorRows = Object.values(creatorAgg).sort((a,b)=>b.count-a.count).slice(0,20);
-  const maxCreatorCount = Math.max(1, ...creatorRows.map(a=>a.count));
-  const fmtCreatorDT = s => { if(!s) return '—'; const d=new Date(s); if(isNaN(d)) return '—'; return d.toLocaleString('th-TH',{year:'2-digit',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}); };
-  const creatorTableRows = creatorRows.map((a,i)=>{
-    const cid = 'cf'+i;
-    const w = (a.count/maxCreatorCount*100).toFixed(0);
-    const supEntries = Object.entries(a.supCounts).sort((x,y)=>y[1]-x[1]); // เรียงตามจำนวน WO ที่ผูกกับ Sup นั้นมากสุดก่อน (Sup นี้มาจากทีมที่รับ WO แต่ละใบ ไม่ใช่ Sup ของคนเปิดเอง — คนเปิด 1 คนอาจเปิดให้หลายทีม/หลาย Sup ได้)
-    const primarySup = supEntries.length ? supEntries[0][0] : '—';
-    const otherSupsCount = supEntries.length - 1;
-    const supDisplay = otherSupsCount>0
-      ? `${escAttr(primarySup)} <span style="color:var(--tm);font-weight:400">(+${otherSupsCount} Sup อื่น)</span>`
-      : escAttr(primarySup);
-    const detailRows = a.records.map(r=>`<tr>
-        <td class="mono" style="font-size:10.5px;padding:4px 8px">${escAttr(r.sourceTicketId)}</td>
-        <td class="mono" style="font-size:10.5px;padding:4px 8px">${escAttr(r.wo)}</td>
-        <td style="font-size:10.5px;padding:4px 8px;color:${teamColor(r.team)};font-weight:700">${escAttr(r.team)}</td>
-        <td style="font-size:10.5px;padding:4px 8px">${escAttr(resolveSupName(r.team))}</td>
-        <td class="mono" style="font-size:10px;padding:4px 8px">${fmtCreatorDT(r.closed)}</td>
-      </tr>`).join('');
-    return `<tr onclick="toggleCreatorRow('${cid}')" style="cursor:pointer">
-      <td class="mono" style="text-align:center;padding:6px 8px;border:1px solid var(--brd);font-size:11px;color:var(--tm)">${i+1}</td>
-      <td style="padding:6px 8px;border:1px solid var(--brd);font-size:11px;font-weight:700;color:var(--crit)">
-        <span id="cf-arrow-${cid}" style="display:inline-block;width:12px;color:var(--acc2)">▸</span> ${escAttr(a.creator)}
+  // ── ตาราง Detail (mirror สไตล์หน้าภาพรวม) — Total Ticket, RELEASE/NO RELEASE, Sub Root Cause(MT), Avg. Arrived, PDT ──
+  const detailRows = topTeams.map(t=>{
+    const col = teamColor(t.team);
+    const nm = teamNameOf(t.team);
+    const avgArrive = t.arriveDays>0 ? hrFmt(t.arriveSum/t.arriveDays) : '—';
+    const pdtAvg = t.workdays>0 ? (t.pdtCount/t.workdays).toFixed(2) : '—';
+    return `<tr>
+      <td style="font-size:10px;color:${GC[t.region]||'var(--tm)'};font-weight:700;padding:6px 8px;border:1px solid var(--brd)">${t.region}</td>
+      <td style="padding:6px 8px;border:1px solid var(--brd)">
+        <span style="font-weight:700;font-size:11px;color:${col}">${escAttr(t.team)}</span>
+        ${nm?`<br><span style="font-size:9.5px;color:var(--tm)">${escAttr(nm)}</span>`:''}
       </td>
-      <td style="padding:6px 8px;border:1px solid var(--brd);font-size:11px">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="mono" style="font-weight:700;width:28px;text-align:right;flex:none">${a.count}</span>
-          <div style="flex:1;min-width:60px;background:var(--surf3);border-radius:3px;height:8px;overflow:hidden"><div style="width:${w}%;height:100%;background:var(--crit)"></div></div>
-        </div>
-      </td>
-      <td style="padding:6px 8px;border:1px solid var(--brd);font-size:10.5px">${supDisplay}</td>
-      <td style="padding:6px 8px;border:1px solid var(--brd);font-size:10.5px">${[...a.regions].join(', ')||'—'}</td>
-      <td class="mono" style="text-align:center;padding:6px 8px;border:1px solid var(--brd);font-size:11px;font-weight:700">${a.sourceTickets.size}</td>
-    </tr>
-    <tr id="cf-detail-${cid}" style="display:none">
-      <td colspan="6" style="padding:0 10px 12px 34px;border:1px solid var(--brd);border-top:none">
-        <div style="font-size:10px;font-weight:700;color:var(--tm);margin:6px 0 4px">📌 TT หลัก (Source Ticket ID) ที่ ${escAttr(a.creator)} เปิด WO เข้าช่วย</div>
-        <div style="overflow-x:auto;border:1px solid var(--brd);border-radius:6px">
-          <table style="width:100%;border-collapse:collapse">
-            <thead><tr style="background:var(--surf3);color:var(--tm)">
-              <th style="text-align:left;padding:4px 8px;font-size:10px">Source Ticket ID (TT หลัก)</th>
-              <th style="text-align:left;padding:4px 8px;font-size:10px">Work Order ID</th>
-              <th style="text-align:left;padding:4px 8px;font-size:10px">Team</th>
-              <th style="text-align:left;padding:4px 8px;font-size:10px">Sup</th>
-              <th style="text-align:left;padding:4px 8px;font-size:10px">Closed</th>
-            </tr></thead>
-            <tbody>${detailRows || `<tr><td colspan="5" style="padding:6px 8px;font-size:10.5px;color:var(--tm)">ไม่มีข้อมูล</td></tr>`}</tbody>
-          </table>
-        </div>
-      </td>
+      <td class="mono" style="text-align:center;padding:6px 8px;border:1px solid var(--brd);font-size:11px">${t.tickets.toLocaleString()}</td>
+      <td class="mono" style="text-align:center;padding:6px 8px;border:1px solid var(--brd);font-size:11px;color:var(--ok);font-weight:700">${t.mtRelease}</td>
+      <td class="mono" style="text-align:center;padding:6px 8px;border:1px solid var(--brd);font-size:11px;color:var(--crit);font-weight:700">${t.mtNoRelease}</td>
+      <td style="padding:6px 8px;border:1px solid var(--brd);font-size:10.5px;max-width:260px" id="mt-cause-detail-${escAttr(t.team)}">⏳ กำลังโหลด...</td>
+      <td class="mono" style="text-align:center;padding:6px 8px;border:1px solid var(--brd);font-size:11px">${avgArrive}</td>
+      <td class="mono" style="text-align:center;padding:6px 8px;border:1px solid var(--brd);font-size:11px">${pdtAvg}</td>
     </tr>`;
   }).join('');
-  const creatorHTML = `<div style="margin-bottom:20px">
-    <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:4px">👤 Create From — ใครเปิด WO มากที่สุด</div>
-    <div style="font-size:10.5px;color:var(--tm);margin-bottom:10px">นับเฉพาะ Create From ที่ไม่ใช่ INOC · Sup = หัวหน้าทีมที่รับ WO นั้นๆ (ทีมที่ไม่มีข้อมูล Sup ใน Roster จะแสดงเป็น "—") · คลิกแถวเพื่อดู TT หลักที่เปิด WO เข้าช่วย</div>
+  const detailHTML = `<div style="margin-bottom:20px">
+    <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:10px">📋 Top 10 MT — Work Order Details</div>
     <div style="overflow-x:auto;border:1px solid var(--brd);border-radius:8px">
       <table style="width:100%;border-collapse:collapse;font-size:11px">
         <thead><tr style="background:var(--surf3);color:var(--tm)">
-          <th style="padding:6px 8px">#</th>
-          <th style="text-align:left;padding:6px 8px">Create From</th>
-          <th style="text-align:left;padding:6px 8px;min-width:120px">Total WO เปิด</th>
-          <th style="text-align:left;padding:6px 8px">Sup</th>
           <th style="text-align:left;padding:6px 8px">Region</th>
-          <th style="padding:6px 8px;min-width:100px">TT หลัก (ใบ)</th>
+          <th style="text-align:left;padding:6px 8px">Team</th>
+          <th style="padding:6px 8px">Total Ticket</th>
+          <th style="padding:6px 8px">Total MT (RELEASE)</th>
+          <th style="padding:6px 8px">Total MT (NO RELEASE)</th>
+          <th style="text-align:left;padding:6px 8px;min-width:220px">Sub Root Cause (MT) — Top 3</th>
+          <th style="padding:6px 8px">Avg. Arrived</th>
+          <th style="padding:6px 8px">PDT</th>
         </tr></thead>
-        <tbody>${creatorTableRows || `<tr><td colspan="6" style="padding:14px;text-align:center;color:var(--tm)">ไม่พบ WO ที่เปิดโดยบุคคล (นอกจาก INOC) ในช่วงที่เลือก</td></tr>`}</tbody>
-
+        <tbody>${detailRows || `<tr><td colspan="8" style="padding:14px;text-align:center;color:var(--tm)">ไม่มีข้อมูล</td></tr>`}</tbody>
       </table>
     </div>
   </div>`;
@@ -5932,7 +5890,7 @@ function renderMTReport(){
     </div>
   </div>`;
 
-  body.innerHTML = kpiCards + chartHTML + topTeamsHTML + topTeamsByRegionHTML + creatorHTML + dupHTML;
+  body.innerHTML = kpiCards + chartHTML + topTeamsHTML + topTeamsByRegionHTML + detailHTML + dupHTML;
   flushMTChartQueue();
   syncZoneTabsEverywhere();
   loadAndRenderMtTopCauses(topTeams.map(t=>t.team), weeks); // โหลด Sub Root Cause จริง (ครอบคลุมทั้ง RELEASE/NO RELEASE) แบบ async ไม่บล็อกการ render หลัก
