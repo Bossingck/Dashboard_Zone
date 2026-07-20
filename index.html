@@ -340,6 +340,7 @@ body.day .src-rank-table thead th{background:#eef2fb}
   <button onclick="goTab('pdtreport',this)">📈 Report PDT</button>
   <button onclick="goTab('mtreport',this)">🛠️ MT Report</button>
   <button onclick="goTab('audit',this)">🕵️ Audit PDT Outlier</button>
+  <button onclick="goTab('plkd',this)">🏭 PLKD</button>
   <button onclick="goTab('pdt',this)" style="display:none">📅 PDT per Month</button>
   <button onclick="goTab('prov',this)" style="display:none">🏙️ Province</button>
 </div>
@@ -584,6 +585,67 @@ body.day .src-rank-table thead th{background:#eef2fb}
     <div style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:2px">🕵️ Audit PDT Outlier</div>
     <div style="font-size:11px;color:var(--tm);margin-bottom:16px">ตรวจสอบทีมที่ PDT สูงผิดปกติ (Node &gt; 5.0, OFC &gt; 4.0) — เกณฑ์นี้แยกจาก PDT Target ปกติ ใช้เฉพาะสำหรับ Audit เท่านั้น</div>
     <div id="audit-body">⏳ กำลังโหลด...</div>
+  </div>
+</div>
+
+<div id="tab-plkd" class="tab">
+  <div style="padding:16px">
+    <div style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:2px">🏭 PLKD Dashboard — Site ปลวกแดง</div>
+    <div style="font-size:11px;color:var(--tm);margin-bottom:12px">ครอบคลุม 168 Site Code (PLKD) — ดึง TT (WO Creator = System) จากตาราง tickets โดยจับคู่กับ Site ID โดยตรง · กรองตาม <b>Closed</b> เฉพาะเดือนนี้</div>
+
+    <div id="plkd-day-filter" class="mw-bar" style="margin-bottom:12px;flex-wrap:wrap;gap:4px"></div>
+
+    <div class="sh" style="margin-top:0"><span class="sh-t">📈 Service Availability — PLKD 168 Site</span><div class="sh-l"></div>
+      <span style="font-size:11px;color:var(--tm)" id="plkd-sa-avail-summary">—</span>
+    </div>
+    <div style="font-size:10.5px;color:var(--tm);margin:-6px 0 8px">
+      สูตร: ((1682460 − รวม Downtime นาที) / 1682460) × 100 — Downtime = Departed → Completed · กราฟรายวัน (เดือนนี้)
+    </div>
+    <div class="tw" style="padding:10px 12px;margin-bottom:16px;width:100%;box-sizing:border-box">
+      <div id="plkd-sa-avail-trend" style="width:100%;min-height:150px">⏳ กำลังโหลด...</div>
+    </div>
+
+    <div class="sh"><span class="sh-t">🔴 Repeat Fault — PLKD 168 Site</span><div class="sh-l"></div>
+      <span style="font-size:11px;color:var(--tm)" id="plkd-sa-count">—</span>
+      <button class="sp-btn" onclick="plkdExpandAllSites(true)">⬇ ขยายทั้งหมด</button>
+      <button class="sp-btn" onclick="plkdExpandAllSites(false)">⬆ ย่อทั้งหมด</button>
+      <button class="sp-btn" onclick="exportPlkdSaToCSV()">⬇ Export CSV</button>
+    </div>
+    <div style="font-size:10.5px;color:var(--tm);margin:-6px 0 8px">กรองตามวันที่เลือก (Closed) — คลิกที่แถว Site ID เพื่อขยาย/ย่อ ดู Alarm (ซ้ำ ≥2 ครั้ง ไฮไลต์แดง)</div>
+    <div class="tw"><div class="tsc"><table><thead><tr>
+      <th>#</th><th style="text-align:left">SITE ID</th><th>DOWNTIME รวม</th><th>TT ทั้งหมด (SA1–6)</th><th>Alarm ที่พบ</th><th>Alarm ซ้ำ (≥2 ครั้ง)</th><th>ปิดล่าสุด</th>
+    </tr></thead><tbody id="plkd-sa-body"><tr><td colspan="7" class="empty">⏳ กำลังโหลด...</td></tr></tbody></table></div></div>
+
+    <div class="sh"><span class="sh-t">📊 Plan — ปัญหาอยู่ที่ช่าง หรืองานยาก?</span><div class="sh-l"></div></div>
+    <div style="font-size:10.5px;color:var(--tm);margin:-6px 0 8px">วิเคราะห์จาก Root Cause / Sub Root Cause ของ TT ทั้ง 6 ทีม PLKD ในช่วงที่เลือก — แยกเป็น "งานยาก/โครงสร้าง" (อุปกรณ์/ไฟเบอร์/ไฟ/สภาพแวดล้อม) vs "ช่าง/กระบวนการ" (การติดตั้ง/คน/ขั้นตอน)</div>
+    <div id="plkd-plan-body" style="margin-bottom:16px">⏳ กำลังโหลด...</div>
+
+    <div class="sh"><span class="sh-t">📈 Trend Downtime เฉลี่ยรายสัปดาห์ — แยกทีม NODE / OFC</span><div class="sh-l"></div></div>
+    <div style="font-size:10.5px;color:var(--tm);margin:-6px 0 8px">
+      ค่า PDT รายสัปดาห์จริงจากตาราง pdt_weekly_summary (อัปโหลดจากไฟล์ Sum_in_Period_W##.xlsx) — เหมือนแหล่งข้อมูลที่แท็บ Report PDT ใช้ ครอบคลุมสัปดาห์ 19–28
+      (SY-EA-RYG-MUF-010 และ MUF-011 เป็นทีมที่เพิ่งเปิด มีข้อมูลตั้งแต่ W27 เป็นต้นไป)
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+      <div class="tw" style="padding:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--tx);margin-bottom:8px">🔵 ทีม NODE — NOD-001, MUF-010, MUF-011</div>
+        <div id="plkd-trend-nod">⏳ กำลังโหลด...</div>
+      </div>
+      <div class="tw" style="padding:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--tx);margin-bottom:8px">🟢 ทีม OFC — OFC-017, OFC-001(EX), OFC-005</div>
+        <div id="plkd-trend-ofc">⏳ กำลังโหลด...</div>
+      </div>
+    </div>
+
+    <div class="sh"><span class="sh-t">📋 PDT Team ปลวกแดง</span><div class="sh-l"></div></div>
+    <div style="font-size:10.5px;color:var(--tm);margin:-6px 0 8px">
+      PDT / Man Hour / 1st Arrive จาก pdt_weekly_summary (สัปดาห์ล่าสุด) · Sub Root Cause / Close Description (TOP จากข้อความจริง ไม่นับว่าง) / Fast Step จาก tickets วันที่เลือก
+    </div>
+    <div class="tw"><div class="tsc"><table><thead><tr>
+      <th style="text-align:left">TEAM</th><th>WORK DAYS</th><th>PDT</th><th>MAN HOUR / DAY</th>
+      <th style="text-align:left">SUB ROOT CAUSE (TOP)</th><th style="text-align:left">CLOSE DESCRIPTION (TOP)</th>
+      <th>1ST ARRIVE AVG.</th><th>FAST D→A<br><span style="font-weight:400;font-size:9px">≤5 น.</span></th>
+      <th>FAST A→C<br><span style="font-weight:400;font-size:9px">≤15 น.</span></th><th>TOTAL WO.<br>STEP FAST</th>
+    </tr></thead><tbody id="plkd-pdt-mh-body"></tbody></table></div></div>
   </div>
 </div>
 
@@ -3707,6 +3769,7 @@ function refreshAll(){
   if(document.getElementById('tab-pdtreport').classList.contains('active')) renderPDTReport();
   if(document.getElementById('tab-mtreport').classList.contains('active')) renderMTReport();
   if(document.getElementById('tab-audit').classList.contains('active')) renderAuditOutlierTab();
+  if(document.getElementById('tab-plkd').classList.contains('active')) renderPlkdTab();
 }
 
 // ═══ HIERARCHY ════════════════════════════════════════════════════
@@ -6344,6 +6407,7 @@ function goTab(name,btn){
   if(name==='pdtreport') renderPDTReport();
   if(name==='mtreport')  renderMTReport();
   if(name==='audit')     renderAuditOutlierTab();
+  if(name==='plkd')      renderPlkdTab();
 }
 
 // ═══ MT REPORT ═══════════════════════════════════════════════════
@@ -6580,6 +6644,599 @@ async function fetchWoCreatorNames(){
   rows.forEach(r=>{ _woCreatorNamesCache[r.code] = r.full_name; });
   return _woCreatorNamesCache;
 }
+// ═══ PLKD (ปลวกแดง) — 168 Site Code จาก Site_Code_PKD.xlsx ═══════════════════
+// จับคู่ตรงกับคอลัมน์ "Site ID" ในตาราง tickets (Supabase project pqnvdtxfgbhijsbdsngg) — ไม่ต้อง parse Subject เพราะ Site ID สะอาดและตรงอยู่แล้ว
+// TT = แถวที่ "WO Creator" = 'System' (ใบหลัก ตามนิยามเดียวกับส่วน MT Report ด้านบน)
+const PLKD_SITE_CODES = ['CBR0020','CBR0415','CBR0663','CBR0885','CBR0916','CBR0971','CBR1263','CBR1311','CBR1350','CBR1365','CBR1414','CBR1861','CBR1867','CBR3005','CBR4028','CBR5895','CBR5926','CBR5939','CBR5945','CBR5946','CBR5951','CBR5954','CBR6472','CBR6796','CBR6797','CBR7119','CBR7148','CBR7181','CBR7193','CBR7347','CBR7450','CBR7469','CBR7929','CBR7930','CBR8790','CBR8814','CBR8841','CBRA441','CBRA516','CBRA517','CBRA518','CBRC058','CBRC096','CBRC110','RYG0041','RYG0073','RYG0164','RYG0204','RYG0216','RYG0232','RYG0308','RYG0327','RYG0354','RYG0355','RYG0356','RYG0394','RYG0395','RYG0396','RYG0397','RYG0399','RYG0400','RYG0401','RYG0402','RYG0416','RYG0417','RYG0418','RYG0506','RYG0539','RYG0571','RYG0583','RYG0624','RYG0626','RYG0627','RYG0641','RYG0649','RYG0650','RYG0651','RYG0652','RYG0653','RYG0654','RYG0655','RYG0656','RYG0657','RYG0673','RYG0707','RYG0710','RYG0715','RYG0716','RYG0719','RYG0723','RYG0739','RYG0744','RYG0757','RYG0760','RYG1316','RYG1380','RYG1637','RYG1830','RYG2113','RYG4002','RYG4003','RYG6007','RYG6040','RYG6403','RYG6407','RYG6409','RYG6412','RYG6414','RYG6422','RYG6706','RYG6707','RYG6751','RYG6754','RYG6755','RYG6766','RYG7100','RYG7113','RYG7132','RYG7141','RYG7144','RYG7146','RYG7195','RYG7196','RYG7209','RYG7227','RYG7231','RYG7232','RYG7235','RYG7248','RYG7254','RYG7255','RYG7256','RYG7265','RYG7266','RYG7267','RYG7271','RYG7273','RYG7279','RYG7283','RYG7284','RYG7290','RYG7297','RYG7315','RYG7347','RYG7402','RYG7611','RYG7614','RYG7620','RYG7629','RYG7634','RYG7649','RYG7917','RYG7935','RYG7958','RYG7981','RYG7984','RYG7997','RYG8517','RYG8547','RYG8548','RYG8550','RYG8596','RYGC043','RYGC045','RYGC069','RYG7348','RYG7349','RYG7350'];
+const PLKD_TEAM_CODES = ['SY-EA-RYG-NOD-001','SY-EA-RYG-MUF-010','SY-EA-RYG-MUF-011','SY-EA-RYG-OFC-017','EX-EA-RYG-OFC-001','SY-EA-RYG-OFC-005'];
+const PLKD_TEAM_LABELS = { 'SY-EA-RYG-NOD-001':'NOD-001', 'SY-EA-RYG-MUF-010':'MUF-010', 'SY-EA-RYG-MUF-011':'MUF-011', 'SY-EA-RYG-OFC-017':'OFC-017', 'EX-EA-RYG-OFC-001':'OFC-001 (EX)', 'SY-EA-RYG-OFC-005':'OFC-005' };
+const PLKD_SA_SEVERITY_LEVELS = ['SA1','SA2','SA3','SA4','SA5','SA6']; // Severity SA1–SA6 (ใน DB เป็น SA1-4H, SA2-4H ฯลฯ)
+const PLKD_SA_CAPACITY_MIN = 1682460; // ฐานนาทีสำหรับคำนวณ Service Availability (168 Site PLKD)
+const PLKD_SA_TARGET_PCT = 99.5; // เป้า Service Availability — ต่ำกว่านี้ = ไม่ผ่าน
+const PLKD_FAST_DA_MAX_MIN = 5;  // Fast Step Departed → Arrive (≤5 นาที)
+const PLKD_FAST_AC_MAX_MIN = 15; // Fast Step Arrive → Completed (≤15 นาที)
+
+// สร้าง query string เอง (แทน URLSearchParams) เพื่อคุมการ encode ให้ตรงกับ PostgREST filter syntax (eq./like./in.()/or=())
+function plkdQS(pairs){
+  return pairs.map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
+}
+function plkdSaSeverityOrClause(){
+  return '(' + PLKD_SA_SEVERITY_LEVELS.map(l=>`Severity.like.${l}*`).join(',') + ')';
+}
+function plkdCloseDescKey(desc){
+  if(desc == null) return null;
+  const t = String(desc).trim().replace(/\s+/g, ' ');
+  return t || null;
+}
+async function fetchSupabaseTable(table, pairs){
+  const res = await fetch(`${MT_RAW_SUPABASE_URL}/rest/v1/${table}?${plkdQS(pairs)}`, {
+    headers:{ 'apikey': MT_RAW_ANON_KEY, 'Authorization':'Bearer '+MT_RAW_ANON_KEY }
+  });
+  if(!res.ok) throw new Error('HTTP '+res.status+' '+(await res.text().catch(()=>'')));
+  return res.json();
+}
+async function fetchTicketsREST(pairs){ return fetchSupabaseTable('tickets', pairs); }
+async function fetchPlkdPdtWeekly(){
+  const orClause = '(' + PLKD_TEAM_CODES.map(t=>`team.like.${t}*`).join(',') + ')';
+  return fetchSupabaseTable('pdt_weekly_summary', [
+    ['select', 'week_no,team,skill,work_day,pdt_per_day,man_hour_per_day,total_closed_wo,avg_first_arrive'],
+    ['or', orClause],
+    ['order', 'team.asc,week_no.asc'],
+  ]);
+}
+// ช่วง Closed เฉพาะเดือนปัจจุบัน (PLKD ใช้ตัวกรองของตัวเอง ไม่ผูก mw-bar ด้านบน)
+function plkdCurrentMonthInfo(){
+  const now = new Date();
+  const year = now.getFullYear(), month = now.getMonth()+1;
+  const lastDay = new Date(year, month, 0).getDate();
+  const mm = String(month).padStart(2,'0');
+  return {
+    year, month, lastDay,
+    from: `${year}-${mm}-01T00:00:00`,
+    to: `${year}-${mm}-${String(lastDay).padStart(2,'0')}T23:59:59`,
+  };
+}
+function plkdMonthClosedRangePairs(){
+  const { from, to } = plkdCurrentMonthInfo();
+  return [['Closed', `gte.${from}`], ['Closed', `lte.${to}`]];
+}
+function plkdDayKeyFromClosed(closedStr){
+  if(!closedStr) return null;
+  const d = new Date(closedStr);
+  if(isNaN(d)) return null;
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function plkdFilterRowsByDay(rows, dayKey){
+  if(!dayKey) return rows;
+  return (rows||[]).filter(r=> plkdDayKeyFromClosed(r['Closed']) === dayKey);
+}
+function plkdBuildDayFilterBar(){
+  const el = document.getElementById('plkd-day-filter');
+  if(!el) return;
+  const { year, month, lastDay } = plkdCurrentMonthInfo();
+  const thMonths = ['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const mm = String(month).padStart(2,'0');
+  let html = `<span class="mw-label">📅 ${thMonths[month]} ${year}:</span>`;
+  html += `<button class="fb${!plkdSelDay?' active':''}" onclick="plkdSetDay(null)">ทั้งเดือน</button>`;
+  for(let d=1; d<=lastDay; d++){
+    const key = `${year}-${mm}-${String(d).padStart(2,'0')}`;
+    html += `<button class="fb${plkdSelDay===key?' active':''}" onclick="plkdSetDay('${key}')" style="min-width:28px;padding:2px 6px">${d}</button>`;
+  }
+  el.innerHTML = html;
+}
+function plkdSetDay(dayKey){
+  plkdSelDay = dayKey;
+  plkdApplyDayFilter();
+}
+function plkdFirstArriveFromPdt(avgFirstArrive){
+  return hrToHHMM(parseHMS(avgFirstArrive));
+}
+function plkdTeamCode(teamField){ return String(teamField||'').split('(')[0].trim(); }
+function fmtPlkdDT(s){
+  if(!s) return '—';
+  const d = new Date(s); if(isNaN(d)) return '—';
+  return d.toLocaleString('th-TH',{year:'2-digit',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+}
+// Downtime = Completed − Departed (นาที) — ใช้ทั้ง Service Availability และ Repeat Fault
+function plkdDowntimeStr(departedStr, completedStr){
+  if(!departedStr || !completedStr) return '—';
+  const d = new Date(departedStr), cl = new Date(completedStr);
+  if(isNaN(d)||isNaN(cl)) return '—';
+  const ms = cl-d; if(ms<0) return '—';
+  const totalMin = Math.round(ms/60000);
+  const day = Math.floor(totalMin/1440), h = Math.floor((totalMin%1440)/60), m = totalMin%60;
+  return (day>0?day+'d ':'')+String(h).padStart(2,'0')+'h '+String(m).padStart(2,'0')+'m';
+}
+function plkdDowntimeMinutes(departedStr, completedStr){
+  if(!departedStr || !completedStr) return null;
+  const d = new Date(departedStr), cl = new Date(completedStr);
+  if(isNaN(d)||isNaN(cl)) return null;
+  const ms = cl-d; return ms<0 ? null : Math.round(ms/60000);
+}
+function plkdStepMinutes(fromStr, toStr){
+  if(!fromStr || !toStr) return null;
+  const a = new Date(fromStr), b = new Date(toStr);
+  if(isNaN(a)||isNaN(b)) return null;
+  const ms = b-a; return ms<0 ? null : Math.round(ms/60000);
+}
+function plkdServiceAvailabilityPct(totalDowntimeMin){
+  const cap = PLKD_SA_CAPACITY_MIN;
+  const dt = Math.max(0, Number(totalDowntimeMin)||0);
+  return Math.max(0, Math.min(100, ((cap - dt) / cap) * 100));
+}
+function plkdMinutesToStr(totalMin){
+  if(totalMin==null) return '—';
+  const d = Math.floor(totalMin/1440), h = Math.floor((totalMin%1440)/60), m = Math.round(totalMin%60);
+  return (d>0?d+'d ':'')+String(h).padStart(2,'0')+'h '+String(m).padStart(2,'0')+'m';
+}
+// ชื่อ Alarm ที่ใช้จัดกลุ่ม "Repeat Fault" — ใช้คอลัมน์ Alarm Description ตรงๆ (สะอาดกว่า parse จาก Subject เอง)
+// เผื่อกรณีไม่มีค่า ถอยไปตัดจาก Subject แทน (ช่วง NOC-...-TRUE- ซึ่งเป็นส่วนบอกประเภท Alarm เดียวกับที่ backend เก็บไว้ใน Alarm Description)
+function plkdAlarmKey(row){
+  if(row['Alarm Description']) return row['Alarm Description'].trim();
+  const subj = row['Subject']||'';
+  const m = subj.match(/(NOC-[^]*?)-TRUE-/);
+  if(m) return m[1].trim();
+  return subj ? subj.slice(0,80) : 'ไม่ระบุ Alarm';
+}
+// ตัด Subject ให้เหลือแค่ส่วน Detail หลังประเภท Alarm/Fault (ช่วงหลัง "-NOP-") เพราะประเภท Alarm โชว์อยู่แล้วในแถวด้านบน
+// ตัวอย่าง Subject เต็ม: ...-TRUE-TH-WW-EAS-RYG-NOP-RYG7232L_6NB02 Huawei-RAN GNSS Locked Satellites Insufficient up/down [U07]
+// จะเหลือ: RYG7232L_6NB02 Huawei-RAN GNSS Locked Satellites Insufficient up/down [U07]
+function plkdSubjectDetail(subject){
+  if(!subject) return '—';
+  const m = subject.match(/-NOP-(.+)$/);
+  return m ? m[1].trim() : subject.trim();
+}
+
+let _plkdSaRowsMonth = [], _plkdTeamTicketRowsMonth = [], _plkdPdtRows = [], plkdSelDay = null, _plkdLoadGen = 0;
+
+function plkdApplyDayFilter(){
+  plkdBuildDayFilterBar();
+  const saRows = plkdFilterRowsByDay(_plkdSaRowsMonth, plkdSelDay);
+  const teamRows = plkdFilterRowsByDay(_plkdTeamTicketRowsMonth, plkdSelDay);
+  const cntEl = document.getElementById('plkd-sa-count');
+  if(cntEl) cntEl.textContent = `พบทั้งหมด ${fmt(saRows.length)} ใบ`;
+  plkdRenderServiceAvailabilityTrend(_plkdSaRowsMonth, plkdSelDay);
+  renderPlkdSitePivot(saRows);
+  renderPlkdPlanAnalysis(teamRows);
+  plkdRenderTrendCharts(_plkdPdtRows);
+  renderPlkdPdtManHourTable(_plkdPdtRows, teamRows);
+}
+
+async function renderPlkdTab(){
+  const myGen = ++_plkdLoadGen;
+  const saBody = document.getElementById('plkd-sa-body');
+  const availTrend = document.getElementById('plkd-sa-avail-trend');
+  const planBody = document.getElementById('plkd-plan-body');
+  plkdBuildDayFilterBar();
+  saBody.innerHTML = '<tr><td colspan="7" class="empty">⏳ กำลังโหลด...</td></tr>';
+  if(availTrend) availTrend.innerHTML = '⏳ กำลังโหลด...';
+  if(planBody) planBody.innerHTML = '⏳ กำลังโหลด...';
+  const closedRange = plkdMonthClosedRangePairs();
+
+  // ── ตาราง 1: Repeat Fault — PLKD 168 Site (TT Severity SA1–6) ──
+  try{
+    const rows = await fetchTicketsREST([
+      ['select', 'Site ID,Work Order ID,Team,Severity,Root Cause,Sub Root Cause,Close Description,Subject,Alarm Description,Departed,Arrived,Completed,Created Time,Closed'],
+      ['WO Creator', 'eq.System'],
+      ['or', plkdSaSeverityOrClause()],
+      ['Site ID', `in.(${PLKD_SITE_CODES.join(',')})`],
+      ...closedRange,
+      ['order', 'Closed.desc'],
+      ['limit', '3000'],
+    ]);
+    if(myGen !== _plkdLoadGen) return;
+    _plkdSaRowsMonth = rows;
+    plkdApplyDayFilter();
+  }catch(err){
+    if(myGen !== _plkdLoadGen) return;
+    console.error('renderPlkdTab (SA) failed', err);
+    saBody.innerHTML = `<tr><td colspan="7" class="empty" style="color:var(--crit)">โหลดข้อมูลไม่สำเร็จ: ${escAttr(err.message)}</td></tr>`;
+    if(availTrend) availTrend.innerHTML = `<div style="color:var(--crit);font-size:11px">โหลดข้อมูลไม่สำเร็จ: ${escAttr(err.message)}</div>`;
+  }
+
+  // ── TT ของ 6 ทีม PLKD (Plan) + PDT table ──
+  try{
+    const orClause = '(' + PLKD_TEAM_CODES.map(t=>`Team.like.${t}*`).join(',') + ')';
+    const [teamRows, pdtRows] = await Promise.all([
+      fetchTicketsREST([
+        ['select', 'Site ID,Work Order ID,Team,Severity,Root Cause,Sub Root Cause,Close Description,Departed,Arrived,Completed,Created Time,Closed'],
+        ['WO Creator', 'eq.System'],
+        ['Site ID', `in.(${PLKD_SITE_CODES.join(',')})`],
+        ['or', orClause],
+        ...closedRange,
+        ['limit', '3000'],
+      ]),
+      fetchPlkdPdtWeekly(),
+    ]);
+    if(myGen !== _plkdLoadGen) return;
+    _plkdTeamTicketRowsMonth = teamRows;
+    _plkdPdtRows = pdtRows;
+    plkdApplyDayFilter();
+  }catch(err){
+    if(myGen !== _plkdLoadGen) return;
+    console.error('renderPlkdTab (team/pdt) failed', err);
+    if(planBody) planBody.innerHTML = `<div style="color:var(--crit);font-size:11px">โหลดข้อมูลไม่สำเร็จ: ${escAttr(err.message)}</div>`;
+    const nodEl = document.getElementById('plkd-trend-nod'), ofcEl = document.getElementById('plkd-trend-ofc');
+    if(nodEl) nodEl.innerHTML = `<div style="color:var(--crit);font-size:11px">โหลดข้อมูลไม่สำเร็จ: ${escAttr(err.message)}</div>`;
+    if(ofcEl) ofcEl.innerHTML = `<div style="color:var(--crit);font-size:11px">โหลดข้อมูลไม่สำเร็จ: ${escAttr(err.message)}</div>`;
+    const pdtBody = document.getElementById('plkd-pdt-mh-body');
+    if(pdtBody) pdtBody.innerHTML = `<tr><td colspan="10" class="empty" style="color:var(--crit)">โหลดข้อมูลไม่สำเร็จ: ${escAttr(err.message)}</td></tr>`;
+  }
+}
+
+// ── Service Availability Trend (รายวัน — เดือนนี้) ──
+function plkdRenderServiceAvailabilityTrend(monthRows, highlightDay){
+  const el = document.getElementById('plkd-sa-avail-trend');
+  const summaryEl = document.getElementById('plkd-sa-avail-summary');
+  if(!el) return;
+  const filtered = plkdFilterRowsByDay(monthRows, highlightDay);
+  const totalDT = filtered.reduce((s,r)=>{ const m=plkdDowntimeMinutes(r['Departed'],r['Completed']); return s+(m||0); }, 0);
+  const overallPct = plkdServiceAvailabilityPct(totalDT);
+  const dayLabel = highlightDay ? highlightDay.slice(8)+'/'+highlightDay.slice(5,7) : 'ทั้งเดือน';
+  if(summaryEl) summaryEl.textContent = `${dayLabel}: ${overallPct.toFixed(3)}% (Downtime รวม ${plkdMinutesToStr(totalDT)})`;
+
+  const { year, month, lastDay } = plkdCurrentMonthInfo();
+  const mm = String(month).padStart(2,'0');
+  const byDay = {};
+  (monthRows||[]).forEach(r=>{
+    const dk = plkdDayKeyFromClosed(r['Closed']);
+    if(!dk) return;
+    if(!byDay[dk]) byDay[dk] = 0;
+    const m = plkdDowntimeMinutes(r['Departed'], r['Completed']);
+    if(m!=null) byDay[dk] += m;
+  });
+  const days = [];
+  for(let d=1; d<=lastDay; d++){
+    const key = `${year}-${mm}-${String(d).padStart(2,'0')}`;
+    days.push({ key, label:String(d), downtime: byDay[key]||0 });
+  }
+  const data = days.map(d=>({ ...d, pct: plkdServiceAvailabilityPct(d.downtime) }));
+  const target = PLKD_SA_TARGET_PCT;
+  const w = Math.max(el.offsetWidth || el.parentElement?.offsetWidth || 900, 480);
+  const h = 165, padL=44, padR=14, padT=16, padB=26;
+  const plotW=w-padL-padR, plotH=h-padT-padB;
+  const dataMin = data.length ? Math.min(...data.map(d=>d.pct)) : target;
+  const yMin = Math.max(98, Math.min(dataMin, target) - 0.08);
+  const yMax = 100;
+  const xStep = data.length>1 ? plotW/(data.length-1) : 0;
+  const xPos = i => padL + i*xStep;
+  const yPos = v => padT + plotH - ((v-yMin)/(yMax-yMin||1))*plotH;
+  const xLabelStep = data.length>20 ? Math.ceil(data.length/18) : (data.length>10 ? 2 : 1);
+  let svg = `<svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMinYMid meet" style="display:block;overflow:visible">`;
+  for(let g=0; g<=4; g++){
+    const v = yMin + (yMax-yMin)*g/4, y = yPos(v);
+    svg += `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${w-padR}" y2="${y.toFixed(1)}" stroke="var(--b)" stroke-width="1"/>`;
+    svg += `<text x="${padL-5}" y="${(y+3).toFixed(1)}" font-size="8" fill="var(--tm)" text-anchor="end">${v.toFixed(2)}%</text>`;
+  }
+  const ty = yPos(target);
+  svg += `<line x1="${padL}" y1="${ty.toFixed(1)}" x2="${w-padR}" y2="${ty.toFixed(1)}" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.85"/>`;
+  svg += `<text x="${w-padR+2}" y="${(ty+3).toFixed(1)}" font-size="8" fill="#ef4444" font-weight="700">เป้า ${target.toFixed(2)}%</text>`;
+  let path = '';
+  data.forEach((d,i)=>{ const x=xPos(i), y=yPos(d.pct); path += (path?' L':'M')+x.toFixed(1)+' '+y.toFixed(1); });
+  if(path) svg += `<path d="${path}" fill="none" stroke="#22c55e" stroke-width="2.2" opacity="0.9"/>`;
+  data.forEach((d,i)=>{
+    const x=xPos(i), y=yPos(d.pct);
+    const isHi = highlightDay && d.key===highlightDay;
+    const belowTarget = d.pct < target;
+    if(d.downtime===0 && !isHi) return;
+    const r = isHi ? 6 : 3;
+    const fill = isHi ? '#facc15' : (belowTarget ? '#ef4444' : '#22c55e');
+    if(isHi) svg += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="none" stroke="#facc15" stroke-width="2.2" opacity="0.75"/>`;
+    svg += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${fill}" style="cursor:pointer" onclick="plkdSetDay('${d.key}')"/>`;
+    if(isHi || d.downtime>0){
+      svg += `<text x="${x.toFixed(1)}" y="${(y-(isHi?13:8)).toFixed(1)}" font-size="${isHi?9:7.5}" fill="${fill}" text-anchor="middle" font-weight="${isHi||belowTarget?700:400}">${d.pct.toFixed(2)}%</text>`;
+    }
+    if(i%xLabelStep===0 || isHi) svg += `<text x="${x.toFixed(1)}" y="${h-6}" font-size="7.5" fill="${isHi?'#facc15':'var(--tm)'}" text-anchor="middle" font-weight="${isHi?700:400}">${d.label}</text>`;
+  });
+  svg += `</svg>`;
+  el.innerHTML = svg + `<div style="font-size:9.5px;color:var(--tm);margin-top:4px">🟢 ผ่านเป้า · 🔴 ต่ำกว่า ${target.toFixed(2)}% · 🟡 วันที่เลือก · เส้นประแดง = เป้า ${target.toFixed(2)}%</div>`;
+}
+
+// ── Pivot: Site ID (ขยาย/ย่อได้) → Alarm ที่พบในไซต์นั้น กี่ครั้ง (Repeat Fault) ──
+function plkdSiteSafeId(s){ return 'ps_' + String(s).replace(/[^a-zA-Z0-9ก-๙]/g,'_').slice(0,60); }
+function buildPlkdSiteTree(rows){
+  const tree = {};
+  rows.forEach(r=>{
+    const site = r['Site ID'] || 'ไม่ระบุ Site';
+    const alarm = plkdAlarmKey(r);
+    if(!tree[site]) tree[site] = { total:0, downtimeSum:0, lastClosed:null, alarms:{} };
+    tree[site].total++;
+    const dt = plkdDowntimeMinutes(r['Departed'], r['Completed']);
+    if(dt!=null) tree[site].downtimeSum += dt;
+    const closedD = r['Closed'] ? new Date(r['Closed']) : null;
+    if(closedD && !isNaN(closedD) && (!tree[site].lastClosed || closedD > tree[site].lastClosed)) tree[site].lastClosed = closedD;
+    if(!tree[site].alarms[alarm]) tree[site].alarms[alarm] = { count:0, downtimeSum:0, rows:[] };
+    tree[site].alarms[alarm].count++;
+    if(dt!=null) tree[site].alarms[alarm].downtimeSum += dt;
+    tree[site].alarms[alarm].rows.push(r);
+  });
+  return tree;
+}
+function renderPlkdSitePivot(rows){
+  const body = document.getElementById('plkd-sa-body');
+  if(!rows.length){
+    body.innerHTML = '<tr><td colspan="7" class="empty">ไม่พบ TT Severity SA1–6 ในกลุ่ม Site PLKD ตามช่วงที่เลือก</td></tr>';
+    return;
+  }
+  const tree = buildPlkdSiteTree(rows);
+  const siteEntries = Object.entries(tree).map(([site,data])=>{
+    const alarmList = Object.entries(data.alarms);
+    const repeatCount = alarmList.filter(([,a])=>a.count>=2).length;
+    const maxAlarmCount = Math.max(...alarmList.map(([,a])=>a.count));
+    return { site, data, repeatCount, maxAlarmCount, alarmTypes: alarmList.length };
+  }).sort((a,b)=> b.repeatCount - a.repeatCount || b.maxAlarmCount - a.maxAlarmCount || b.data.total - a.data.total);
+
+  let html = '';
+  siteEntries.forEach(({site,data,repeatCount,alarmTypes})=>{
+    const id = plkdSiteSafeId(site);
+    const hasRepeat = repeatCount>0;
+    html += `<tr class="plkd-rc-row" style="cursor:pointer;background:${hasRepeat?'rgba(239,68,68,.08)':'rgba(37,99,235,.05)'}" onclick="plkdToggleCause('${id}')">
+      <td></td>
+      <td style="text-align:left;font-family:'JetBrains Mono',monospace;font-weight:700"><span id="arrow-${id}" style="display:inline-block;width:14px">▸</span>${escAttr(site)}</td>
+      <td style="text-align:center;font-weight:700;color:var(--crit)">${plkdMinutesToStr(data.downtimeSum)}</td>
+      <td style="text-align:center;font-weight:700">${fmt(data.total)}</td>
+      <td style="text-align:center">${fmt(alarmTypes)}</td>
+      <td style="text-align:center;font-weight:800;color:${hasRepeat?'var(--crit)':'var(--tm)'}">${hasRepeat?('🔁 '+fmt(repeatCount)):'—'}</td>
+      <td style="text-align:center;font-size:10.5px;white-space:nowrap">${data.lastClosed?fmtPlkdDT(data.lastClosed.toISOString()):'—'}</td>
+    </tr>`;
+    const alarmEntries = Object.entries(data.alarms).sort((a,b)=>b[1].count-a[1].count);
+    alarmEntries.forEach(([alarm,adata])=>{
+      const isRepeat = adata.count>=2;
+      const lastDT = adata.rows.reduce((max,r)=>{ const d=r['Closed']?new Date(r['Closed']):null; return (d && !isNaN(d) && (!max||d>max)) ? d : max; }, null);
+      const alarmId = id + '_' + plkdCauseSafeId(alarm);
+      html += `<tr data-parent="${id}" style="display:none;${isRepeat?'background:rgba(239,68,68,.05)':''};cursor:pointer" onclick="plkdToggleAlarm('${alarmId}')">
+        <td></td>
+        <td style="padding-left:34px;font-size:11px;color:${isRepeat?'var(--crit)':'var(--tx)'};font-weight:${isRepeat?'700':'400'}"><span id="arrow2-${alarmId}" style="display:inline-block;width:12px;font-size:9px">▸</span>${escAttr(alarm)}</td>
+        <td style="text-align:center;font-size:11px;font-weight:700;color:var(--crit)">${plkdMinutesToStr(adata.downtimeSum)}</td>
+        <td style="text-align:center;font-size:11px;font-weight:${isRepeat?'800':'600'};color:${isRepeat?'var(--crit)':'var(--tx)'}">${adata.count} ครั้ง</td>
+        <td colspan="2"></td>
+        <td style="text-align:center;font-size:10.5px;color:var(--tm)">${lastDT?fmtPlkdDT(lastDT.toISOString()):'—'}</td>
+      </tr>`;
+      const sortedTtRows = [...adata.rows].sort((a,b)=> new Date(b['Closed']||0) - new Date(a['Closed']||0));
+      html += `<tr data-parent2="${alarmId}" style="display:none">
+        <td colspan="7" style="padding:6px 10px 10px 46px;background:rgba(255,255,255,.02)">
+          <table style="width:100%;border-collapse:collapse">
+            <thead><tr style="font-size:10px;color:var(--tm)">
+              <th style="text-align:left;padding:3px 6px">TT (Work Order ID)</th><th style="text-align:left;padding:3px 6px">Subject</th><th style="padding:3px 6px">Severity</th>
+              <th style="text-align:left;padding:3px 6px">Sub Root Cause</th><th style="text-align:left;padding:3px 6px">Close Description</th>
+              <th style="padding:3px 6px">Departed</th><th style="padding:3px 6px">Completed</th><th style="padding:3px 6px">Downtime</th>
+            </tr></thead>
+            <tbody>${sortedTtRows.map(r=>`
+              <tr style="font-size:10.5px;border-top:1px solid var(--b)">
+                <td style="padding:3px 6px;font-family:'JetBrains Mono',monospace">${escAttr(r['Work Order ID'])||'—'}</td>
+                <td style="padding:3px 6px;max-width:300px;white-space:normal;word-break:break-word;color:var(--tm)">${escAttr(plkdSubjectDetail(r['Subject']))}</td>
+                <td style="padding:3px 6px;text-align:center"><span class="pill" style="background:var(--crit-bg);color:var(--crit);font-size:9.5px;padding:1px 6px">${escAttr(r['Severity'])||'—'}</span></td>
+                <td style="padding:3px 6px">${escAttr(r['Sub Root Cause'])||'—'}</td>
+                <td style="padding:3px 6px;max-width:260px;white-space:normal;word-break:break-word;color:var(--tm)">${escAttr(r['Close Description'])||'—'}</td>
+                <td style="padding:3px 6px;text-align:center;white-space:nowrap">${fmtPlkdDT(r['Departed'])}</td>
+                <td style="padding:3px 6px;text-align:center;white-space:nowrap">${fmtPlkdDT(r['Completed'])}</td>
+                <td style="padding:3px 6px;text-align:center;font-weight:600">${plkdDowntimeStr(r['Departed'], r['Completed'])}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </td>
+      </tr>`;
+    });
+  });
+  body.innerHTML = html;
+}
+function plkdToggleAlarm(alarmId){
+  const arrow = document.getElementById('arrow2-'+alarmId);
+  const rows = document.querySelectorAll(`tr[data-parent2="${alarmId}"]`);
+  const willShow = rows.length && rows[0].style.display === 'none';
+  rows.forEach(tr=>{ tr.style.display = willShow ? '' : 'none'; });
+  if(arrow) arrow.textContent = willShow ? '▾' : '▸';
+}
+function plkdExpandAllSites(expand){
+  document.querySelectorAll('#plkd-sa-body tr[data-parent]').forEach(tr=>{ tr.style.display = expand ? '' : 'none'; });
+  document.querySelectorAll('#plkd-sa-body tr.plkd-rc-row span[id^="arrow-"]').forEach(a=>{ a.textContent = expand ? '▾' : '▸'; });
+  // ย่อรายละเอียด TT ของ Alarm กลับเสมอเวลา "ย่อทั้งหมด" กันมึนตา ส่วน "ขยายทั้งหมด" ไม่ auto-ขยายลึกขนาดนั้น
+  if(!expand){
+    document.querySelectorAll('#plkd-sa-body tr[data-parent2]').forEach(tr=>{ tr.style.display = 'none'; });
+    document.querySelectorAll('#plkd-sa-body span[id^="arrow2-"]').forEach(a=>{ a.textContent = '▸'; });
+  }
+}
+
+
+// ── Plan: วิเคราะห์สาเหตุ — ช่าง vs งานยาก ──
+function plkdClassifyCause(rootCause, subRootCause){
+  const txt = ((rootCause||'')+' '+(subRootCause||'')).toLowerCase();
+  const techKw = ['improper','human','configuration','process','procedure','installation','ติดตั้งไม่','คน','ขั้นตอน','กระบวนการ','ปฏิบัติ','operational'];
+  const hardKw = ['hardware','fiber','power','temperature','vandal','rru','antenna','transmission','facility','break','เบรก','ไฟเบอร์','ฮาร์ดแวร์','อุณหภูมิ','ไฟฟ้า','โครงสร้าง','equipment','plant'];
+  if(hardKw.some(k=>txt.includes(k))) return 'hard';
+  if(techKw.some(k=>txt.includes(k))) return 'tech';
+  if(/network|outside|inside|plant/i.test(txt)) return 'hard';
+  return 'hard'; // default งานยาก/โครงสร้าง ถ้าไม่ match
+}
+function renderPlkdPlanAnalysis(rows){
+  const el = document.getElementById('plkd-plan-body');
+  if(!el) return;
+  if(!rows.length){ el.innerHTML = '<div class="empty" style="padding:14px">ไม่พบข้อมูล TT ของ 6 ทีม PLKD ในช่วงที่เลือก</div>'; return; }
+  const buckets = { hard:{label:'🔧 งานยาก / โครงสร้าง', count:0, subs:{}}, tech:{label:'👷 ช่าง / กระบวนการ', count:0, subs:{}} };
+  rows.forEach(r=>{
+    const cat = plkdClassifyCause(r['Root Cause'], r['Sub Root Cause']);
+    buckets[cat].count++;
+    const sc = r['Sub Root Cause'] || r['Root Cause'] || 'ไม่ระบุ';
+    buckets[cat].subs[sc] = (buckets[cat].subs[sc]||0)+1;
+  });
+  const total = rows.length;
+  const hardPct = (buckets.hard.count/total*100).toFixed(1);
+  const techPct = (buckets.tech.count/total*100).toFixed(1);
+  const verdict = buckets.hard.count >= buckets.tech.count
+    ? `สรุป: ปัญหาหลักมาจาก <b style="color:var(--warn)">งานยาก/โครงสร้าง</b> (${hardPct}%) — อุปกรณ์/ไฟเบอร์/ไฟ/สภาพแวดล้อม มากกว่าปัญหาช่าง`
+    : `สรุป: ปัญหาหลักมาจาก <b style="color:var(--crit)">ช่าง/กระบวนการ</b> (${techPct}%) — การติดตั้ง/ขั้นตอนทำงาน มากกว่างานยาก`;
+  function topSubs(subs, n){
+    return Object.entries(subs).sort((a,b)=>b[1]-a[1]).slice(0,n)
+      .map(([s,c])=>`<li style="margin:3px 0;font-size:11px">${escAttr(s)} <span style="color:var(--tm)">(${c})</span></li>`).join('');
+  }
+  el.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <div class="tw" style="padding:14px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px">${buckets.hard.label} — ${fmt(buckets.hard.count)} ใบ (${hardPct}%)</div>
+      <ul style="margin:0;padding-left:18px;max-height:180px;overflow-y:auto">${topSubs(buckets.hard.subs,8)||'<li style="color:var(--tm)">—</li>'}</ul>
+    </div>
+    <div class="tw" style="padding:14px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px">${buckets.tech.label} — ${fmt(buckets.tech.count)} ใบ (${techPct}%)</div>
+      <ul style="margin:0;padding-left:18px;max-height:180px;overflow-y:auto">${topSubs(buckets.tech.subs,8)||'<li style="color:var(--tm)">—</li>'}</ul>
+    </div>
+  </div>
+  <div style="margin-top:10px;padding:10px 14px;background:var(--surf2);border:1px solid var(--brd);border-radius:8px;font-size:12px">${verdict}</div>`;
+}
+
+function plkdCauseSafeId(s){ return 'pc_' + String(s).replace(/[^a-zA-Z0-9ก-๙]/g,'_').slice(0,60); }
+function plkdWeekKey(d){
+  const onejan = new Date(d.getFullYear(),0,1);
+  const week = Math.ceil((((d - onejan) / 86400000) + onejan.getDay()+1)/7);
+  return d.getFullYear()+'-W'+String(week).padStart(2,'0');
+}
+function buildPlkdTeamTicketStats(ticketRows){
+  const stats = {};
+  PLKD_TEAM_CODES.forEach(t=>{ stats[t] = { subs:{}, closes:{}, closeMissing:0, fastDA:0, fastAC:0, fastTotal:0 }; });
+  (ticketRows||[]).forEach(r=>{
+    const tc = plkdTeamCode(r['Team']);
+    if(!stats[tc]) return;
+    const s = stats[tc];
+    const sc = r['Sub Root Cause'] || '—';
+    s.subs[sc] = (s.subs[sc]||0)+1;
+    const cd = plkdCloseDescKey(r['Close Description']);
+    if(cd) s.closes[cd] = (s.closes[cd]||0)+1;
+    else s.closeMissing++;
+    const da = plkdStepMinutes(r['Departed'], r['Arrived']);
+    const ac = plkdStepMinutes(r['Arrived'], r['Completed']);
+    let isFast = false;
+    if(da!=null && da <= PLKD_FAST_DA_MAX_MIN){ s.fastDA++; isFast = true; }
+    if(ac!=null && ac <= PLKD_FAST_AC_MAX_MIN){ s.fastAC++; isFast = true; }
+    if(isFast) s.fastTotal++;
+  });
+  return stats;
+}
+function plkdTopEntry(map){
+  const e = Object.entries(map||{}).sort((a,b)=>b[1]-a[1])[0];
+  return e ? { text:e[0], count:e[1] } : null;
+}
+function plkdToggleCause(id){
+  const arrow = document.getElementById('arrow-'+id);
+  const rows = document.querySelectorAll(`tr[data-parent="${id}"]`);
+  const willShow = rows.length && rows[0].style.display === 'none';
+  rows.forEach(tr=>{ tr.style.display = willShow ? '' : 'none'; });
+  if(arrow) arrow.textContent = willShow ? '▾' : '▸';
+}
+
+// ═══ Trend PDT รายสัปดาห์ (ค่าจริงจาก pdt_weekly_summary) แยกทีม NODE / OFC ═══
+const PLKD_NOD_TEAMS = ['SY-EA-RYG-NOD-001','SY-EA-RYG-MUF-010','SY-EA-RYG-MUF-011'];
+const PLKD_OFC_TEAMS = ['SY-EA-RYG-OFC-017','EX-EA-RYG-OFC-001','SY-EA-RYG-OFC-005'];
+function plkdRenderTrendCharts(pdtRows){
+  const nodEl = document.getElementById('plkd-trend-nod');
+  const ofcEl = document.getElementById('plkd-trend-ofc');
+  if(nodEl) nodEl.innerHTML = plkdBuildPdtTrendSvg(pdtRows, PLKD_NOD_TEAMS);
+  if(ofcEl) ofcEl.innerHTML = plkdBuildPdtTrendSvg(pdtRows, PLKD_OFC_TEAMS);
+}
+function plkdBuildPdtTrendSvg(pdtRows, teamList){
+  const perTeamWeek = {};
+  teamList.forEach(t=>{ perTeamWeek[t] = {}; });
+  const allWeeks = new Set();
+  pdtRows.forEach(r=>{
+    const tc = plkdTeamCode(r.team);
+    if(!teamList.includes(tc)) return;
+    const wk = Number(r.week_no);
+    if(!wk) return;
+    allWeeks.add(wk);
+    const v = Number(r.pdt_per_day);
+    if(isNaN(v)) return;
+    perTeamWeek[tc][wk] = v;
+  });
+  const weeks = [...allWeeks].sort((a,b)=>a-b);
+  if(!weeks.length) return '<div style="color:var(--tm);font-size:11px;padding:20px;text-align:center">ไม่มีข้อมูลในช่วงที่เลือก</div>';
+
+  const colors = ['#60a5fa','#4ade80','#f472b6','#facc15','#a78bfa','#fb923c'];
+  const w = 480, h = 160, padL=32, padB=22, padT=10, padR=10;
+  const plotW = w-padL-padR, plotH = h-padT-padB;
+
+  const series = teamList.map(t=> weeks.map(wk=> perTeamWeek[t][wk]!=null ? perTeamWeek[t][wk] : null));
+  let maxVal = 1;
+  series.forEach(s=> s.forEach(v=>{ if(v!=null && v>maxVal) maxVal = v; }));
+  maxVal = Math.ceil(maxVal*1.15);
+
+  const xStep = weeks.length>1 ? plotW/(weeks.length-1) : 0;
+  const xPos = i => padL + i*xStep;
+  const yPos = v => padT + plotH - (v/maxVal)*plotH;
+
+  let svg = `<svg width="100%" viewBox="0 0 ${w} ${h}" style="overflow:visible">`;
+  for(let g=0; g<=4; g++){
+    const val = maxVal/4*g, y = yPos(val);
+    svg += `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${w-padR}" y2="${y.toFixed(1)}" stroke="var(--b)" stroke-width="1"/>`;
+    svg += `<text x="${padL-4}" y="${(y+3).toFixed(1)}" font-size="8" fill="var(--tm)" text-anchor="end">${val.toFixed(1)}</text>`;
+  }
+  weeks.forEach((wk,i)=>{
+    const x = xPos(i);
+    svg += `<text x="${x.toFixed(1)}" y="${h-6}" font-size="7.5" fill="var(--tm)" text-anchor="middle">W${wk}</text>`;
+  });
+  series.forEach((s,si)=>{
+    const color = colors[si % colors.length];
+    let path = '';
+    s.forEach((v,i)=>{ if(v==null) return; const x=xPos(i), y=yPos(v); path += (path?' L':'M')+x.toFixed(1)+' '+y.toFixed(1); });
+    if(path) svg += `<path d="${path}" fill="none" stroke="${color}" stroke-width="2"/>`;
+    s.forEach((v,i)=>{ if(v==null) return; const x=xPos(i), y=yPos(v); svg += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.5" fill="${color}"/>`; });
+  });
+  svg += `</svg>`;
+  const legend = teamList.map((t,i)=>`<span style="display:inline-flex;align-items:center;gap:4px;margin-right:12px;font-size:10px;color:var(--tm)"><span style="width:8px;height:8px;border-radius:50%;background:${colors[i%colors.length]};display:inline-block"></span>${escAttr(PLKD_TEAM_LABELS[t]||t)}</span>`).join('');
+  return svg + `<div style="margin-top:6px">${legend}</div>`;
+}
+
+// ═══ PDT / Man Hour ของ 6 ทีม — ค่าจริงจาก pdt_weekly_summary + สถิติจาก tickets ═══
+function renderPlkdPdtManHourTable(pdtRows, ticketRows){
+  const body = document.getElementById('plkd-pdt-mh-body');
+  if(!body) return;
+  const latestByTeam = {};
+  pdtRows.forEach(r=>{
+    const tc = plkdTeamCode(r.team);
+    const wk = Number(r.week_no);
+    if(!latestByTeam[tc] || wk > latestByTeam[tc].week_no) latestByTeam[tc] = {...r, week_no: wk};
+  });
+  const tStats = buildPlkdTeamTicketStats(ticketRows);
+  body.innerHTML = PLKD_TEAM_CODES.map(tc=>{
+    const t = latestByTeam[tc];
+    const st = tStats[tc] || {};
+    const topSub = plkdTopEntry(st.subs);
+    const topClose = plkdTopEntry(st.closes);
+    const closeMissingNote = st.closeMissing ? ` <span style="color:var(--tm);font-size:9px">(ว่าง ${st.closeMissing} ใบ)</span>` : '';
+    const firstArrive = plkdFirstArriveFromPdt(t?.avg_first_arrive);
+    if(!t){
+      return `<tr>
+        <td style="font-family:'JetBrains Mono',monospace;font-weight:700">${escAttr(PLKD_TEAM_LABELS[tc]||tc)}</td>
+        <td colspan="9" style="color:var(--crit);font-size:11px">⚠️ ยังไม่มีข้อมูล PDT ใน pdt_weekly_summary</td>
+      </tr>`;
+    }
+    const fastStyle = v => v>0 ? 'color:var(--crit);font-weight:800' : 'color:var(--tm)';
+    return `<tr>
+      <td style="font-family:'JetBrains Mono',monospace;font-weight:700">${escAttr(PLKD_TEAM_LABELS[tc]||tc)}</td>
+      <td style="text-align:center">${fmt(Number(t.work_day))}</td>
+      <td style="text-align:center;font-weight:700">${Number(t.pdt_per_day).toFixed(2)}</td>
+      <td style="text-align:center;font-weight:700">${Number(t.man_hour_per_day).toFixed(2)}</td>
+      <td style="font-size:10.5px;max-width:200px;white-space:normal;word-break:break-word">${topSub ? escAttr(topSub.text)+` <span style="color:var(--tm)">(${topSub.count})</span>` : '—'}</td>
+      <td style="font-size:10.5px;max-width:220px;white-space:normal;word-break:break-word;color:var(--tm)">${topClose ? escAttr(topClose.text.slice(0,120))+(topClose.text.length>120?'…':'')+` <span style="color:var(--tm)">(${topClose.count})</span>`+closeMissingNote : (st.closeMissing ? `—${closeMissingNote}` : '—')}</td>
+      <td style="text-align:center;font-weight:600">${firstArrive}</td>
+      <td style="text-align:center;${fastStyle(st.fastDA||0)}">${st.fastDA||0}</td>
+      <td style="text-align:center;${fastStyle(st.fastAC||0)}">${st.fastAC||0}</td>
+      <td style="text-align:center;${fastStyle(st.fastTotal||0)}">${st.fastTotal||0}</td>
+    </tr>`;
+  }).join('');
+}
+
+function exportPlkdSaToCSV(){
+  const rows = plkdFilterRowsByDay(_plkdSaRowsMonth, plkdSelDay);
+  if(!rows.length){ alert('ยังไม่มีข้อมูลให้ Export'); return; }
+  const cols = [
+    {key:'Site ID',label:'Site ID'},{key:'Work Order ID',label:'Work Order ID'},{key:'TeamCode',label:'Team'},
+    {key:'Alarm',label:'Alarm'},{key:'Severity',label:'Severity'},{key:'Sub Root Cause',label:'Sub Root Cause'},{key:'Close Description',label:'Close Description'},
+    {key:'Departed',label:'Departed'},{key:'Completed',label:'Completed'},{key:'Downtime',label:'Downtime (Departed to Completed)'},
+  ];
+  const exportData = rows.map(r=>({...r, TeamCode:plkdTeamCode(r['Team']), Alarm:plkdAlarmKey(r), Downtime: plkdDowntimeStr(r['Departed'], r['Completed'])}));
+  const wb = XLSX.utils.book_new();
+  const ws = xlsxSheetFromRows(cols, exportData);
+  XLSX.utils.book_append_sheet(wb, ws, 'PLKD SA');
+  xlsxDownload(wb, `PLKD_SA_Severity_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
 function cfSafeId(code){ return String(code).replace(/[^a-zA-Z0-9_-]/g,'_'); }
 let _cfNameLoadGen = 0;
 async function loadAndRenderCreatorNames(codes){
