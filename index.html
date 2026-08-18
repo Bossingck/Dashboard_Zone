@@ -622,9 +622,9 @@ body.day .src-rank-table thead th{background:#eef2fb}
     </div>
     <div style="font-size:10.5px;color:var(--tm);margin:-6px 0 8px">ข้อมูลดิบทุกใบตามวันที่เลือก (Closed) — เรียงตามเวลาปิดล่าสุด</div>
     <div class="tw"><div class="tsc" style="max-height:480px"><table><thead><tr>
-      <th style="text-align:left">SOURCE TICKET ID</th><th>SEVERITY</th><th style="text-align:left;min-width:220px">SUBJECT</th>
+      <th style="text-align:left">SOURCE TICKET ID</th><th style="text-align:left">TEAM CODE</th><th>SEVERITY</th><th style="text-align:left;min-width:220px">SUBJECT</th>
       <th>ARRIVE TIME</th><th style="text-align:left">ROOT CAUSE</th><th style="text-align:left;min-width:200px">CLOSED DESCRIPTION</th><th>DOWNTIME</th>
-    </tr></thead><tbody id="plkd-raw-body"><tr><td colspan="7" class="empty">⏳ กำลังโหลด...</td></tr></tbody></table></div></div>
+    </tr></thead><tbody id="plkd-raw-body"><tr><td colspan="8" class="empty">⏳ กำลังโหลด...</td></tr></tbody></table></div></div>
 
     <div class="sh"><span class="sh-t">📈 Trend Downtime เฉลี่ยรายสัปดาห์ — แยกทีม NODE / OFC</span><div class="sh-l"></div></div>
     <div style="font-size:10.5px;color:var(--tm);margin:-6px 0 8px">
@@ -6726,7 +6726,12 @@ function plkdSetDay(dayKey){
 function plkdFirstArriveFromPdt(avgFirstArrive){
   return hrToHHMM(parseHMS(avgFirstArrive));
 }
-function plkdTeamCode(teamField){ return String(teamField||'').split('(')[0].trim(); }
+// SY-EA-RYG-MUF-011 กับ SY-EA-RYG-NOD-011 คือทีมเดียวกัน (ชื่อใน DB สะกดไม่ตรงกัน) — รวมเป็นโค้ดเดียว
+const PLKD_TEAM_CODE_ALIASES = { 'SY-EA-RYG-NOD-011': 'SY-EA-RYG-MUF-011' };
+function plkdTeamCode(teamField){
+  const raw = String(teamField||'').split('(')[0].trim();
+  return PLKD_TEAM_CODE_ALIASES[raw] || raw;
+}
 function fmtPlkdDT(s){
   if(!s) return '—';
   const d = new Date(s); if(isNaN(d)) return '—';
@@ -6836,7 +6841,8 @@ async function renderPlkdTab(){
 
   // ── TT ของ 6 ทีม PLKD (Plan) + PDT table ──
   try{
-    const orClause = '(' + PLKD_TEAM_CODES.map(t=>`Team.like.${t}*`).join(',') + ')';
+    const plkdTeamCodesForFetch = [...PLKD_TEAM_CODES, ...Object.keys(PLKD_TEAM_CODE_ALIASES)];
+    const orClause = '(' + plkdTeamCodesForFetch.map(t=>`Team.like.${t}*`).join(',') + ')';
     const [teamRows, pdtRows] = await Promise.all([
       fetchTicketsREST([
         ['select', 'Site ID,Work Order ID,Team,Severity,SLA,Root Cause,Sub Root Cause,Close Description,Departed,Arrived,Completed,Created Time,Closed'],
@@ -6960,13 +6966,14 @@ function renderPlkdRawTable(rows){
   _plkdRawRows = rows;
   if(!body) return;
   if(!rows.length){
-    body.innerHTML = '<tr><td colspan="7" class="empty">ไม่พบข้อมูลตามช่วงที่เลือก</td></tr>';
+    body.innerHTML = '<tr><td colspan="8" class="empty">ไม่พบข้อมูลตามช่วงที่เลือก</td></tr>';
     return;
   }
   const sorted = [...rows].sort((a,b)=> new Date(b['Closed']||0) - new Date(a['Closed']||0));
   body.innerHTML = sorted.map(r=>`
     <tr>
       <td style="font-family:'JetBrains Mono',monospace">${escAttr(r['Work Order ID'])||'—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:10.5px">${escAttr(plkdTeamCode(r['Team']))||'—'}</td>
       <td style="text-align:center"><span class="pill" style="background:var(--crit-bg);color:var(--crit);font-size:9.5px;padding:1px 6px">${escAttr(r['Severity'])||'—'}</span></td>
       <td style="max-width:280px;white-space:normal;word-break:break-word">${escAttr(plkdSubjectDetail(r['Subject']))}</td>
       <td style="text-align:center;white-space:nowrap">${fmtPlkdDT(r['Arrived'])}</td>
@@ -6978,11 +6985,11 @@ function renderPlkdRawTable(rows){
 function exportPlkdRawToCSV(){
   if(!_plkdRawRows.length){ alert('ยังไม่มีข้อมูลให้ Export'); return; }
   const cols = [
-    {key:'Work Order ID',label:'Source Ticket ID'},{key:'Severity',label:'Severity'},{key:'SubjectDetail',label:'Subject'},
+    {key:'Work Order ID',label:'Source Ticket ID'},{key:'TeamCode',label:'Team Code'},{key:'Severity',label:'Severity'},{key:'SubjectDetail',label:'Subject'},
     {key:'Arrived',label:'Arrive Time'},{key:'Root Cause',label:'Root Cause'},{key:'Close Description',label:'Closed Description'},
     {key:'Downtime',label:'Downtime (min)'},
   ];
-  const rows = _plkdRawRows.map(r=>({...r, SubjectDetail: plkdSubjectDetail(r['Subject']), Downtime: plkdDowntimeMinutes(r['Created Time'], r['Closed'])}));
+  const rows = _plkdRawRows.map(r=>({...r, TeamCode: plkdTeamCode(r['Team']), SubjectDetail: plkdSubjectDetail(r['Subject']), Downtime: plkdDowntimeMinutes(r['Created Time'], r['Closed'])}));
   const wb = XLSX.utils.book_new();
   const ws = xlsxSheetFromRows(cols, rows);
   XLSX.utils.book_append_sheet(wb, ws, 'PLKD Raw Data');
