@@ -9,6 +9,7 @@
 :root{
   --bg:#08111e;--surf:#0f1929;--surf2:#162236;--surf3:#1d2d45;
   --b:#253348;--b2:#1b2a3e;
+  --brd:#253348;--accent:#2563eb;
   --tx:#e2eaf5;--tm:#7a90a8;--td:#35496a;
   --acc:#2563eb;--acc2:#3b82f6;--glow:rgba(37,99,235,.15);
   --crit:#ef4444;--crit-bg:#1f0d0d;
@@ -22,6 +23,7 @@
 body.day{
   --bg:#f0f4fa;--surf:#fff;--surf2:#f2f6fc;--surf3:#e8eef8;
   --b:#cdd8ea;--b2:#dde5f2;--tx:#1a2540;--tm:#5a7096;--td:#9db0c8;
+  --brd:#cdd8ea;--accent:#1d4ed8;
   --acc:#1d4ed8;--acc2:#2563eb;--glow:rgba(29,78,216,.08);
   --crit:#dc2626;--crit-bg:#fef2f2;--high:#c2410c;--high-bg:#fff7ed;
   --med:#92400e;--med-bg:#fffbeb;--ok:#15803d;--ok-bg:#f0fdf4;
@@ -299,6 +301,70 @@ body.day .src-rank-table thead th{background:#eef2fb}
 .src-rank-n{background:var(--surf3);color:var(--tm);border:1.5px solid var(--b);font-size:11px}
 .src-bar-wrap{background:var(--surf3);border-radius:4px;height:8px;flex:1;min-width:60px;overflow:hidden}
 .src-bar-fill{height:100%;border-radius:4px;transition:width .4s ease}
+
+/* PDT Update visual alignment with Report PDT — presentation only */
+#tab-pdtupdate .pdtupd-chart-card{background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:12px 14px;margin:0 0 14px;box-shadow:0 1px 2px rgba(15,23,42,.08)}
+#tab-pdtupdate .pdtupd-chart-title{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 0 7px;color:var(--tx);font-size:13px;font-weight:750}
+#tab-pdtupdate .pdtupd-chart-sub{font-size:11px;color:var(--tm);font-weight:500}
+#tab-pdtupdate .pdtupd-chart-wrap{overflow:hidden;border:1px solid var(--brd);border-radius:7px;background:var(--surf);padding:6px 8px}
+#tab-pdtupdate .pdtupd-chart-wrap svg{display:block;width:100%;height:auto;max-height:380px}
+#tab-pdtupdate .pdtupd-legend{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:7px 2px 0;font:11.5px/1.35 sans-serif;color:var(--tm)}
+#tab-pdtupdate .pdtupd-legend-item{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+#tab-pdtupdate .pdtupd-legend-dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:0 0 auto}
+#tab-pdtupdate .pdtupd-table-card{margin:0 0 16px;background:var(--surf2);border:1px solid var(--brd);border-radius:8px;overflow:hidden}
+#tab-pdtupdate .pdtupd-table-card .ttbar{padding:10px 12px;background:var(--surf2);border-bottom:1px solid var(--brd);font-size:12px;color:var(--tx)}
+#tab-pdtupdate .pdtupd-table-card .ttbar strong{letter-spacing:.1px}
+#tab-pdtupdate .pdtupd-week-filter{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 12px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--accent) 38%,var(--brd));border-radius:10px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 14%,var(--surf2)),var(--surf2) 62%);box-shadow:0 2px 8px color-mix(in srgb,var(--accent) 12%,transparent)}
+#tab-pdtupdate .pdtupd-week-heading{display:flex;flex-direction:column;gap:1px;min-width:112px}
+#tab-pdtupdate .pdtupd-week-eyebrow{font-size:9px;line-height:1;color:var(--accent);font-weight:850;letter-spacing:1px;text-transform:uppercase}
+#tab-pdtupdate .pdtupd-week-filter label{font-size:11px;color:var(--tx);font-weight:750;letter-spacing:.1px}
+#tab-pdtupdate .pdtupd-week-control{display:flex;align-items:center;gap:7px;min-width:170px;padding:2px 8px 2px 10px;border:1px solid color-mix(in srgb,var(--accent) 66%,var(--brd));border-radius:9px;background:var(--surf);box-shadow:0 2px 5px color-mix(in srgb,var(--accent) 16%,transparent)}
+#tab-pdtupdate .pdtupd-week-icon{color:var(--accent);font-size:14px;line-height:1}
+#tab-pdtupdate .pdtupd-week-select{appearance:none;min-width:0;width:100%;padding:8px 24px 8px 0;border:0;background:var(--surf) linear-gradient(45deg,transparent 50%,var(--accent) 50%) calc(100% - 11px) 50%/6px 6px no-repeat,linear-gradient(135deg,var(--accent) 50%,transparent 50%) calc(100% - 6px) 50%/6px 6px no-repeat;color:var(--tx);font:800 12px/1.2 sans-serif;cursor:pointer;outline:none}
+#tab-pdtupdate .pdtupd-week-control:hover{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 13%,transparent)}
+#tab-pdtupdate .pdtupd-week-select:focus{outline:none}
+#tab-pdtupdate .pdtupd-week-current{display:flex;align-items:center;gap:5px;padding:7px 10px;border-radius:8px;background:color-mix(in srgb,var(--accent) 13%,var(--surf));color:var(--tm);font-size:10px;white-space:nowrap}
+#tab-pdtupdate .pdtupd-week-current strong{color:var(--tx);font-size:11px}
+#tab-pdtupdate .pdtupd-week-filter .pdtupd-week-note{font-size:10px;color:var(--tm);font-weight:600;white-space:nowrap}
+@media(max-width:640px){#tab-pdtupdate .pdtupd-week-heading{min-width:100%;}#tab-pdtupdate .pdtupd-week-control{flex:1;min-width:160px}#tab-pdtupdate .pdtupd-week-note{width:100%;white-space:normal!important}}
+#tab-pdtupdate .pdtupd-sortable{cursor:pointer;user-select:none}
+#tab-pdtupdate .pdtupd-sortable:hover{color:var(--accent)}
+#tab-pdtupdate .pdtupd-sort-arrow{display:inline-block;margin-left:4px;color:var(--accent);font-size:10px}
+#tab-pdtupdate .pdtupd-table-scroll{overflow:auto;max-height:560px;border:0}
+#tab-pdtupdate table.pdtupd-table{width:100%;min-width:1120px;border-collapse:separate;border-spacing:0;font-size:11px;line-height:1.45;color:var(--tx)}
+#tab-pdtupdate table.pdtupd-table th{position:sticky;top:0;z-index:4;background:var(--surf2);color:var(--tm);font-size:11px;font-weight:700;white-space:nowrap;border-bottom:1px solid var(--brd);padding:8px 7px}
+#tab-pdtupdate table.pdtupd-table td{padding:7px;border-bottom:1px solid color-mix(in srgb,var(--brd) 68%,transparent);white-space:nowrap;vertical-align:middle}
+#tab-pdtupdate .pdtupd-team-cell{position:sticky;left:0;z-index:3;width:260px;min-width:260px;max-width:260px;background:var(--surf2);white-space:normal;line-height:1.3;border-left-width:3px!important;padding:9px 10px!important}
+#tab-pdtupdate .pdtupd-team-code{display:block;color:var(--tx);font:800 12px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:0}
+#tab-pdtupdate .pdtupd-team-name{display:block;margin-top:3px;color:var(--tm);font:600 11px/1.3 sans-serif;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#tab-pdtupdate table.pdtupd-table th:nth-child(1){position:sticky;left:0;z-index:5;background:var(--surf2)}
+#tab-pdtupdate table.pdtupd-table th:nth-child(2),#tab-pdtupdate table.pdtupd-table td:nth-child(2){position:sticky;left:260px;z-index:3;background:var(--surf2)}
+#tab-pdtupdate table.pdtupd-table tbody tr:hover td{background:color-mix(in srgb,var(--accent) 7%,var(--surf))}
+#tab-pdtupdate .pdtupd-heat{border-radius:4px;font-weight:750;text-align:center}
+#tab-pdtupdate .pdtupd-mh-fail{color:var(--crit);font-weight:800;background:color-mix(in srgb,var(--crit) 13%,var(--surf))}
+
+
+.pdtupd-skill-tabs{display:flex;gap:6px;margin:0 0 14px;align-items:center}
+.pdtupd-skill-btn{appearance:none;border:1px solid var(--brd);background:var(--surf);color:var(--tm);border-radius:7px;padding:6px 16px;font:600 11px/1.2 sans-serif;cursor:pointer;transition:.15s ease}
+.pdtupd-skill-btn:hover{border-color:var(--accent);color:var(--tx)}
+.pdtupd-skill-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 6px color-mix(in srgb,var(--accent) 28%,transparent)}
+#tab-pdtupdate .pdtupd-topbar{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+#tab-pdtupdate .pdtupd-summary{display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));gap:10px;margin:0 0 14px}
+#tab-pdtupdate .pdtupd-kpi{background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:10px 12px;min-width:0}
+#tab-pdtupdate .pdtupd-kpi-label{font-size:9.5px;color:var(--tm);font-weight:800;letter-spacing:.6px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tab-pdtupdate .pdtupd-kpi-value{font:800 24px/1.15 'JetBrains Mono',monospace;margin-top:4px;color:var(--tx)}
+#tab-pdtupdate .pdtupd-kpi-sub{font-size:10.5px;color:var(--tm);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tab-pdtupdate .pdtupd-risk{color:var(--crit)}
+#tab-pdtupdate .pdtupd-ok{color:var(--ok)}
+#tab-pdtupdate .pdtupd-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+#tab-pdtupdate .pdtupd-search{min-width:220px;flex:1;background:var(--surf);border:1px solid var(--brd);border-radius:7px;color:var(--tx);padding:7px 10px;font:600 11.5px/1.2 sans-serif;outline:none}
+#tab-pdtupdate .pdtupd-search:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 12%,transparent)}
+#tab-pdtupdate .pdtupd-filter-btn,#tab-pdtupdate .pdtupd-raw-btn{appearance:none;border:1px solid var(--brd);background:var(--surf);color:var(--tm);border-radius:7px;padding:7px 10px;font:750 11px/1.2 sans-serif;cursor:pointer}
+#tab-pdtupdate .pdtupd-filter-btn:hover,#tab-pdtupdate .pdtupd-raw-btn:hover{border-color:var(--accent);color:var(--tx)}
+#tab-pdtupdate .pdtupd-filter-btn.active{background:color-mix(in srgb,var(--crit) 14%,var(--surf));border-color:var(--crit);color:var(--crit)}
+#tab-pdtupdate .pdtupd-raw-note{font-size:10.5px;color:var(--tm);margin-left:auto}
+@media(max-width:900px){#tab-pdtupdate .pdtupd-summary{grid-template-columns:repeat(2,minmax(130px,1fr))}}
+@media(max-width:560px){#tab-pdtupdate .pdtupd-summary{grid-template-columns:1fr}#tab-pdtupdate .pdtupd-search{min-width:100%}}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -338,8 +404,7 @@ body.day .src-rank-table thead th{background:#eef2fb}
   <button class="active" onclick="goTab('ov',this)">📊 ภาพรวม</button>
   <button onclick="goTab('hier',this)">👥 Manager › Sup › Team</button>
   <button onclick="goTab('pdtreport',this)">📈 Report PDT</button>
-  <button onclick="goTab('mtreport',this)">🛠️ MT Report</button>
-  <button onclick="goTab('audit',this)">🕵️ Audit PDT Outlier</button>
+  <button onclick="goTab('pdtupdate',this)">📊 PDT Update</button>
   <button onclick="goTab('plkd',this)">🏭 PLKD</button>
   <button onclick="goTab('pdt',this)" style="display:none">📅 PDT per Month</button>
   <button onclick="goTab('prov',this)" style="display:none">🏙️ Province</button>
@@ -355,13 +420,6 @@ body.day .src-rank-table thead th{background:#eef2fb}
   <span class="mw-label">สัปดาห์:</span>
   <div class="fg" id="wk-btns"></div>
   <div class="mw-sep"></div>
-  <span class="mw-label">MT:</span>
-  <div class="sla-dd" id="mt-rel-filter">
-    <button class="sla-dd-btn" type="button" onclick="toggleMtRelDropdown(event)">
-      <span id="mt-rel-label">All</span><span>▾</span>
-    </button>
-    <div class="sla-dd-menu" id="mt-rel-menu"></div>
-  </div>
   <div class="mw-date-info" id="mw-date-info">—</div>
 </div>
 <div style="font-size:11px;color:var(--acc2);margin:4px 16px 8px" id="wk-info"></div>
@@ -568,26 +626,17 @@ body.day .src-rank-table thead th{background:#eef2fb}
   <div id="pdtrpt-body" style="padding:16px"></div>
 </div>
 
-<!-- ══ MT REPORT ══════════════════════════════════════════════════ -->
-<div id="tab-mtreport" class="tab">
-  <div style="padding:12px 16px 8px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-    <span style="font-size:13px;font-weight:600">🛠️ MT Report — Maintenance Ticket ที่เข้าช่วยเหลือ Trouble Ticket</span>
-    <span style="font-size:11px;color:var(--tm)">TT = ตั๋วปิดทั้งหมด (รวม MT) · MT = ในนั้นที่ WO Creator ไม่ใช่ System (ใบที่ทีมอื่นเปิดเข้าช่วย)</span>
-    <span style="font-size:11px;color:var(--tm);margin-left:auto" id="mtrpt-info">—</span>
-  </div>
-  <div class="reg-zone-tabs zone-bar-mirror" style="border-bottom:1px solid var(--brd)"></div>
-  <div id="mtrpt-body" style="padding:16px"></div>
-</div>
-
+<!-- MT Report and Audit PDT Outlier tabs removed. -->
 <!-- ══ PROVINCE ══════════════════════════════════════════════════ -->
-<div id="tab-audit" class="tab">
+<div id="tab-pdtupdate" class="tab">
   <div style="padding:16px">
-    <div style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:2px">🕵️ Audit PDT Outlier</div>
-    <div style="font-size:11px;color:var(--tm);margin-bottom:16px">ตรวจสอบทีมที่ PDT สูงผิดปกติ (Node &gt; 5.0, OFC &gt; 4.0) — เกณฑ์นี้แยกจาก PDT Target ปกติ ใช้เฉพาะสำหรับ Audit เท่านั้น</div>
-    <div id="audit-body">⏳ กำลังโหลด...</div>
+    <div class="sh" style="margin-top:0"><span class="sh-t">📊 PDT Update</span><div class="sh-l"></div><span id="pdtupd-info" style="font-size:10px;color:var(--tm)">—</span></div>
+    <div style="font-size:11px;color:var(--tm);margin:0 0 10px">เลือก Skill เพื่อดู Trend และรายชื่อทีมที่ไม่ผ่าน PDT · ไฮไลต์ Man Hour ที่ต่ำกว่า 8 · By Week</div>
+    <div id="pdtupd-skill-tabs" class="pdtupd-skill-tabs" role="tablist" aria-label="เลือก Skill PDT Update"></div>
+    <div id="pdtupd-charts"></div>
+    <div id="pdtupd-tables"></div>
   </div>
 </div>
-
 <div id="tab-plkd" class="tab">
   <div style="padding:16px">
     <div style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:2px">🏭 PLKD Dashboard — Site ปลวกแดง</div>
@@ -944,27 +993,48 @@ function buildPdtWeeklyDerived(raw){
 }
 
 async function fetchFromGAS(url){
-  try {
-    // ลอง fetch ปกติก่อน (ใช้ได้เมื่อเปิดผ่าน http:// หรือ server)
-    const res = await fetch(url, { cache:'no-store' });
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const raw = await res.json();
-    if(raw.error) throw new Error('GAS error: '+raw.error);
-    if(!raw.kpis) throw new Error('JSON ไม่มี field "kpis" — ตรวจสอบ App Script');
-    sanitizeData(raw);
-    console.log('[GAS] OK — tickets:', raw.kpis.total_tickets, 'teams:', raw.teams?.length);
-    showFetchStatus('✅ โหลดข้อมูลสำเร็จ: '+Number(raw.kpis.total_tickets).toLocaleString()+' tickets', 'var(--ok)');
-    return raw;
-  } catch(e){
-    console.error('[GAS] fetch error:', e.message);
-    // ถ้า CORS error (file://) → ลอง JSONP
-    if(e.message.includes('Failed to fetch') || e.message.includes('CORS') || e.message.includes('NetworkError')){
-      showFetchStatus('⏳ กำลังลอง JSONP...', 'var(--tm)');
-      return await fetchViaJSONP(url);
+  const maxAttempts = 3;
+  let lastError = null;
+  for(let attempt=1; attempt<=maxAttempts; attempt++){
+    try {
+      // Endpoint นี้ส่ง JSON ขนาดใหญ่และบางครั้ง cold start/โหลดสูงทำให้ตอบ 500 ชั่วคราว
+      const res = await fetch(url, { cache:'no-store' });
+      if(!res.ok){
+        let detail='';
+        try{ detail=(await res.text()).replace(/\s+/g,' ').slice(0,160); }catch(_){ }
+        throw new Error('HTTP '+res.status+(detail?' — '+detail:''));
+      }
+      const raw = await res.json();
+      if(raw.error) throw new Error('GAS error: '+raw.error);
+      if(!raw.kpis) throw new Error('JSON ไม่มี field "kpis" — ตรวจสอบ App Script');
+      sanitizeData(raw);
+      console.log('[GAS] OK — tickets:', raw.kpis.total_tickets, 'teams:', raw.teams?.length, 'attempt:', attempt);
+      showFetchStatus('✅ โหลดข้อมูลสำเร็จ: '+Number(raw.kpis.total_tickets).toLocaleString()+' tickets', 'var(--ok)');
+      return raw;
+    } catch(e){
+      lastError = e;
+      const msg = String(e?.message || e);
+      const retryable = /HTTP (429|500|502|503|504)/.test(msg);
+      const networkError = msg.includes('Failed to fetch') || msg.includes('CORS') || msg.includes('NetworkError');
+      if(attempt < maxAttempts && (retryable || networkError)){
+        const waitMs = attempt * 1200;
+        console.warn('[GAS] retry', attempt+1, 'in', waitMs+'ms:', msg);
+        showFetchStatus(`⏳ กำลังเชื่อมต่อข้อมูลอีกครั้ง (${attempt+1}/${maxAttempts})...`, 'var(--tm)');
+        await new Promise(resolve=>setTimeout(resolve, waitMs));
+        continue;
+      }
+      console.error('[GAS] fetch error:', msg);
+      // ถ้า CORS error (file://) → ลอง JSONP หลัง retry ครบ
+      if(networkError){
+        showFetchStatus('⏳ กำลังลอง JSONP...', 'var(--tm)');
+        return await fetchViaJSONP(url);
+      }
+      showFetchStatus('⚠️ GAS Error: '+msg, 'var(--crit)');
+      return null;
     }
-    showFetchStatus('⚠️ GAS Error: '+e.message, 'var(--crit)');
-    return null;
   }
+  console.error('[GAS] fetch error:', lastError?.message || lastError);
+  return null;
 }
 
 // JSONP fallback สำหรับ file:// protocol
@@ -1392,7 +1462,6 @@ function buildMWFilter(){
     const lbl = m===null ? 'ทั้งหมด' : `${MONTH_NAMES[m]||m}`;
     return `<button class="mwbtn ${m===selMonth?'active':''}" onclick="setMonth(${m===null?'null':m})">${lbl}</button>`;
   }).join('');
-  renderMtRelDropdown();
   buildWeekFilter();
 }
 
@@ -1455,66 +1524,6 @@ function setMonth(m){
   buildMWFilter();
   refreshAll();
 }
-
-const MT_REL_OPTIONS = [
-  {key:'release',   label:'MT Release (มี TT หลักผูกอยู่)'},
-  {key:'norelease', label:'MT No Release (ไม่มี TT หลัก)'},
-];
-let selMtRel = []; // [] = All (ไม่กรอง แสดงทั้งคู่)
-
-function getMtRelLabel(){
-  if(!selMtRel.length) return 'All';
-  if(selMtRel.length===1) return MT_REL_OPTIONS.find(o=>o.key===selMtRel[0]).label;
-  return `${selMtRel.length} selected`;
-}
-
-function renderMtRelDropdown(){
-  const menu = document.getElementById('mt-rel-menu');
-  const label = document.getElementById('mt-rel-label');
-  if(label) label.textContent = getMtRelLabel();
-  if(!menu) return;
-  const checked = v => selMtRel.includes(v) ? 'checked' : '';
-  menu.innerHTML = `
-    <div style="font-size:10px;color:var(--tm);padding:2px 4px 6px;border-bottom:1px solid var(--brd);margin-bottom:4px">
-      กรองเฉพาะหน้าที่เกี่ยวกับ MT (เช่น MT Report) · ไม่เลือกเลย = แสดงทั้งหมด
-    </div>
-    <label class="sla-opt all"><input type="checkbox" ${selMtRel.length?'':'checked'} onchange="setMtRelAll(this.checked)"> All (ทั้งหมด)</label>
-    ${MT_REL_OPTIONS.map(o=>`<label class="sla-opt"><input type="checkbox" value="${o.key}" ${checked(o.key)} onchange="toggleMtRel('${o.key}',this.checked)"> ${o.label}</label>`).join('')}
-    <div class="sla-dd-actions">
-      <button type="button" class="sla-mini" onclick="setMtRelAll(true)">All</button>
-    </div>`;
-}
-
-function toggleMtRelDropdown(ev){
-  ev.stopPropagation();
-  document.getElementById('mt-rel-filter')?.classList.toggle('open');
-}
-
-document.addEventListener('click', ev => {
-  const dd = document.getElementById('mt-rel-filter');
-  if(dd && !dd.contains(ev.target)) dd.classList.remove('open');
-});
-
-// ฟิลเตอร์นี้เป็นแบบ "หน้าใครหน้ามัน" — ไม่แก้ query ดึงข้อมูล แค่ re-render หน้าปัจจุบัน
-// หน้าที่ไม่มีแนวคิด MT Release/No Release (เช่น Overview, Report PDT) จะไม่ได้รับผลกระทบเลย
-// หน้าที่มี (เช่น MT Report) จะซ่อนฝั่งที่ไม่ได้เลือกออกจากการนับ/แสดงผล
-function setMtRelAll(isAll){
-  selMtRel = isAll ? [] : selMtRel;
-  renderMtRelDropdown();
-  refreshAll();
-}
-
-function toggleMtRel(v, isChecked){
-  if(!MT_REL_OPTIONS.some(o=>o.key===v)) return;
-  const selected = new Set(selMtRel);
-  if(isChecked) selected.add(v); else selected.delete(v);
-  selMtRel = MT_REL_OPTIONS.map(o=>o.key).filter(k => selected.has(k));
-  renderMtRelDropdown();
-  refreshAll();
-}
-// true = ให้นับ/แสดง MT Release (มี TT); ถ้าไม่ได้เลือกอะไรเลย (All) ถือว่านับทั้งคู่
-function mtRelShown(){ return !selMtRel.length || selMtRel.includes('release'); }
-function mtNoRelShown(){ return !selMtRel.length || selMtRel.includes('norelease'); }
 
 async function reloadDashboardData(){
   const src = GAS_URL || sessionStorage.getItem('ww_gas_url');
@@ -3776,8 +3785,7 @@ function refreshAll(){
   if(document.getElementById('tab-prov').classList.contains('active')) renderProv();
   if(document.getElementById('tab-hier').classList.contains('active')) renderH();
   if(document.getElementById('tab-pdtreport').classList.contains('active')) renderPDTReport();
-  if(document.getElementById('tab-mtreport').classList.contains('active')) renderMTReport();
-  if(document.getElementById('tab-audit').classList.contains('active')) renderAuditOutlierTab();
+  if(document.getElementById('tab-pdtupdate').classList.contains('active')) renderPDTUpdate();
   if(document.getElementById('tab-plkd').classList.contains('active')) renderPlkdTab();
 }
 
@@ -6217,178 +6225,397 @@ function renderPDTReport(){
 
 
 
-// ═══ AUDIT PDT OUTLIER ═══════════════════════════════════════════
-// เกณฑ์ Audit (แยกต่างหากจาก PDT_TARGET_BY_SKILL ที่ใช้เป็นเป้าปกติ): Node > 5.0, OFC > 4.0
-// แหล่งข้อมูล PDT/ชม.ทำงาน: D.week_team_pdt (จาก pdt_weekly_summary — แม่นกว่า/สัปดาห์ล่าสุดสุด เหมือนแท็บ Report PDT)
-// Fast Step + Top Sub Root Cause: ดึงสดจาก RPC (ตั๋วระดับ ticket ไม่มีใน pdt_weekly_summary)
-const AUDIT_PDT_THRESHOLD = {OFC:4.0, NOD:5.0};
 
-async function fetchFastStepCounts(teamIds, closedFrom, closedTo){
-  const res = await fetch(`${MT_RAW_SUPABASE_URL}/rest/v1/rpc/get_fast_step_counts_by_teams`, {
-    method:'POST',
-    headers:{ 'apikey': MT_RAW_ANON_KEY, 'Authorization':'Bearer '+MT_RAW_ANON_KEY, 'Content-Type':'application/json' },
-    body: JSON.stringify({ team_ids: teamIds, closed_from: closedFrom, closed_to: closedTo, max_minutes: 5 })
-  });
-  if(!res.ok) throw new Error('HTTP '+res.status);
-  return res.json(); // [{team_id, fast_count}]
+// ═══ PDT UPDATE — weekly trend + PDT/Man Hour team tables ═══
+const PDT_UPDATE_TARGET = {NOD:3.5, OFC:2.7};
+let pdtUpdateSkill = 'OFC';
+let pdtUpdSearch = window.pdtUpdSearch || '';
+let pdtUpdOnlyBoth = window.pdtUpdOnlyBoth || false;
+function pdtUpdNum(v){ const n=Number(v); return Number.isFinite(n)?n:null; }
+function pdtUpdRaw(r){ return r._pdtWeeklyRaw||r; }
+function pdtUpdField(r, keys){ const raw=pdtUpdRaw(r); for(const k of keys){ if(raw[k]!=null && raw[k]!=='') return pdtUpdNum(raw[k]); if(r[k]!=null && r[k]!=='') return pdtUpdNum(r[k]); } return null; }
+function pdtUpdSkillOf(r){
+  const v=String(r.SkillP??r.skill??r.Skill??'').toUpperCase();
+  if(v.includes('NODE')||v==='NOD') return 'NOD';
+  if(v.includes('OFC')) return 'OFC';
+  return v;
 }
-
-async function fetchAuditTopCauses(teamIds, closedFrom, closedTo){
-  const res = await fetch(`${MT_RAW_SUPABASE_URL}/rest/v1/rpc/get_top_causes_by_teams`, {
-    method:'POST',
-    headers:{ 'apikey': MT_RAW_ANON_KEY, 'Authorization':'Bearer '+MT_RAW_ANON_KEY, 'Content-Type':'application/json' },
-    body: JSON.stringify({ team_ids: teamIds, closed_from: closedFrom, closed_to: closedTo, top_n: 3 })
-  });
-  if(!res.ok) throw new Error('HTTP '+res.status);
-  return res.json(); // [{team_id, cause, count}]
+function pdtUpdSourceRows(){
+  const pdt=Array.isArray(D.week_team_pdt)?D.week_team_pdt:[];
+  const base=Array.isArray(D.week_team)?D.week_team:[];
+  const bm=new Map(base.map(r=>[`${r.Year}|${r.WeekNum}|${r.TeamID}`,r]));
+  return pdt.map(r=>({...r,_base:bm.get(`${r.Year}|${r.WeekNum}|${r.TeamID}`)||null}));
 }
-
-// ช่วงวันที่ปิดตั๋ว (closed_from/closed_to) ครอบคลุมสัปดาห์ที่เลือกอยู่ ใช้ยิง RPC ระดับตั๋ว
-function auditWeeksClosedRange(weeks){
-  const metas = (D.week_meta_pdt||[]).filter(m=>weeks.some(w=>Number(w.WeekNum)===Number(m.WeekNum)&&Number(w.Year)===Number(m.Year)));
-  if(!metas.length) return null;
-  const starts = metas.map(m=>new Date(m.wk_start+'T00:00:00'));
-  const from = new Date(Math.min(...starts.map(d=>d.getTime())));
-  const maxStart = new Date(Math.max(...starts.map(d=>d.getTime())));
-  const to = new Date(maxStart.getTime()+6*86400000+86399000); // สัปดาห์สุดท้าย +6 วัน 23:59:59
-  return { from: from.toISOString().slice(0,19), to: to.toISOString().slice(0,19) };
+function pdtUpdAny(r, keys){
+  const raw=r._pdtWeeklyRaw||r, base=r._base||{};
+  for(const key of keys){
+    const hit=Object.keys(raw).find(k=>k.toLowerCase()===key.toLowerCase());
+    if(hit!=null && raw[hit]!=null && raw[hit]!=='') return Number(raw[hit])||0;
+    const bhit=Object.keys(base).find(k=>k.toLowerCase()===key.toLowerCase());
+    if(bhit!=null && base[bhit]!=null && base[bhit]!=='') return Number(base[bhit])||0;
+  }
+  return 0;
 }
-
-// รวมทีมที่ PDT เฉลี่ย (ตามสัปดาห์/โซนที่กรองอยู่) เกินเกณฑ์ Audit ของ skill นั้น
-function computeAuditOutlierTeams(skill){
-  const weeks = getPdtTableWeeks();
-  const threshold = AUDIT_PDT_THRESHOLD[skill];
-  let rows = (D.week_team_pdt||[]).filter(r=>r.SkillP===skill);
-  if(selZone && selZone!=='ALL') rows = rows.filter(r=>regionGroupOf(r.NewZone)===selZone);
-  const byTeam = {};
-  rows.forEach(r=>{
-    if(!weeks.some(w=>Number(w.WeekNum)===Number(r.WeekNum)&&Number(w.Year)===Number(r.Year))) return;
-    if(!byTeam[r.TeamID]) byTeam[r.TeamID] = {teamId:r.TeamID, region:r.NewZone, pdtSum:0, wd:0, whSum:0, mhSum:0};
-    const t = byTeam[r.TeamID];
-    t.pdtSum += Number(r.pdt_count)||0;
-    t.wd     += Number(r.workdays)||0;
-    t.whSum  += Number(r.work_hours_sum)||0;
-    t.mhSum  += (Number(r.man_hour_avg)||0) * (Number(r.workdays)||0);
-    if(r.NewZone) t.region = r.NewZone;
-  });
-  const list = Object.values(byTeam).filter(t=>t.wd>0).map(t=>({
-    teamId:t.teamId, region:t.region,
-    pdtAvg: t.pdtSum/t.wd,
-    workHourAvg: t.whSum/t.wd,
-    manHourAvg: t.mhSum/t.wd,
-  })).filter(t=>t.pdtAvg>threshold);
-  list.sort((a,b)=>b.pdtAvg-a.pdtAvg);
-  return {list, weeks, threshold};
+let pdtUpdateRawTrend = null;
+let pdtUpdateRawTrendPromise = null;
+let pdtUpdateRawTrendAutoStarted = false;
+function pdtUpdRawTeam(r){
+  for(const k of ['Team ID','TeamID','Team Code','Team','team']){
+    const v=r?.[k]; if(v!=null && String(v).trim()) return String(v).trim().split(' (')[0].trim();
+  }
+  return '';
 }
-
-let _auditLoadGen = 0;
-async function renderAuditOutlierTab(){
-  const body = document.getElementById('audit-body');
-  if(!body) return;
-  const myGen = ++_auditLoadGen;
-
-  const skills = [{key:'NOD',label:'🔧 Node',color:'#60a5fa'},{key:'OFC',label:'🔌 OFC',color:'#fb923c'}];
-  const sections = skills.map(sk=>{
-    const {list, threshold} = computeAuditOutlierTeams(sk.key);
-    return {sk, list, threshold};
-  });
-
-  // แสดงตาราง PDT/ชม.ทำงาน/Man Hour ทันที — Fast Step กับ Top Sub Root Cause ค่อย inject ทีหลังแบบ async (ไม่บล็อกตาราง)
-  body.innerHTML = sections.map(({sk, list, threshold})=>{
-    if(!list.length) return `<div style="margin-bottom:24px">
-      <div style="font-size:13px;font-weight:700;color:${sk.color};margin-bottom:8px">${sk.label} — PDT Outlier (&gt; ${threshold.toFixed(1)})</div>
-      <div class="empty" style="padding:20px;color:var(--tm);font-size:12px">ไม่พบทีมที่ PDT เกินเกณฑ์ในช่วงที่เลือก ✅</div>
-    </div>`;
-    const rows = list.map((t,i)=>{
-      const c = teamColor(t.teamId); const nm = teamNameOf(t.teamId);
-      return `<tr>
-        <td class="mono" style="text-align:center;padding:6px 8px;border:1px solid var(--brd);color:var(--tm)">${i+1}</td>
-        <td style="padding:6px 8px;border:1px solid var(--brd);font-weight:700;color:${c}">${escAttr(t.teamId)}${nm?`<br><span style="font-size:9.5px;color:var(--tm);font-weight:400">${escAttr(nm)}</span>`:''}</td>
-        <td style="padding:6px 8px;border:1px solid var(--brd)">${escAttr(regionGroupOf(t.region))}</td>
-        <td class="mono" style="text-align:center;padding:6px 8px;border:1px solid var(--brd);font-weight:700;color:var(--crit)">${t.pdtAvg.toFixed(2)}</td>
-        <td class="mono" style="text-align:center;padding:6px 8px;border:1px solid var(--brd)">${t.workHourAvg.toFixed(2)}</td>
-        <td class="mono" style="text-align:center;padding:6px 8px;border:1px solid var(--brd)">${t.manHourAvg.toFixed(2)}</td>
-        <td class="mono" style="text-align:center;padding:6px 8px;border:1px solid var(--brd)" id="audit-fast-${sk.key}-${cfSafeId(t.teamId)}">⏳</td>
-        <td style="padding:6px 8px;border:1px solid var(--brd);font-size:10.5px" id="audit-cause-${sk.key}-${cfSafeId(t.teamId)}">⏳ กำลังโหลด...</td>
-      </tr>`;
-    }).join('');
-    return `<div style="margin-bottom:24px">
-      <div style="font-size:13px;font-weight:700;color:${sk.color};margin-bottom:4px">${sk.label} — PDT Outlier (&gt; ${threshold.toFixed(1)}) · พบ ${list.length} ทีม</div>
-      <div style="font-size:10.5px;color:var(--tm);margin-bottom:8px">Audit ทีมที่ PDT สูงผิดปกติ · Fast Step = จำนวนตั๋วที่ Arrive→Complete ภายใน 5 นาที (สัญญาณต้องสงสัย)</div>
-      <div style="overflow-x:auto;border:1px solid var(--brd);border-radius:8px;margin-bottom:14px">
-        <table style="width:100%;border-collapse:collapse;font-size:11px">
-          <thead><tr style="background:var(--surf3);color:var(--tm)">
-            <th style="padding:6px 8px">#</th><th style="text-align:left;padding:6px 8px">Team</th><th style="text-align:left;padding:6px 8px">Region</th>
-            <th style="padding:6px 8px">Avg PDT</th><th style="padding:6px 8px;min-width:90px">ชม.ทำงาน</th><th style="padding:6px 8px;min-width:90px">Man Hour</th>
-            <th style="padding:6px 8px;min-width:100px">Fast Step (≤5น.)</th><th style="text-align:left;padding:6px 8px;min-width:180px">Top 3 Sub Root Cause</th>
-          </tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-      <div style="background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:12px;margin-bottom:8px">
-        <div style="font-size:12px;font-weight:700;color:${sk.color};margin-bottom:6px">📈 ${sk.label} — Avg PDT by Region Trend (เฉพาะทีมที่เกินเป้า)</div>
-        <canvas id="audit-chart-${sk.key}" height="220" style="width:100%;display:block"></canvas>
-      </div>
-    </div>`;
-  }).join('');
-
-  // กราฟ trend PDT by Region — เฉพาะทีมที่อยู่ในลิสต์ outlier (reuse drawMultiLineChart แบบเดียวกับ Report PDT)
-  sections.forEach(({sk, list})=>{
-    if(!list.length) return;
-    const outlierTeamIds = new Set(list.map(t=>t.teamId));
-    const allWeeks = getPdtAllWeeks();
-    const weekKeys = allWeeks.map(w=>'W'+w.WeekNum);
-    const rowsBySkill = (D.week_team_pdt||[]).filter(r=>r.SkillP===sk.key && outlierTeamIds.has(r.TeamID));
-    const regionsToShow = [...new Set(list.map(t=>regionGroupOf(t.region)))].filter(rg=>GRP_ORDER.includes(rg));
-    if(!regionsToShow.length) return;
-    const matrix = {}; regionsToShow.forEach(rg=>matrix[rg]={});
-    const acc = {};
-    rowsBySkill.forEach(r=>{
-      const rg = regionGroupOf(r.NewZone);
-      if(!regionsToShow.includes(rg)) return;
-      const key = rg+'||W'+r.WeekNum;
-      if(!acc[key]) acc[key] = {pdt:0, wd:0};
-      acc[key].pdt += Number(r.pdt_count)||0;
-      acc[key].wd  += Number(r.workdays)||0;
-    });
-    regionsToShow.forEach(rg=>{ weekKeys.forEach(wk=>{ const a=acc[rg+'||'+wk]; matrix[rg][wk] = a && a.wd>0 ? a.pdt/a.wd : null; }); });
-    const rowDefs = regionsToShow.map(rg=>({key:rg, color:GC[rg]}));
-    requestAnimationFrame(()=>{ drawMultiLineChart('audit-chart-'+sk.key, rowDefs, weekKeys, (rg,k)=>matrix[rg][k], {target:AUDIT_PDT_THRESHOLD[sk.key], h:220}); });
-  });
-
-  // โหลด Fast Step count + Top Sub Root Cause แบบ async แยกทีหลัง ต่อ skill (ไม่บล็อกตาราง/กราฟด้านบน)
-  for(const {sk, list} of sections){
-    if(!list.length) continue;
-    const teamIds = list.map(t=>t.teamId);
-    const range = auditWeeksClosedRange(getPdtTableWeeks());
-    if(!range) continue;
-    try{
-      const [fastRows, causeRows] = await Promise.all([
-        fetchFastStepCounts(teamIds, range.from, range.to),
-        fetchAuditTopCauses(teamIds, range.from, range.to)
-      ]);
-      if(myGen !== _auditLoadGen) return; // มีการ render ใหม่กว่าเกิดขึ้นระหว่างรอ — ทิ้งผลลัพธ์เก่า
-      const fastByTeam = {}; fastRows.forEach(r=>{ fastByTeam[r.team_id]=r.fast_count; });
-      const causeByTeam = {}; causeRows.forEach(r=>{ if(!causeByTeam[r.team_id]) causeByTeam[r.team_id]=[]; causeByTeam[r.team_id].push({cause:r.cause,count:r.count}); });
-      teamIds.forEach(tid=>{
-        const elF = document.getElementById(`audit-fast-${sk.key}-${cfSafeId(tid)}`);
-        if(elF) elF.innerHTML = `<span style="color:${(fastByTeam[tid]||0)>0?'var(--crit)':'var(--tm)'};font-weight:700">${fastByTeam[tid]||0}</span>`;
-        const elC = document.getElementById(`audit-cause-${sk.key}-${cfSafeId(tid)}`);
-        if(elC) elC.innerHTML = formatTopCausesHTML(causeByTeam[tid]);
-      });
-    }catch(err){
-      if(myGen !== _auditLoadGen) return;
-      console.error('renderAuditOutlierTab load failed', err);
-      teamIds.forEach(tid=>{
-        const elF = document.getElementById(`audit-fast-${sk.key}-${cfSafeId(tid)}`);
-        if(elF) elF.innerHTML = '<span style="color:var(--crit)">✗</span>';
-        const elC = document.getElementById(`audit-cause-${sk.key}-${cfSafeId(tid)}`);
-        if(elC) elC.innerHTML = '<span style="color:var(--crit)">โหลดไม่สำเร็จ</span>';
-      });
+function pdtUpdRawSkill(r){
+  const direct=String(r?.Skill??r?.skill??'').toUpperCase();
+  if(direct.includes('NODE')||direct==='NOD') return 'NOD';
+  if(direct.includes('OFC')) return 'OFC';
+  const team=pdtUpdRawTeam(r).toUpperCase();
+  return team.includes('-NOD-')||team.includes('NODE')?'NOD':team.includes('-OFC-')||team.includes('OFC')?'OFC':'';
+}
+function pdtUpdISOWeek(value){
+  const d=new Date(value); if(!value||isNaN(d)) return null;
+  const u=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()));
+  const day=u.getUTCDay()||7; u.setUTCDate(u.getUTCDate()+4-day);
+  const year=u.getUTCFullYear(), start=new Date(Date.UTC(year,0,1));
+  const week=Math.ceil((((u-start)/86400000)+1)/7);
+  return {Year:year,WeekNum:week};
+}
+async function pdtUpdFetchWeek(pairs){
+  // Cursor on the indexed primary key instead of OFFSET. OFFSET forces
+  // Postgres to rescan an increasingly large result set and can hit 57014.
+  const pageSize=1000, all=[]; let cursor=0;
+  for(let page=0; page<200; page++){
+    const query=[...pairs,['id','gt.'+String(cursor)],['order','id.asc'],['limit',String(pageSize)]];
+    let res=null, body='';
+    for(let attempt=0; attempt<3; attempt++){
+      res=await fetch(`${MT_RAW_SUPABASE_URL}/rest/v1/tickets?${plkdQS(query)}`,{headers:{'apikey':MT_RAW_ANON_KEY,'Authorization':'Bearer '+MT_RAW_ANON_KEY}});
+      if(res.ok) break;
+      body=await res.text().catch(()=> '');
+      if(res.status<500 || attempt===2) throw new Error('Ticket trend HTTP '+res.status+(body?': '+body.slice(0,240):''));
+      await new Promise(resolve=>setTimeout(resolve,350*(attempt+1)));
     }
+    const rows=await res.json();
+    if(!Array.isArray(rows)||!rows.length) break;
+    all.push(...rows);
+    const next=Number(rows[rows.length-1]?.id);
+    if(!Number.isFinite(next)||next<=cursor) break;
+    cursor=next;
+    if(rows.length<pageSize) break;
+  }
+  return all;
+}
+function pdtUpdTrendRange(){
+  const src=(Array.isArray(D.week_meta_pdt)&&D.week_meta_pdt.length?D.week_meta_pdt:D.week_team_pdt)||[];
+  const keys=src.map(r=>({Year:Number(r.Year),WeekNum:Number(r.WeekNum)})).filter(r=>r.Year&&r.WeekNum);
+  if(!keys.length) return null;
+  keys.sort((a,b)=>a.Year-b.Year||a.WeekNum-b.WeekNum);
+  const start=isoWeekMonday(keys[0].Year,keys[0].WeekNum), end=new Date(isoWeekMonday(keys[keys.length-1].Year,keys[keys.length-1].WeekNum));
+  end.setUTCDate(end.getUTCDate()+7);
+  return {start:start.toISOString(),end:end.toISOString()};
+}
+async function pdtUpdLoadRawTrend(){
+  if(pdtUpdateRawTrend) return pdtUpdateRawTrend;
+  if(pdtUpdateRawTrendPromise) return pdtUpdateRawTrendPromise;
+  pdtUpdateRawTrendPromise=(async()=>{
+    const range=pdtUpdTrendRange(); if(!range) return null;
+    // Including the indexed primary key keeps the Create-Time query stable on busy weeks.
+    const selectCreate='Work Order ID,Skill,Created Time,id';
+    const selectClosed='Work Order ID,Team,Skill,WO Creator,Source Ticket ID,Closed,id';
+    // Scan the requested date range once per timestamp field. Repeating the
+    // same scan for every week was the source of statement timeouts on busy data.
+    const created=await pdtUpdFetchWeek([['select',selectCreate],['Created Time','gte.'+range.start],['Created Time','lt.'+range.end]]);
+    const closed=await pdtUpdFetchWeek([['select',selectClosed],['Closed','gte.'+range.start],['Closed','lt.'+range.end]]);
+    const out={created,closed,loadedAt:new Date().toISOString()}; pdtUpdateRawTrend=out; return out;
+  })().catch(err=>{ console.warn('[PDT Update] raw Ticket trend unavailable; keeping fallback aggregates:',err); return null; });
+  return pdtUpdateRawTrendPromise;
+}
+function pdtUpdRawCounts(skill){
+  const out={}; const raw=pdtUpdateRawTrend; if(!raw) return out;
+  const ensure=k=>out[k]??(out[k]={tickets:0,totalIds:new Set(),system:new Set(),withTT:new Set()});
+  (raw.created||[]).forEach(r=>{if(pdtUpdRawSkill(r)!==skill)return; const wk=pdtUpdISOWeek(r['Created Time']); if(!wk)return; ensure(`${wk.Year}|${wk.WeekNum}`).tickets++;});
+  (raw.closed||[]).forEach(r=>{if(pdtUpdRawSkill(r)!==skill)return; const wk=pdtUpdISOWeek(r.Closed); if(!wk)return; const id=String(r['Work Order ID']??'').trim(); if(!id)return; const x=ensure(`${wk.Year}|${wk.WeekNum}`); x.totalIds.add(id); const woCreator=String(r.WOCreator??r['WO Creator']??'').trim().toUpperCase(); if(woCreator==='SYSTEM')x.system.add(id); if(String(r['Source Ticket ID']??'').trim())x.withTT.add(id);});
+  Object.values(out).forEach(x=>{x.total=x.totalIds.size;x.system=x.system.size;x.withTT=x.withTT.size; delete x.totalIds;}); return out;
+}
+function pdtUpdSeries(skill){
+  const rows=pdtUpdSourceRows().filter(r=>pdtUpdSkillOf(r)===skill); const rawCounts=pdtUpdRawCounts(skill);
+  const map={};
+  const rawAdded=new Set();
+  let usingRaw=false;
+  rows.forEach(r=>{
+    const b=r._base||{}, k=`${r.Year}|${r.WeekNum}`; if(!r.WeekNum)return;
+    if(!map[k])map[k]={Year:Number(r.Year),WeekNum:Number(r.WeekNum),tickets:0,total:0,system:0,withTT:0,pdtSum:0,pdtWeight:0};
+    const x=map[k];
+    const exact=rawCounts[k];
+    if(exact){
+      usingRaw=true;
+      // rawCounts is already aggregated at Week level; add it once, not once per team row.
+      if(!rawAdded.has(k)){
+        x.tickets=Number(exact.tickets)||0;
+        x.total=Number(exact.total)||0;
+        x.system=Number(exact.system)||0;
+        x.withTT=Number(exact.withTT)||0;
+        rawAdded.add(k);
+      }
+    }else{
+      // Safe fallback for deployments where the API has not yet exposed raw ticket rows.
+      x.tickets+=pdtUpdAny(r,['ticket_open','ticket_open_count','tickets']);
+      x.total+=pdtUpdAny(r,['total_wo','total_wo_count','wo_total','total_work_order']);
+      x.system+=pdtUpdAny(r,['wo_creator_system','wo_system','system_wo','tt_wo','wo_exc_manual','wo_excluding_manual']);
+      x.withTT+=pdtUpdAny(r,['wo_with_source_ticket','wo_manual_with_tt','wo_with_manual_tt','manual_with_tt','source_ticket_wo']);
+    }
+    // Weekly PDT average is kept on the PDT axis; it must not be mixed with WO counts.
+    const raw=r._pdtWeeklyRaw||{};
+    const pdtVal=Number(raw.pdt_per_day??r.pdt_per_day??(r.workdays?(r.pdt_count||0)/r.workdays:0));
+    const weight=Number(r.workdays)||0;
+    if(Number.isFinite(pdtVal)&&weight>0){ x.pdtSum+=pdtVal*weight; x.pdtWeight+=weight; }
+  });
+  return Object.values(map).map(x=>({...x,pdt:x.pdtWeight?x.pdtSum/x.pdtWeight:0,_usingRaw:usingRaw})).sort((a,b)=>a.Year-b.Year||a.WeekNum-b.WeekNum);
+}
+function pdtUpdEsc(s){ return typeof escAttr==='function'?escAttr(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function pdtUpdNationwideSeries(){
+  const buckets=new Map();
+  ['OFC','NOD'].forEach(skill=>{
+    pdtUpdRows(skill).forEach(r=>{
+      if(!r.pdtFail||!r.TeamID)return;
+      const key=pdtUpdWeekKey(r); if(key==='0|0')return;
+      if(!buckets.has(key))buckets.set(key,{Year:Number(r.Year),WeekNum:Number(r.WeekNum),teams:new Set()});
+      buckets.get(key).teams.add(String(r.TeamID));
+    });
+  });
+  return [...buckets.values()].sort((a,b)=>a.Year-b.Year||a.WeekNum-b.WeekNum).map(x=>({Year:x.Year,WeekNum:x.WeekNum,count:x.teams.size}));
+}
+function pdtUpdNationwideChart(){
+  const data=pdtUpdNationwideSeries();
+  const c=(name,fallback)=>{const v=getComputedStyle(document.documentElement).getPropertyValue(name).trim();return v||fallback;};
+  const col=c('--crit','#ef4444'), trendCol=c('--accent','#3b82f6'), gridCol=c('--brd','#cbd5e1'), textCol=c('--tm','#64748b'), surf=c('--surf','#0b1220');
+  if(!data.length)return `<div class="pdtupd-chart-card"><div class="pdtupd-chart-title"><span>PDT NOT PASS TARGET</span><span class="pdtupd-chart-sub">Nationwide · OFC + NODE · By Week</span></div><div class="empty" style="padding:30px;text-align:center">ไม่พบข้อมูลทีมที่ PDT ไม่ผ่าน Target</div></div>`;
+  const W=960,H=230,L=56,R=24,T=30,B=46,cw=W-L-R,ch=H-T-B;
+  const ys=data.map(d=>Number(d.count)||0), n=data.length, maxRaw=Math.max(1,...ys);
+  const mean=ys.reduce((a,b)=>a+b,0)/(n||1), meanX=(n-1)/2;
+  let num=0,den=0; ys.forEach((v,i)=>{num+=(i-meanX)*(v-mean);den+=(i-meanX)*(i-meanX);});
+  const slope=den?num/den:0, intercept=mean-slope*meanX;
+  const fit=i=>Math.max(0,intercept+slope*i), maxY=Math.max(maxRaw,...data.map((_,i)=>fit(i)),1)*1.18;
+  const x=i=>n<=1?L+cw/2:L+cw*i/(n-1), y=v=>T+ch-(Number(v)||0)/maxY*ch;
+  const ticks=Array.from({length:5},(_,i)=>maxY*i/4);
+  const grid=ticks.map(v=>`<line x1="${L}" x2="${L+cw}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="${gridCol}" stroke-width=".8" opacity=".75"/><text x="${L-10}" y="${(y(v)+4).toFixed(1)}" text-anchor="end" fill="${textCol}" font-size="11.5" font-family="sans-serif">${Math.round(v).toLocaleString()}</text>`).join('');
+  const points=data.map((d,i)=>`${x(i).toFixed(1)},${y(d.count).toFixed(1)}`).join(' ');
+  const fitPoints=data.map((_,i)=>`${x(i).toFixed(1)},${y(fit(i)).toFixed(1)}`).join(' ');
+  const labels=data.map((d,i)=>`<text x="${x(i).toFixed(1)}" y="${H-16}" text-anchor="middle" fill="${textCol}" font-size="11.5" font-family="sans-serif">W${String(d.WeekNum).padStart(2,'0')}</text>`).join('');
+  const valueLabels=data.map((d,i)=>`<text x="${x(i).toFixed(1)}" y="${Math.max(T+14,y(d.count)-10).toFixed(1)}" text-anchor="middle" fill="${col}" stroke="${surf}" stroke-width="3" paint-order="stroke" font-size="12" font-weight="800" font-family="sans-serif">${d.count}</text>`).join('');
+  const dots=data.map((d,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(d.count).toFixed(1)}" r="4" fill="${col}" stroke="${surf}" stroke-width="1.5"><title>Nationwide W${String(d.WeekNum).padStart(2,'0')}: ${d.count} teams</title></circle>`).join('');
+  const legend=`<span class="pdtupd-legend-item"><i class="pdtupd-legend-dot" style="background:${col}"></i>Nationwide <b style="color:${col}">${ys[ys.length-1]}</b></span><span class="pdtupd-legend-item"><i style="display:inline-block;width:18px;border-top:3px dashed ${trendCol}"></i>Linear ( Nationwide )</span>`;
+  return `<div class="pdtupd-chart-card"><div class="pdtupd-chart-title"><span>PDT NOT PASS TARGET</span><span class="pdtupd-chart-sub">Nationwide · OFC + NODE · จำนวนทีมที่ PDT ไม่ผ่านราย Week</span></div><div class="pdtupd-chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="PDT NOT PASS TARGET Nationwide trend" preserveAspectRatio="xMidYMid meet"><line x1="${L}" y1="${T}" x2="${L}" y2="${T+ch}" stroke="${textCol}" opacity=".65"/><line x1="${L}" y1="${T+ch}" x2="${L+cw}" y2="${T+ch}" stroke="${textCol}" opacity=".65"/>${grid}<polyline points="${fitPoints}" fill="none" stroke="${trendCol}" stroke-width="2.8" stroke-dasharray="8 5" stroke-linecap="round"/><polyline points="${points}" fill="none" stroke="${col}" stroke-width="4.2" stroke-linejoin="round" stroke-linecap="round"/>${dots}${valueLabels}${labels}<text x="${L}" y="${T-10}" fill="${textCol}" font-size="11.5" font-family="sans-serif">Teams</text></svg></div><div class="pdtupd-legend">${legend}</div></div>`;
+}
+function pdtUpdChart(skill){
+  const target=PDT_UPDATE_TARGET[skill], data=pdtUpdSeries(skill);
+  const title=skill==='OFC'?'OFC Nationwide':'NODE Nationwide';
+  const last=data.length?data[data.length-1]:null;
+  const c=(name,fallback)=>{const v=getComputedStyle(document.documentElement).getPropertyValue(name).trim();return v||fallback;};
+  const colors={bar:c('--accent','#2563eb'),pdt:c('--accent2','#3b82f6'),total:c('--crit','#dc2626'),system:c('--ok','#16a34a'),withTT:c('--teal','#06b6d4'),target:c('--tm','#64748b'),grid:c('--brd','#cbd5e1'),text:c('--tm','#64748b'),surf:c('--surf','#0b1220')};
+  const sourceLabel=last&&last._usingRaw?'Ticket Open (Create Time)':'Total Closed WO (Weekly)';
+  const esc=(v)=>pdtUpdEsc(v);
+  const fmtWhole=v=>(Number(v)||0).toLocaleString(undefined,{maximumFractionDigits:0});
+  const W=960,H=360,L=56,R=28,T=28,B=58,cw=W-L-R,ch=170,workTop=226,workH=86;
+  const pdtVals=data.map(d=>Number(d.pdt)||0);
+  const pdtMin=Math.min(target,...pdtVals), pdtMax=Math.max(target,...pdtVals,1);
+  const span=Math.max(pdtMax-pdtMin,.8), y0=Math.max(0,pdtMin-span*.28), y1=pdtMax+span*.32;
+  const workMax=Math.max(1,...data.flatMap(d=>[d.tickets,d.total,d.system,d.withTT].map(v=>Number(v)||0)));
+  const x=i=>data.length<=1?L+cw/2:L+(cw*i/(data.length-1));
+  const y=v=>T+ch-(Number(v)-y0)/(y1-y0||1)*ch;
+  const ticks=Array.from({length:4},(_,i)=>y0+(y1-y0)*i/3);
+  const grid=ticks.map(v=>`<line x1="${L}" x2="${L+cw}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="${colors.grid}" stroke-width="1" opacity=".55"/><text x="${L-10}" y="${(y(v)+4).toFixed(1)}" text-anchor="end" fill="${colors.text}" font-size="11">${v.toFixed(1)}</text>`).join('');
+  const pdtPoints=data.map((d,i)=>`${x(i).toFixed(1)},${y(d.pdt).toFixed(1)}`).join(' ');
+  const targetY=y(target);
+  const labels=data.map((d,i)=>`<text x="${x(i).toFixed(1)}" y="${H-20}" text-anchor="middle" fill="${colors.text}" font-size="11">W${String(d.WeekNum).padStart(2,'0')}</text>`).join('');
+  const pdtDots=data.map((d,i)=>{const xx=x(i), yy=y(d.pdt), good=Number(d.pdt)>=target; return `<g><circle cx="${xx.toFixed(1)}" cy="${yy.toFixed(1)}" r="4.2" fill="${good?colors.pdt:colors.total}" stroke="${colors.surf}" stroke-width="2"><title>W${String(d.WeekNum).padStart(2,'0')} PDT ${Number(d.pdt||0).toFixed(2)} · ${sourceLabel} ${fmtWhole(d.tickets)}</title></circle><text x="${xx.toFixed(1)}" y="${(yy-10).toFixed(1)}" text-anchor="middle" fill="${good?colors.pdt:colors.total}" stroke="${colors.surf}" stroke-width="3" paint-order="stroke" font-size="10.5" font-weight="800">${Number(d.pdt||0).toFixed(2)}</text></g>`;}).join('');
+  const workBars=data.map((d,i)=>{const bw=Math.max(16,Math.min(34,cw/Math.max(data.length,1)*.38)); const h=(Number(d.tickets)||0)/workMax*58; const xx=x(i)-bw/2, yy=workTop+workH-h; return `<rect x="${xx.toFixed(1)}" y="${yy.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${colors.bar}" opacity=".34"><title>${sourceLabel}: ${fmtWhole(d.tickets)}</title></rect>`;}).join('');
+  const workLabels=data.map((d,i)=>`<text x="${x(i).toFixed(1)}" y="${(workTop+workH+14).toFixed(1)}" text-anchor="middle" fill="${colors.bar}" stroke="${colors.surf}" stroke-width="3" paint-order="stroke" font-size="9.5" font-weight="750">${fmtWhole(d.tickets)}</text>`).join('');
+  const laneDefs=[
+    {key:'total',label:'Total WO',col:colors.total,base:workTop+14,fn:d=>d.total,labelDy:-7},
+    {key:'withTT',label:'WO + TT',col:colors.withTT,base:workTop+42,fn:d=>d.withTT,labelDy:-7},
+    {key:'system',label:'Exc. Manual',col:colors.system,base:workTop+68,fn:d=>d.system,labelDy:13}
+  ];
+  const laneY=(lane,d)=>{
+    const vals=data.map(lane.fn).map(v=>Number(v)||0);
+    const min=Math.min(...vals), max=Math.max(...vals), span=Math.max(1,max-min);
+    return lane.base - ((Number(lane.fn(d))||0)-min)/span*10 + 5;
+  };
+  const workLaneLines=laneDefs.map(lane=>{
+    const pts=data.map((d,i)=>`${x(i).toFixed(1)},${laneY(lane,d).toFixed(1)}`).join(' ');
+    const dots=data.map((d,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${laneY(lane,d).toFixed(1)}" r="2.7" fill="${lane.col}" stroke="${colors.surf}" stroke-width="1"><title>${lane.label} W${String(d.WeekNum).padStart(2,'0')}: ${fmtWhole(lane.fn(d))}</title></circle>`).join('');
+    const vals=data.map((d,i)=>`<text x="${x(i).toFixed(1)}" y="${(laneY(lane,d)+lane.labelDy).toFixed(1)}" text-anchor="middle" fill="${lane.col}" stroke="${colors.surf}" stroke-width="3" paint-order="stroke" font-size="9.5" font-weight="800">${fmtWhole(lane.fn(d))}</text>`).join('');
+    return `<text x="${L-8}" y="${(lane.base+4).toFixed(1)}" text-anchor="end" fill="${lane.col}" font-size="9.5" font-weight="800">${lane.label}</text><line x1="${L}" x2="${L+cw}" y1="${lane.base.toFixed(1)}" y2="${lane.base.toFixed(1)}" stroke="${colors.grid}" opacity=".18"/><polyline points="${pts}" fill="none" stroke="${lane.col}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${dots}${vals}`;
+  }).join('');
+  const delta=last&&data.length>1?Number(last.pdt||0)-Number(data[data.length-2].pdt||0):null;
+  const deltaText=delta==null?'—':`${delta>=0?'ขึ้น':'ลง'} ${Math.abs(delta).toFixed(2)}`;
+  const rawLoading=pdtUpdateRawTrendPromise&&!pdtUpdateRawTrend;
+  const metricVal=(v,d=1,needsRaw=false)=>needsRaw&&rawLoading?'กำลังโหลด...':(v==null?'—':(d===0?fmtWhole(v):Number(v||0).toFixed(d)));
+  const legendHTML=[
+    ['bar',sourceLabel,last&&last.tickets,0,true],
+    ['pdt','PDT Avg',last&&last.pdt,2,false],
+    ['total','Total WO (Closed)',last&&last.total,0,true],
+    ['system','WO Exc. Manual',last&&last.system,0,true],
+    ['withTT','WO + Manual With TT (Closed)',last&&last.withTT,0,true],
+    ['target',`Target ${Number(target).toFixed(2)}`,target,2,false]
+  ].map(([k,label,v,d,needsRaw])=>`<span class="pdtupd-legend-item"><i class="pdtupd-legend-dot" style="background:${colors[k]}"></i>${label} <b style="color:${colors[k]}">${metricVal(v,d,needsRaw)}</b></span>`).join('')+`<span class="pdtupd-legend-item">WoW <b style="color:${delta!=null&&delta<0?colors.total:colors.system}">${deltaText}</b></span>`;
+  return `<div class="pdtupd-chart-card"><div class="pdtupd-chart-title"><span>${title}</span><span class="pdtupd-chart-sub">PDT trend · WO lanes below · Target ${Number(target).toFixed(1)}</span></div><div class="pdtupd-chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(title)} trend" preserveAspectRatio="xMidYMid meet"><text x="${L}" y="16" fill="${colors.text}" font-size="11" font-weight="700">PDT</text><text x="${L}" y="${workTop-10}" fill="${colors.text}" font-size="11" font-weight="700">WO</text><line x1="${L}" x2="${L+cw}" y1="${T+ch}" y2="${T+ch}" stroke="${colors.grid}" opacity=".8"/>${grid}<line x1="${L}" x2="${L+cw}" y1="${targetY.toFixed(1)}" y2="${targetY.toFixed(1)}" stroke="${colors.target}" stroke-width="1.8" stroke-dasharray="7 6"/><polyline points="${pdtPoints}" fill="none" stroke="${colors.pdt}" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>${pdtDots}<line x1="${L}" x2="${L+cw}" y1="${workTop+workH}" y2="${workTop+workH}" stroke="${colors.grid}" opacity=".55"/><line x1="${L}" x2="${L+cw}" y1="${workTop}" y2="${workTop}" stroke="${colors.grid}" opacity=".35"/>${workBars}${workLaneLines}${workLabels}${labels}</svg></div><div class="pdtupd-legend">${legendHTML}</div></div>`;
+}
+function pdtUpdSummary(rows,selectedKey,skill){
+  const selected=rows.filter(r=>pdtUpdWeekKey(r)===selectedKey);
+  const fail=selected.filter(r=>r.pdtFail);
+  const both=fail.filter(r=>r.mhFail);
+  const avgPdt=selected.length?selected.reduce((s,r)=>s+(Number(r.pdt)||0),0)/selected.length:null;
+  const prevKey=(()=>{const opts=pdtUpdWeekOptions(rows), idx=opts.findIndex(o=>o.key===selectedKey); return idx>0?opts[idx-1].key:'';})();
+  const prev=prevKey?rows.filter(r=>pdtUpdWeekKey(r)===prevKey):[];
+  const prevAvg=prev.length?prev.reduce((s,r)=>s+(Number(r.pdt)||0),0)/prev.length:null;
+  const delta=avgPdt!=null&&prevAvg!=null?avgPdt-prevAvg:null;
+  const deltaText=delta==null?'ไม่มีสัปดาห์ก่อนหน้า':`${delta>=0?'ดีขึ้น':'ลดลง'} ${Math.abs(delta).toFixed(2)} จากสัปดาห์ก่อน`;
+  const regionCount=new Set(fail.map(r=>r.region).filter(Boolean)).size;
+  const target=PDT_UPDATE_TARGET[skill];
+  return `<div class="pdtupd-summary">
+    <div class="pdtupd-kpi"><div class="pdtupd-kpi-label">PDT Avg ล่าสุด</div><div class="pdtupd-kpi-value ${avgPdt!=null&&avgPdt<target?'pdtupd-risk':'pdtupd-ok'}">${avgPdt==null?'—':avgPdt.toFixed(2)}</div><div class="pdtupd-kpi-sub">Target ${target.toFixed(1)} · ${deltaText}</div></div>
+    <div class="pdtupd-kpi"><div class="pdtupd-kpi-label">ทีมไม่ผ่าน PDT</div><div class="pdtupd-kpi-value pdtupd-risk">${fail.length.toLocaleString()}</div><div class="pdtupd-kpi-sub">จาก ${selected.length.toLocaleString()} ทีมในสัปดาห์นี้</div></div>
+    <div class="pdtupd-kpi"><div class="pdtupd-kpi-label">PDT + Man Hour Risk</div><div class="pdtupd-kpi-value pdtupd-risk">${both.length.toLocaleString()}</div><div class="pdtupd-kpi-sub">Man Hour / Day ต่ำกว่า 8</div></div>
+    <div class="pdtupd-kpi"><div class="pdtupd-kpi-label">Region ที่มี Fail</div><div class="pdtupd-kpi-value">${regionCount.toLocaleString()}</div><div class="pdtupd-kpi-sub">ใช้จัด priority ตามพื้นที่</div></div>
+  </div>`;
+}
+function setPdtUpdSearch(value){
+  pdtUpdSearch=String(value||'');
+  window.pdtUpdSearch=pdtUpdSearch;
+  renderPDTUpdate();
+}
+function togglePdtUpdOnlyBoth(){
+  pdtUpdOnlyBoth=!pdtUpdOnlyBoth;
+  window.pdtUpdOnlyBoth=pdtUpdOnlyBoth;
+  renderPDTUpdate();
+}
+async function refreshPdtUpdRawTrend(){
+  const btn=document.getElementById('pdtupd-raw-btn');
+  if(btn){btn.disabled=true;btn.textContent='กำลังโหลด Raw Trend...';}
+  pdtUpdateRawTrend=null;
+  pdtUpdateRawTrendPromise=null;
+  await pdtUpdLoadRawTrend();
+  if(btn){btn.disabled=false;btn.textContent='โหลด Raw Trend ใหม่';}
+  renderPDTUpdate();
+}
+function pdtUpdAutoLoadRawTrend(){
+  if(pdtUpdateRawTrendAutoStarted || pdtUpdateRawTrend || pdtUpdateRawTrendPromise) return;
+  if(!pdtUpdSourceRows().length) return;
+  pdtUpdateRawTrendAutoStarted = true;
+  pdtUpdLoadRawTrend().then(()=>{ if(pdtUpdateRawTrend) renderPDTUpdate(); });
+}
+function pdtUpdRows(skill){
+  return pdtUpdSourceRows().filter(r=>pdtUpdSkillOf(r)===skill).map(r=>{
+    const target=PDT_UPDATE_TARGET[skill], raw=r._pdtWeeklyRaw||{}, wd=Number(r.workdays)||0;
+    const pdt=Number(raw.pdt_per_day??r.pdt_per_day??(wd?(r.pdt_count||0)/wd:0))||0;
+    const mhVal=raw.man_hour_per_day??r.man_hour_avg??r.man_hour_per_day;
+    const mh=mhVal==null||mhVal===''?null:Number(mhVal);
+    const region=r.NewZone||r.Region||r.region||r.ZoneGroup||'ไม่ระบุ';
+    return {...r,pdt,target,mh,region,pdtFail:pdt<target,mhFail:mh!=null&&mh<8};
+  }).filter(r=>r.TeamID);
+}
+function pdtUpdWeekKey(r){ return `${Number(r?.Year)||0}|${Number(r?.WeekNum)||0}`; }
+function pdtUpdWeekLabel(key){ const [y,w]=String(key||'').split('|').map(Number); return y&&w ? `W${String(w).padStart(2,'0')} / ${y}` : '—'; }
+function pdtUpdWeekOptions(rows){
+  const seen=new Map();
+  rows.forEach(r=>{const k=pdtUpdWeekKey(r); if(k!=='0|0') seen.set(k,{Year:Number(r.Year),WeekNum:Number(r.WeekNum)});});
+  return [...seen.entries()].sort((a,b)=>a[1].Year-b[1].Year||a[1].WeekNum-b[1].WeekNum).map(([key,v])=>({key,label:`W${String(v.WeekNum).padStart(2,'0')} / ${v.Year}`,Year:v.Year,WeekNum:v.WeekNum}));
+}
+function pdtUpdHistoryWeeks(options, selectedKey){
+  const idx=options.findIndex(x=>x.key===selectedKey);
+  if(idx<0) return [];
+  return [0,1,2,3].map(offset=>options[idx-offset]||null);
+}
+let pdtUpdSort = window.pdtUpdSort || {key:'',dir:1};
+function setPdtUpdSort(key){
+  if(pdtUpdSort.key===key) pdtUpdSort.dir *= -1;
+  else { pdtUpdSort.key=key; pdtUpdSort.dir=1; }
+  window.pdtUpdSort=pdtUpdSort;
+  renderPDTUpdate();
+}
+function pdtUpdSortArrow(key){
+  if(pdtUpdSort.key!==key) return '<span class="pdtupd-sort-arrow">↕</span>';
+  return `<span class="pdtupd-sort-arrow">${pdtUpdSort.dir===1?'▲':'▼'}</span>`;
+}
+function pdtUpdTeamTable(rows,title,onlyBoth=false,selectedKey='',historyWeeks=[]){
+  const selectedRows=rows.filter(r=>pdtUpdWeekKey(r)===selectedKey);
+  const q=String(pdtUpdSearch||'').trim().toLowerCase();
+  const shown=selectedRows.filter(r=>{
+    if(!r.pdtFail || (onlyBoth && !r.mhFail)) return false;
+    if(!q) return true;
+    const teamCode=String(r.TeamID||r.team||r.Team||'').toLowerCase();
+    const teamName=String(teamNameOf(r.TeamID)||r.Name||r.TeamName||r['Team Name']||'').toLowerCase();
+    const mgr=String(r.Manager||'').toLowerCase();
+    const region=String(r.region||'').toLowerCase();
+    return teamCode.includes(q)||teamName.includes(q)||mgr.includes(q)||region.includes(q);
+  });
+  const regionAvg={};
+  selectedRows.forEach(r=>{const k=r.region;(regionAvg[k]??=[]).push(r.pdt);});
+  const teamWeeks=new Map(rows.map(r=>[`${r.TeamID}||${pdtUpdWeekKey(r)}`,r]));
+  const pdtHeader=historyWeeks.map((w,i)=>{
+    const wk=w?`W${String(w.WeekNum).padStart(2,'0')}`:'—';
+    const sortable=i===0;
+    return `<th class="${sortable?'pdtupd-sortable':''}" ${sortable?`onclick="setPdtUpdSort('selectedPdt')" aria-sort="${pdtUpdSort.key==='selectedPdt'?(pdtUpdSort.dir===1?'ascending':'descending'):'none'}"`:''}>PDT ${wk}${sortable?pdtUpdSortArrow('selectedPdt'):''}</th>`;
+  }).join('');
+  const sortedShown=shown.slice().sort((a,b)=>{
+    if(pdtUpdSort.key==='selectedPdt') return pdtUpdSort.dir*(Number(a.pdt||0)-Number(b.pdt||0));
+    return String(a.TeamID).localeCompare(String(b.TeamID));
+  });
+  const body=sortedShown.map(r=>{
+    const avgList=regionAvg[r.region]||[], avg=avgList.length?avgList.reduce((a,b)=>a+b,0)/avgList.length:0;
+    const rc=(ZC[r.region]||GC[r.region]||'var(--accent)');
+    const diff=r.pdt-r.target, intensity=Math.min(.34,.08+Math.abs(diff)*.16);
+    const heat=diff<0?`color-mix(in srgb,var(--crit) ${Math.round(intensity*100)}%,var(--surf))`:`color-mix(in srgb,var(--ok) ${Math.round(intensity*100)}%,var(--surf))`;
+    const hist=historyWeeks.map((w,i)=>{const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null; const val=hr?Number(hr.pdt):null; const cls=i===0?'pdtupd-heat ':''; const style=i===0?`background:${heat};color:${diff<0?'var(--crit)':'var(--ok)'}`:''; return `<td class="mono ${cls}" style="${style}">${val==null?'—':val.toFixed(2)}</td>`;}).join('');
+    const teamCode=String(r.TeamID||r.team||r.Team||'—').trim();
+    const teamName=teamNameOf(teamCode)||r.Name||r.TeamName||r['Team Name']||'—';
+    return `<tr><td class="pdtupd-team-cell" style="border-left:3px solid ${rc}"><span class="pdtupd-team-code">${pdtUpdEsc(teamCode)}</span><span class="pdtupd-team-name" title="${pdtUpdEsc(teamName)}">${pdtUpdEsc(teamName)}</span></td><td class="pdtupd-sticky-region" style="background:linear-gradient(90deg,color-mix(in srgb,${rc} 10%,transparent),transparent 82%)">${pdtUpdEsc(r.region)}</td>${hist}<td class="mono">${r.target.toFixed(1)}</td><td class="mono ${r.mhFail?'pdtupd-mh-fail':''}">${r.mh==null?'—':r.mh.toFixed(2)}</td><td class="mono">${avg.toFixed(2)}</td><td>${r.pdt<avg?'<span style="color:var(--crit);font-weight:700">แย่กว่า</span>':'<span style="color:var(--ok);font-weight:700">ไม่แย่กว่า</span>'}</td><td>${pdtUpdEsc(r.Manager||'—')}</td></tr>`;
+  }).join('')||`<tr><td colspan="${7+historyWeeks.length}" class="empty">ไม่พบทีมตามเงื่อนไขใน ${pdtUpdEsc(pdtUpdWeekLabel(selectedKey))}</td></tr>`;
+  return `<div class="pdtupd-table-card"><div class="ttbar"><strong>${pdtUpdEsc(title)} — ${pdtUpdEsc(pdtUpdWeekLabel(selectedKey))}</strong><span style="font-size:11px;color:var(--tm);margin-left:8px">แสดง ${shown.length.toLocaleString()} ทีม · PDT < Target · Man Hour < 8 จะถูกไฮไลต์</span></div><div class="pdtupd-table-scroll"><table class="pdtupd-table"><thead><tr><th>Team</th><th>Region</th>${pdtHeader}<th>Target</th><th>Man Hour / Day</th><th>Avg PDT Region</th><th>เทียบ Region</th><th>Manager</th></tr></thead><tbody>${body}</tbody></table></div></div>`;
+}
+let pdtUpdSelectedSkill = window.pdtUpdSelectedSkill || 'OFC';
+let pdtUpdSelectedWeek = window.pdtUpdSelectedWeek || '';
+function setPdtUpdSkill(skill){
+  pdtUpdSelectedSkill = skill === 'NOD' ? 'NOD' : 'OFC';
+  window.pdtUpdSelectedSkill = pdtUpdSelectedSkill;
+  pdtUpdSelectedWeek = '';
+  window.pdtUpdSelectedWeek = '';
+  renderPDTUpdate();
+}
+function setPdtUpdWeek(value){
+  pdtUpdSelectedWeek=String(value||'');
+  window.pdtUpdSelectedWeek=pdtUpdSelectedWeek;
+  renderPDTUpdate();
+}
+function renderPDTUpdate(){
+  const root=document.getElementById('pdtupd-charts'), tabs=document.getElementById('pdtupd-skill-tabs'), tbl=document.getElementById('pdtupd-tables');
+  if(!root||!tbl)return;
+  const info=document.getElementById('pdtupd-info'); if(info)info.textContent=periodLabelText();
+  const skill=pdtUpdSelectedSkill === 'NOD' ? 'NOD' : 'OFC';
+  if(tabs) tabs.innerHTML=`<button type="button" class="pdtupd-skill-btn ${skill==='OFC'?'active':''}" role="tab" aria-selected="${skill==='OFC'}" onclick="setPdtUpdSkill('OFC')">OFC</button><button type="button" class="pdtupd-skill-btn ${skill==='NOD'?'active':''}" role="tab" aria-selected="${skill==='NOD'}" onclick="setPdtUpdSkill('NOD')">NODE</button>`;
+  try{
+    const rows=pdtUpdRows(skill), options=pdtUpdWeekOptions(rows);
+    if(!options.length){
+      root.innerHTML='<div class="empty" style="padding:30px;text-align:center">ไม่พบข้อมูล PDT รายสัปดาห์</div>';
+      tbl.innerHTML='';
+      return;
+    }
+    if(!options.some(x=>x.key===pdtUpdSelectedWeek)) pdtUpdSelectedWeek=options[options.length-1].key;
+    window.pdtUpdSelectedWeek=pdtUpdSelectedWeek;
+    const selectedOpt=options.find(x=>x.key===pdtUpdSelectedWeek)||options[options.length-1];
+    const historyWeeks=pdtUpdHistoryWeeks(options,pdtUpdSelectedWeek);
+    pdtUpdAutoLoadRawTrend();
+    root.innerHTML=pdtUpdSummary(rows,pdtUpdSelectedWeek,skill)+pdtUpdChart(skill)+pdtUpdNationwideChart();
+    const weekSelect=`<div class="pdtupd-week-filter"><div class="pdtupd-week-heading"><span class="pdtupd-week-eyebrow">WEEK FILTER</span><label for="pdtupd-week-select">เลือกสัปดาห์ที่ต้องการดู</label></div><div class="pdtupd-week-control"><span class="pdtupd-week-icon">▣</span><select id="pdtupd-week-select" class="pdtupd-week-select" aria-label="เลือกสัปดาห์ที่ต้องการดู" onchange="setPdtUpdWeek(this.value)">${options.map(o=>`<option value="${pdtUpdEsc(o.key)}" ${o.key===selectedOpt.key?'selected':''}>${pdtUpdEsc(o.label)}</option>`).join('')}</select></div><div class="pdtupd-week-current"><span>กำลังแสดง</span><strong>${pdtUpdEsc(selectedOpt.label)}</strong></div><span class="pdtupd-week-note">คอลัมน์: ${historyWeeks.map(w=>w?`PDT W${String(w.WeekNum).padStart(2,'0')}`:'PDT —').join(' · ')}</span></div>`;
+    const rawState=pdtUpdateRawTrend?'ใช้ raw tickets แล้ว':(pdtUpdateRawTrendPromise?'กำลังโหลด raw trend อัตโนมัติ...':'กำลังใช้ pdt_weekly_summary และจะโหลด raw trend อัตโนมัติ');
+    const controls=`<div class="pdtupd-controls"><input class="pdtupd-search" value="${pdtUpdEsc(pdtUpdSearch)}" placeholder="ค้นหา Team / Manager / Region แล้วกด Enter" onkeydown="if(event.key==='Enter')setPdtUpdSearch(this.value)" onchange="setPdtUpdSearch(this.value)"><button type="button" class="pdtupd-filter-btn ${pdtUpdOnlyBoth?'active':''}" onclick="togglePdtUpdOnlyBoth()">เฉพาะ PDT + MH Risk</button><button type="button" class="pdtupd-raw-btn" id="pdtupd-raw-btn" onclick="refreshPdtUpdRawTrend()" ${pdtUpdateRawTrendPromise&&!pdtUpdateRawTrend?'disabled':''}>${pdtUpdateRawTrend?'โหลด Raw Trend ใหม่':'โหลด Raw Trend ใหม่'}</button><span class="pdtupd-raw-note">${rawState}</span></div>`;
+    tbl.innerHTML=weekSelect+controls+pdtUpdTeamTable(rows,`รายชื่อทีม ${skill==='NOD'?'Node':'OFC'} ที่ไม่ผ่าน PDT${pdtUpdOnlyBoth?' และ Man Hour':''}`,pdtUpdOnlyBoth,pdtUpdSelectedWeek,historyWeeks);
+  }catch(err){
+    console.error('PDT Update render failed',err);
+    root.innerHTML=`<div class="empty" style="padding:30px;text-align:center;color:var(--crit)">โหลด PDT Update ไม่สำเร็จ: ${pdtUpdEsc(err.message||err)}</div>`;
+    tbl.innerHTML='';
   }
 }
-
 function goTab(name,btn){
 
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -6400,245 +6627,12 @@ function goTab(name,btn){
   if(name==='prov')      renderProv();
   if(name==='le')        renderLE();
   if(name==='pdtreport') renderPDTReport();
-  if(name==='mtreport')  renderMTReport();
-  if(name==='audit')     renderAuditOutlierTab();
+  if(name==='pdtupdate') renderPDTUpdate();
   if(name==='plkd')      renderPlkdTab();
 }
 
-// ═══ MT REPORT ═══════════════════════════════════════════════════
-// TT = ticket ที่ WO Creator เป็น 'System' (ใบหลัก/Trouble Ticket)
-// MT = ticket ที่ WO Creator ไม่ใช่ System และมี Source Ticket ID ตรงกับ TT ใบใดใบหนึ่ง (ใบที่ทีมอื่นเปิดเข้าช่วย)
-// ข้อมูลต้นทาง: D.mt_trend (สรุปรายสัปดาห์ต่อ Region — จาก get_kpi_dashboard() โดยตรง), D.week_team.mt_tickets (นับต่อทีม), D.mt_dup_groups (Source Ticket ID ที่มี MT ผูกอยู่ ≥1 ใบ — กรองเหลือ ≥2 ฝั่ง frontend)
-
-// สีประจำชื่อทีม แบบ hash คงที่ (ไม่ขึ้นกับลำดับ) เพื่อ highlight ชื่อทีมให้จำง่ายเวลาเจอซ้ำหลายแถว
-function teamColor(name){
-  const s = String(name||'');
-  let h = 0;
-  for(let i=0;i<s.length;i++){ h = (h*31 + s.charCodeAt(i)) >>> 0; }
-  return MGR_COLOR_PALETTE[h % MGR_COLOR_PALETTE.length];
-}
-
-// เช็คว่าวันที่ (string) ตกอยู่ในช่วงสัปดาห์ที่กรองอยู่หรือไม่ — ใช้ wk_start/wk_end จาก D.week_meta ผ่าน weeksList
-// (เลือกวิธีนี้แทนการคำนวณ ISO week เองฝั่ง client เพื่อเคารพ selMonth/compareWeeks ที่กรองไว้แล้วโดยตรง ไม่พลาด edge case)
-function dateInWeeksRange(dateStr, weeksList){
-  if(!dateStr) return false;
-  const d = new Date(dateStr);
-  if(isNaN(d)) return false;
-  return weeksList.some(w=>{
-    const s = new Date(w.wk_start), e = new Date(w.wk_end);
-    e.setHours(23,59,59,999);
-    return d>=s && d<=e;
-  });
-}
-
-let _mtChartQueue = [];
-function queueMTChart(canvasId, weekKeys, mtReleaseVals, mtNoReleaseVals, ttVals){
-  _mtChartQueue.push({canvasId, weekKeys, mtReleaseVals, mtNoReleaseVals, ttVals});
-}
-function flushMTChartQueue(){
-  const q = _mtChartQueue; _mtChartQueue = [];
-  requestAnimationFrame(()=>{ q.forEach(c=>drawTTMTChart(c.canvasId, c.weekKeys, c.mtReleaseVals, c.mtNoReleaseVals, c.ttVals)); });
-}
-
-// กราฟแท่งซ้อนใหญ่ = MT แยก RELEASE (เขียว) / NO RELEASE (แดง) — แกนซ้าย สเกลตาม MT ให้เห็นชัด
-// เส้นประบาง = TT ทั้งหมด (ฟ้า) — แกนขวา สเกลตาม TT ไว้อ้างอิงสัดส่วนเท่านั้น
-function drawTTMTChart(canvasId, weekKeys, mtReleaseVals, mtNoReleaseVals, ttVals){
-  const canvas = document.getElementById(canvasId);
-  if(!canvas) return;
-  const W = canvas.offsetWidth || canvas.parentElement.offsetWidth || 600;
-  const H = 280;
-  canvas.width = W*devicePixelRatio; canvas.height = H*devicePixelRatio;
-  const ctx = canvas.getContext('2d');
-  ctx.scale(devicePixelRatio, devicePixelRatio);
-  ctx.clearRect(0,0,W,H);
-  const isDark = !document.body.classList.contains('day');
-  const gridC = isDark?'rgba(255,255,255,.08)':'rgba(0,0,0,.08)';
-  const textC = isDark?'rgba(255,255,255,.45)':'rgba(0,0,0,.45)';
-  const releaseColor = '#22c55e', noReleaseColor = '#ef4444', ttColor = '#3b82f6';
-
-  if(!weekKeys.length){
-    ctx.fillStyle = textC; ctx.font='13px sans-serif'; ctx.textAlign='center';
-    ctx.fillText('ไม่มีข้อมูล', W/2, H/2);
-    return;
-  }
-
-  const mtTotals = weekKeys.map((_,i)=>(mtReleaseVals[i]||0)+(mtNoReleaseVals[i]||0));
-  const padL=54, padR=54, padT=16, padB=38;
-  const iw = W-padL-padR, ih = H-padT-padB;
-  const maxMT = Math.max(1, ...mtTotals)*1.2;
-  const maxTT = Math.max(1, ...ttVals)*1.15;
-  const n = weekKeys.length;
-  const bw = Math.min(24, iw/n*0.26); // ความกว้างต่อแท่ง (มี 2 แท่งต่อสัปดาห์แล้ว จึงลดขนาดต่อแท่งลงนิดหน่อยให้พอดีกัน)
-  const gap = 4; // ช่องว่างระหว่างแท่ง MT กับแท่ง TT ในกลุ่มเดียวกัน
-  const maxSpacing = 130;
-  const usedWidth = n>1 ? Math.min(iw, maxSpacing*(n-1)) : 0;
-  const offsetX = padL + (iw-usedWidth)/2;
-  const px = i => n>1 ? offsetX + usedWidth*(i/(n-1)) : padL+iw/2;
-  const pyMT = v => padT + ih*(1-v/maxMT);
-  const pyTT = v => padT + ih*(1-v/maxTT);
-
-  // grid + แกนซ้าย (MT) / แกนขวา (TT)
-  ctx.strokeStyle=gridC; ctx.lineWidth=1;
-  ctx.font='12.5px JetBrains Mono, monospace';
-  for(let i=0;i<=4;i++){
-    const vMT = maxMT*i/4, y = pyMT(vMT);
-    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(padL+iw,y); ctx.stroke();
-    ctx.fillStyle=textC; ctx.textAlign='right'; ctx.fillText(Math.round(vMT), padL-10, y+3);
-    const vTT = maxTT*i/4;
-    ctx.fillStyle=ttColor; ctx.textAlign='left'; ctx.fillText(Math.round(vTT), padL+iw+10, pyTT(vTT)+3);
-  }
-  // x labels
-  ctx.fillStyle=textC; ctx.textAlign='center';
-  weekKeys.forEach((k,i)=>{ ctx.fillText(k, px(i), H-padB+20); });
-
-  weekKeys.forEach((_,i)=>{
-    const cx = px(i);
-    // แท่งซ้าย: MT ซ้อน RELEASE(เขียว)/NO RELEASE(แดง) — แกนซ้าย
-    const xMT = cx - gap/2 - bw;
-    const rel = mtReleaseVals[i]||0, norel = mtNoReleaseVals[i]||0;
-    const y1 = pyMT(rel), h1 = padT+ih-y1;
-    ctx.fillStyle = releaseColor+'cc';
-    ctx.fillRect(xMT,y1,bw,h1);
-    ctx.strokeStyle = releaseColor; ctx.lineWidth=1.2;
-    ctx.strokeRect(xMT,y1,bw,h1);
-    const y2 = pyMT(rel+norel), h2 = y1-y2;
-    ctx.fillStyle = noReleaseColor+'cc';
-    ctx.fillRect(xMT,y2,bw,h2);
-    ctx.strokeStyle = noReleaseColor; ctx.lineWidth=1.2;
-    ctx.strokeRect(xMT,y2,bw,h2);
-    if(rel>0){ ctx.font='700 12px JetBrains Mono, monospace'; ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.fillText(rel, xMT+bw/2, (y1+padT+ih)/2+3); }
-    if(norel>0){ ctx.font='700 12px JetBrains Mono, monospace'; ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.fillText(norel, xMT+bw/2, (y2+y1)/2+3); }
-
-    // แท่งขวา: TT ทั้งหมด (ฟ้า) — แกนขวา
-    const xTT = cx + gap/2;
-    const yTT = pyTT(ttVals[i]||0), hTT = padT+ih-yTT;
-    ctx.fillStyle = ttColor+'aa';
-    ctx.fillRect(xTT,yTT,bw,hTT);
-    ctx.strokeStyle = ttColor; ctx.lineWidth=1.2;
-    ctx.strokeRect(xTT,yTT,bw,hTT);
-    ctx.font='700 12px JetBrains Mono, monospace'; ctx.fillStyle=ttColor; ctx.textAlign='center';
-    ctx.fillText(ttVals[i]||0, xTT+bw/2, yTT-6);
-  });
-}
-
-function toggleMtGroup(gid){
-  const el = document.getElementById('mtgrp-'+gid);
-  const arrow = document.getElementById('mtgrp-arrow-'+gid);
-  if(!el) return;
-  const willShow = el.style.display==='none';
-  el.style.display = willShow ? '' : 'none';
-  if(arrow) arrow.textContent = willShow ? '▾' : '▸';
-}
-
-function toggleCreatorRow(cid){
-  const el = document.getElementById('cf-detail-'+cid);
-  const arrow = document.getElementById('cf-arrow-'+cid);
-  if(!el) return;
-  const willShow = el.style.display==='none';
-  el.style.display = willShow ? '' : 'none';
-  if(arrow) arrow.textContent = willShow ? '▾' : '▸';
-}
-
-// ══ Helper: สร้างไฟล์ .xlsx จริง (ไม่ใช่ .csv) พร้อมสีหัวตาราง + ลายม้าลาย + AutoFilter ที่หัวคอลัมน์ ══
-function xlsxSheetFromRows(cols, rows, opts={}){
-  const header = cols.map(c=>c.label);
-  const data = rows.map(r=>cols.map(c=>{ const v=r[c.key]; return v==null?'':v; }));
-  const ws = XLSX.utils.aoa_to_sheet([header, ...data]);
-  const range = XLSX.utils.decode_range(ws['!ref'] || 'A1:A1');
-
-  // หัวตาราง: พื้นน้ำเงินเข้ม ตัวหนังสือขาวหนา
-  for(let c=range.s.c; c<=range.e.c; c++){
-    const addr = XLSX.utils.encode_cell({r:0, c});
-    if(!ws[addr]) ws[addr] = {t:'s', v:header[c]||''};
-    ws[addr].s = {
-      fill:{patternType:'solid', fgColor:{rgb:'1E3A5F'}},
-      font:{bold:true, color:{rgb:'FFFFFF'}, sz:11},
-      alignment:{horizontal:'center', vertical:'center', wrapText:true},
-      border:{bottom:{style:'medium',color:{rgb:'0F172A'}}}
-    };
-  }
-  // แถวข้อมูล: ลายม้าลายอ่านง่าย + เรียก override เพิ่มเติมได้ผ่าน opts.rowStyler(rowIndex, rowData)
-  for(let r=1; r<=range.e.r; r++){
-    const rowData = rows[r-1];
-    for(let c=range.s.c; c<=range.e.c; c++){
-      const addr = XLSX.utils.encode_cell({r,c});
-      if(!ws[addr]) continue;
-      const baseFill = (r%2===0) ? 'F1F5F9' : 'FFFFFF';
-      ws[addr].s = { fill:{patternType:'solid', fgColor:{rgb:baseFill}}, font:{sz:10}, alignment:{vertical:'center'} };
-    }
-    if(typeof opts.rowStyler === 'function'){
-      const overrides = opts.rowStyler(rowData, r) || {};
-      Object.entries(overrides).forEach(([colKey, style])=>{
-        const ci = cols.findIndex(c=>c.key===colKey);
-        if(ci<0) return;
-        const addr = XLSX.utils.encode_cell({r, c:ci});
-        if(ws[addr]) ws[addr].s = {...ws[addr].s, ...style};
-      });
-    }
-  }
-  // AutoFilter ที่แถวหัวตาราง (ปุ่มกรอง/เรียงลำดับใน Excel ใช้ได้ทันที)
-  ws['!autofilter'] = { ref: XLSX.utils.encode_range({s:{r:0,c:range.s.c}, e:{r:0,c:range.e.c}}) };
-  // ตรึงแถวหัวตาราง (freeze pane) ให้เลื่อนดูข้อมูลเยอะๆ ไม่หลุดหัวตาราง
-  ws['!pane'] = { ySplit:1, topLeftCell:'A2', activePane:'bottomLeft', state:'frozen' };
-  // ความกว้างคอลัมน์อัตโนมัติคร่าวๆ ตามความยาวเนื้อหา
-  ws['!cols'] = cols.map(c=>{
-    let maxLen = c.label.length;
-    rows.slice(0,80).forEach(row=>{ const v=row[c.key]; if(v!=null){ const len=String(v).length; if(len>maxLen) maxLen=len; } });
-    return { wch: Math.min(Math.max(maxLen+2, 10), 55) };
-  });
-  return ws;
-}
-function xlsxDownload(wb, filename){
-  const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array', cellStyles:true});
-  const blob = new Blob([wbout], {type:'application/octet-stream'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-// ── Export ตาราง "MT ที่มี Source Ticket ID ซ้ำกัน" เป็น Excel (.csv) — โชว์ทุก WO (ทั้งใบหลัก TT และ MT ที่เข้าช่วย) แถวละ 1 ใบ ──
-// คำนวณสดตามตัวกรอง Region/Week/Month ปัจจุบัน (เหมือนกับที่ตารางบนจอใช้อยู่)
-// ── Export ตาราง "Top 10 ทีมที่เข้าช่วยเหลือ" เป็น Excel (.csv) — คำนวณสดตามตัวกรอง Region/Week/Month ปัจจุบัน ──
 const MT_RAW_SUPABASE_URL = 'https://pqnvdtxfgbhijsbdsngg.supabase.co';
-const MT_RAW_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxbnZkdHhmZ2JoaWpzYmRzbmdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwMTg0OTEsImV4cCI6MjA5NzU5NDQ5MX0.547fTaDE4beHSov61_P7kHZzwwZJiyuI8lm_0I-guvw';
-
-async function fetchMtRawByTeams(teamIds, closedFrom, closedTo){
-  const res = await fetch(`${MT_RAW_SUPABASE_URL}/rest/v1/rpc/get_mt_raw_by_teams`, {
-    method:'POST',
-    headers:{ 'apikey': MT_RAW_ANON_KEY, 'Authorization':'Bearer '+MT_RAW_ANON_KEY, 'Content-Type':'application/json' },
-    body: JSON.stringify({ team_ids: teamIds, closed_from: closedFrom, closed_to: closedTo })
-  });
-  if(!res.ok) throw new Error('HTTP '+res.status);
-  return res.json();
-}
-
-// ── Sub Root Cause ของ MT ต่อทีม — ดึงจาก MT ทั้งหมดจริงๆ (ทั้ง RELEASE และ NO RELEASE) ผ่านฟังก์ชันเบาๆ แยกต่างหาก ──
-// ไม่ใช้ D.mt_dup_groups เพราะ NO RELEASE (ไม่มี Source Ticket ID) ไม่มีทางโผล่ในนั้นได้เลยโดยนิยาม
-async function fetchMtTopCausesByTeams(teamIds, closedFrom, closedTo, topN=3){
-  const res = await fetch(`${MT_RAW_SUPABASE_URL}/rest/v1/rpc/get_mt_top_causes_by_teams`, {
-    method:'POST',
-    headers:{ 'apikey': MT_RAW_ANON_KEY, 'Authorization':'Bearer '+MT_RAW_ANON_KEY, 'Content-Type':'application/json' },
-    body: JSON.stringify({ team_ids: teamIds, closed_from: closedFrom, closed_to: closedTo, top_n: topN })
-  });
-  if(!res.ok) throw new Error('HTTP '+res.status);
-  return res.json(); // [{team_id, cause, count}, ...]
-}
-
-// ── ชื่อจริงของ Code "Create By" (MT Creator) — ดึงจากตาราง wo_creator_names ──
-let _woCreatorNamesCache = null;
-async function fetchWoCreatorNames(){
-  if(_woCreatorNamesCache) return _woCreatorNamesCache;
-  const res = await fetch(`${MT_RAW_SUPABASE_URL}/rest/v1/wo_creator_names?select=code,full_name`, {
-    headers:{ 'apikey': MT_RAW_ANON_KEY, 'Authorization':'Bearer '+MT_RAW_ANON_KEY }
-  });
-  if(!res.ok) throw new Error('HTTP '+res.status);
-  const rows = await res.json();
-  _woCreatorNamesCache = {};
-  rows.forEach(r=>{ _woCreatorNamesCache[r.code] = r.full_name; });
-  return _woCreatorNamesCache;
-}
+const MT_RAW_ANON_KEY = 'sb_publishable_pfiDwO41HClof585G1_E0w_JaKzwLJq';
 // ═══ PLKD (ปลวกแดง) — 168 Site Code จาก Site_Code_PKD.xlsx ═══════════════════
 // จับคู่ตรงกับคอลัมน์ "Site ID" ในตาราง tickets (Supabase project pqnvdtxfgbhijsbdsngg) — ไม่ต้อง parse Subject เพราะ Site ID สะอาดและตรงอยู่แล้ว
 // TT = แถวที่ "WO Creator" = 'System' (ใบหลัก ตามนิยามเดียวกับส่วน MT Report ด้านบน)
@@ -6674,7 +6668,7 @@ async function fetchTicketsREST(pairs){ return fetchSupabaseTable('tickets', pai
 async function fetchPlkdPdtWeekly(){
   const orClause = '(' + PLKD_TEAM_CODES.map(t=>`team.like.${t}*`).join(',') + ')';
   return fetchSupabaseTable('pdt_weekly_summary', [
-    ['select', 'week_no,team,skill,work_day,pdt_per_day,man_hour_per_day,total_closed_wo,avg_first_arrive'],
+    ['select', '*'],
     ['or', orClause],
     ['order', 'team.asc,week_no.asc'],
   ]);
@@ -7282,601 +7276,7 @@ function exportPlkdSaToCSV(){
   xlsxDownload(wb, `PLKD_SA_Severity_${new Date().toISOString().slice(0,10)}.xlsx`);
 }
 
-function cfSafeId(code){ return String(code).replace(/[^a-zA-Z0-9_-]/g,'_'); }
-let _cfNameLoadGen = 0;
-async function loadAndRenderCreatorNames(codes){
-  const myGen = ++_cfNameLoadGen;
-  try{
-    const names = await fetchWoCreatorNames();
-    if(myGen !== _cfNameLoadGen) return;
-    codes.forEach(code=>{
-      const el = document.getElementById('cf-name-'+cfSafeId(code));
-      if(el && names[code]) el.innerHTML = `<br><span style="font-size:9.5px;color:var(--tm);font-weight:400">${escAttr(names[code])}</span>`;
-    });
-  }catch(err){ console.error('loadAndRenderCreatorNames failed', err); }
-}
-
-// รูปแบบเดียวกันทั้ง 2 จุด (Most MT Top10 list และ Top10 MT — Work Order Details) ตามที่ขอ
-function formatTopCausesHTML(causes){
-  if(!causes || !causes.length) return '<span style="color:var(--tm)">—</span>';
-  return causes.map((c,i)=>`${i+1}. ${escAttr(c.cause)} <span style="color:var(--tm)">(${c.count})</span>`).join('<br>');
-}
-
-let _mtCauseLoadGen = 0; // เพิ่มทุกครั้งที่เรียก renderMTReport ใหม่ — กัน request เก่าที่ช้ากว่ามาทับผลลัพธ์ที่ใหม่กว่า (เผื่อมีการ render ซ้อนกัน)
-async function loadAndRenderMtTopCauses(teamIds, weeks){
-  if(!teamIds.length || !weeks.length) return;
-  const myGen = ++_mtCauseLoadGen;
-  const closedFrom = weeks[0].wk_start + 'T00:00:00';
-  const closedTo = weeks[weeks.length-1].wk_end + 'T23:59:59';
-  try{
-    const rows = await fetchMtTopCausesByTeams(teamIds, closedFrom, closedTo, 3);
-    if(myGen !== _mtCauseLoadGen) return; // มี render ใหม่กว่าเกิดขึ้นระหว่างรอ — ทิ้งผลลัพธ์นี้ไป ไม่เขียนทับ DOM ปัจจุบัน
-    const byTeam = {};
-    rows.forEach(r=>{ if(!byTeam[r.team_id]) byTeam[r.team_id]=[]; byTeam[r.team_id].push({cause:r.cause, count:r.count}); });
-    teamIds.forEach(tid=>{
-      const html = formatTopCausesHTML(byTeam[tid]);
-      const el1 = document.getElementById('mt-cause-'+tid);
-      if(el1) el1.innerHTML = html;
-      const el2 = document.getElementById('mt-cause-detail-'+tid);
-      if(el2) el2.innerHTML = html;
-    });
-  }catch(err){
-    if(myGen !== _mtCauseLoadGen) return; // เช่นเดียวกัน — ถ้ามี render ใหม่กว่าแล้ว ไม่ต้องโชว์ error ทับของเก่า
-    console.error('loadAndRenderMtTopCauses failed', err);
-    teamIds.forEach(tid=>{
-      const errHtml = '<span style="color:var(--crit)">โหลดไม่สำเร็จ</span>';
-      const el1 = document.getElementById('mt-cause-'+tid);
-      if(el1) el1.innerHTML = errHtml;
-      const el2 = document.getElementById('mt-cause-detail-'+tid);
-      if(el2) el2.innerHTML = errHtml;
-    });
-  }
-}
-
-async function exportMtTopTeamsToCSV(){
-  if(!Array.isArray(D.week_team) || !D.week_team.length){ alert('ไม่มีข้อมูลให้ Export'); return; }
-  const weeks = getPdtTableWeeks();
-  const inWeeksList = (yr,wk) => weeks.some(w=>Number(w.WeekNum)===Number(wk) && Number(w.Year)===Number(yr));
-  const teamAgg = {};
-  let wtRows = D.week_team || [];
-  if(selZone!=='ALL' && GRP_ORDER.includes(selZone)) wtRows = wtRows.filter(r=>regionGroupOf(r.NewZone)===selZone);
-  wtRows.forEach(r=>{
-    if(!inWeeksList(r.Year, r.WeekNum)) return;
-    const mt = Number(r.mt_tickets)||0;
-    if(mt<=0) return;
-    const tid = r.TeamID || '—';
-    if(!teamAgg[tid]) teamAgg[tid] = {team:tid, region:regionGroupOf(r.NewZone), mtClosed:0};
-    teamAgg[tid].mtClosed += mt;
-  });
-  const topTeams = Object.values(teamAgg).sort((a,b)=>b.mtClosed-a.mtClosed).slice(0,10);
-  if(!topTeams.length){ alert('ไม่มีข้อมูล MT ที่ปิดในช่วงที่เลือกอยู่'); return; }
-
-  // ── Sheet 1: สรุป Top 10 ──
-  const summaryCols = [
-    {key:'rank',    label:'อันดับ'},
-    {key:'team',    label:'Team ID'},
-    {key:'teamName',label:'Team Name'},
-    {key:'region',  label:'Region'},
-    {key:'mtClosed',label:'MT ที่ปิด'},
-  ];
-  const summaryRows = topTeams.map((t,i)=>{
-    const r = rosterOf(t.team);
-    return {rank:i+1, team:t.team, teamName:(r&&r.Name)||'', region:t.region, mtClosed:t.mtClosed};
-  });
-
-  // ── Sheet 2: Raw Data ของ MT ทุกใบ ของ 10 ทีมนี้ ในช่วงที่เลือกอยู่ ──
-  const btn = document.getElementById('mt-top10-export-btn');
-  const btnOrigText = btn ? btn.textContent : '';
-  if(btn){ btn.textContent = '⏳ กำลังดึง Raw Data...'; btn.disabled = true; btn.style.opacity = '.6'; }
-  let rawRows = [];
-  try{
-    if(weeks.length){
-      const closedFrom = weeks[0].wk_start + 'T00:00:00';
-      const closedTo = weeks[weeks.length-1].wk_end + 'T23:59:59';
-      rawRows = await fetchMtRawByTeams(topTeams.map(t=>t.team), closedFrom, closedTo);
-    }
-  }catch(err){
-    console.error('fetchMtRawByTeams failed', err);
-    alert('ดึง Raw Data ไม่สำเร็จ (จะ Export แค่ตารางสรุปแทน): '+err.message);
-  } finally {
-    if(btn){ btn.textContent = btnOrigText; btn.disabled = false; btn.style.opacity = ''; }
-  }
-
-  const wb = XLSX.utils.book_new();
-  const wsSummary = xlsxSheetFromRows(summaryCols, summaryRows, {
-    rowStyler: (row) => {
-      // ไล่สีเขียวอ่อน 3 อันดับแรก ให้เด่นสุด
-      if(row.rank<=3) return { mtClosed:{ font:{bold:true, color:{rgb:'166534'}}, fill:{patternType:'solid',fgColor:{rgb:'DCFCE7'}} } };
-      return {};
-    }
-  });
-  XLSX.utils.book_append_sheet(wb, wsSummary, 'สรุป Top 10');
-
-  if(rawRows.length){
-    const rawCols = [
-      {key:'TeamID',label:'Team ID'}, {key:'TeamName',label:'Team Name'}, {key:'WorkOrderID',label:'Work Order ID'},
-      {key:'Subject',label:'Subject'},
-      {key:'Region',label:'Region'}, {key:'Province',label:'Province'}, {key:'Skill',label:'Skill'},
-      {key:'SubRootCause',label:'Sub Root Cause'}, {key:'WOCreator',label:'Create From'}, {key:'SourceTicketID',label:'Source Ticket ID'},
-      {key:'Status',label:'Status'}, {key:'CreatedTime',label:'Created Time'}, {key:'Closed',label:'Closed'},
-    ];
-    const isInoc = s => /INOC/i.test(String(s||''));
-    const wsRaw = xlsxSheetFromRows(rawCols, rawRows, {
-      rowStyler: (row) => {
-        // Create From ที่ไม่ใช่ INOC → ไฮไลต์แดง เหมือนที่โชว์บนหน้าเว็บ
-        if(!isInoc(row.WOCreator)) return { WOCreator:{ font:{bold:true, color:{rgb:'B91C1C'}}, fill:{patternType:'solid',fgColor:{rgb:'FEE2E2'}} } };
-        return {};
-      }
-    });
-    XLSX.utils.book_append_sheet(wb, wsRaw, 'Raw Data');
-  }
-
-  const dateTag = new Date().toISOString().slice(0,10);
-  const zoneTag = selZone!=='ALL' ? '_'+selZone.replace('&','') : '';
-  xlsxDownload(wb, `MT_Top10_Teams${zoneTag}_${dateTag}.xlsx`);
-}
-
-function exportMtDupToCSV(){
-  if(!Array.isArray(D.mt_dup_groups) || !D.mt_dup_groups.length){ alert('ไม่มีข้อมูลให้ Export'); return; }
-  const weeks = getPdtTableWeeks();
-  const dupGroups = (D.mt_dup_groups||[])
-    .filter(g=>Array.isArray(g.mt_tickets) && g.mt_tickets.length>=2)
-    .map(g=>{
-      const children = (g.mt_tickets||[]).filter(c=>{
-        if(selZone!=='ALL' && GRP_ORDER.includes(selZone) && c.region!==selZone) return false;
-        return dateInWeeksRange(c.closed, weeks);
-      });
-      return {...g, filteredChildren: children};
-    }).filter(g=>g.filteredChildren.length>=1)
-      .sort((a,b)=>b.filteredChildren.length-a.filteredChildren.length);
-
-  if(!dupGroups.length){ alert('ไม่มีข้อมูลให้ Export ตามตัวกรองที่เลือกอยู่'); return; }
-
-  const cols = [
-    {key:'sourceTicketId', label:'Source Ticket ID'},
-    {key:'role',           label:'ประเภท'},
-    {key:'wo',              label:'Work Order ID'},
-    {key:'team',            label:'Team'},
-    {key:'teamName',        label:'Team Name'},
-    {key:'region',          label:'Region'},
-    {key:'skill',           label:'Skill'},
-    {key:'subRootCause',    label:'Sub Root Cause ที่ปิด'},
-    {key:'creator',         label:'Create From'},
-    {key:'closed',          label:'Closed'},
-    {key:'mtCountInGroup',  label:'จำนวน MT ในกลุ่มนี้'},
-  ];
-
-  const rows = [];
-  dupGroups.forEach(g=>{
-    (g.system_tickets||[]).forEach(p=>{
-      rows.push({sourceTicketId:g.source_ticket_id, role:'ใบหลัก (TT)', wo:p.wo, team:p.team_id, teamName:p.team_name||'', region:p.region, skill:p.skill, subRootCause:'', creator:'System', closed:p.closed||'', mtCountInGroup:g.filteredChildren.length});
-    });
-    g.filteredChildren.forEach(c=>{
-      rows.push({sourceTicketId:g.source_ticket_id, role:'MT (เข้าช่วย)', wo:c.wo, team:c.team_id, teamName:c.team_name||'', region:c.region, skill:c.skill, subRootCause:c.sub_root_cause||'', creator:c.wo_creator||'', closed:c.closed||'', mtCountInGroup:g.filteredChildren.length});
-    });
-  });
-
-  const isInoc = s => /INOC/i.test(String(s||''));
-  const wb = XLSX.utils.book_new();
-  const ws = xlsxSheetFromRows(cols, rows, {
-    rowStyler: (row) => {
-      const styles = {};
-      // แถวใบหลัก (TT) → ไล่สีฟ้าอ่อนให้แยกจาก MT ชัดเจน
-      if(row.role==='ใบหลัก (TT)') styles.role = { font:{bold:true, color:{rgb:'1D4ED8'}}, fill:{patternType:'solid',fgColor:{rgb:'DBEAFE'}} };
-      // Create From ที่ไม่ใช่ INOC → ไฮไลต์แดง เหมือนบนหน้าเว็บ
-      if(row.creator && row.creator!=='System' && !isInoc(row.creator)){
-        styles.creator = { font:{bold:true, color:{rgb:'B91C1C'}}, fill:{patternType:'solid',fgColor:{rgb:'FEE2E2'}} };
-      }
-      return styles;
-    }
-  });
-  XLSX.utils.book_append_sheet(wb, ws, 'MT Released Duplicate');
-
-  const dateTag = new Date().toISOString().slice(0,10);
-  const zoneTag = selZone!=='ALL' ? '_'+selZone.replace('&','') : '';
-  xlsxDownload(wb, `MT_Duplicate_SourceTicket${zoneTag}_${dateTag}.xlsx`);
-}
-
-function renderMTReport(){
-  const body = document.getElementById('mtrpt-body');
-  const infoEl = document.getElementById('mtrpt-info');
-  if(!body) return;
-  if(infoEl) infoEl.textContent = periodLabelText() + (selZone!=='ALL' ? ' · Zone: '+selZone : '');
-
-  if(!Array.isArray(D.mt_trend) || !D.mt_trend.length){
-    body.innerHTML = `<div class="empty" style="padding:20px;color:var(--tm);font-size:12px">ยังไม่มีข้อมูล MT — กรุณา sync ข้อมูลล่าสุด (ต้องมี field mt_trend / mt_dup_groups จาก get_kpi_dashboard())</div>`;
-    return;
-  }
-
-  const weeks = getPdtTableWeeks(); // เคารพ selMonth/compareWeeks อยู่แล้ว
-  const weekKeys = weeks.map(w=>'W'+w.WeekNum);
-  const inWeeksList = (yr,wk) => weeks.some(w=>Number(w.WeekNum)===Number(wk) && Number(w.Year)===Number(yr));
-
-  // mt_trend: เป็นระดับ Region (ZoneGroup อยู่ในรูปกลุ่มแล้ว BMA/C&W/EAS/SOU) — tt = ตั๋วปิดทั้งหมด, แยก with/without Source Ticket ID, mt = ในนั้นที่ WO Creator ไม่ใช่ System, แยก release/no-release
-  let trendRows = D.mt_trend;
-  if(selZone!=='ALL' && GRP_ORDER.includes(selZone)) trendRows = trendRows.filter(r=>r.ZoneGroup===selZone);
-
-  const withSidByWk = {}, withoutSidByWk = {}, mtByWk = {}, mtReleaseByWk = {}, mtNoReleaseByWk = {};
-  weeks.forEach(w=>{ const k='W'+w.WeekNum; withSidByWk[k]=0; withoutSidByWk[k]=0; mtByWk[k]=0; mtReleaseByWk[k]=0; mtNoReleaseByWk[k]=0; });
-  trendRows.forEach(r=>{
-    if(!inWeeksList(r.Year, r.WeekNum)) return;
-    const k = 'W'+r.WeekNum;
-    const relCount = mtRelShown() ? (Number(r.mt_release)||0) : 0;
-    const noRelCount = mtNoRelShown() ? (Number(r.mt_no_release)||0) : 0;
-    withSidByWk[k]    = (withSidByWk[k]||0)    + (Number(r.tt_with_sid)||0);
-    withoutSidByWk[k] = (withoutSidByWk[k]||0) + (Number(r.tt_without_sid)||0);
-    mtByWk[k]         = (mtByWk[k]||0)         + relCount + noRelCount;
-    mtReleaseByWk[k]  = (mtReleaseByWk[k]||0)  + relCount;
-    mtNoReleaseByWk[k]= (mtNoReleaseByWk[k]||0)+ noRelCount;
-  });
-  const totalTT = weekKeys.reduce((s,k)=>s+(withSidByWk[k]||0)+(withoutSidByWk[k]||0),0);
-  const totalMTOpened = weekKeys.reduce((s,k)=>s+(mtByWk[k]||0),0);
-  const totalMTRelease = weekKeys.reduce((s,k)=>s+(mtReleaseByWk[k]||0),0);
-  const totalMTNoRelease = weekKeys.reduce((s,k)=>s+(mtNoReleaseByWk[k]||0),0);
-  const mtRatio = totalTT>0 ? (totalMTOpened/totalTT*100) : 0;
-
-  // ── Trend ใหญ่ (แยก RELEASE/NO RELEASE เทียบ TT) โชว์ทุกสัปดาห์ที่มีข้อมูลเสมอ ไม่ผูกกับตัวกรอง Month/Week — คำนวณแยกจากส่วน KPI/ตารางด้านล่างซึ่งยังกรองตามปกติ ──
-  const chartWeeks = getPdtAllWeeks();
-  const chartWeekKeys = chartWeeks.map(w=>'W'+w.WeekNum);
-  const chartInWeeksList = (yr,wk) => chartWeeks.some(w=>Number(w.WeekNum)===Number(wk) && Number(w.Year)===Number(yr));
-  const cWithSidByWk = {}, cWithoutSidByWk = {}, cMtReleaseByWk = {}, cMtNoReleaseByWk = {};
-  chartWeeks.forEach(w=>{ const k='W'+w.WeekNum; cWithSidByWk[k]=0; cWithoutSidByWk[k]=0; cMtReleaseByWk[k]=0; cMtNoReleaseByWk[k]=0; });
-  trendRows.forEach(r=>{
-    if(!chartInWeeksList(r.Year, r.WeekNum)) return;
-    const k = 'W'+r.WeekNum;
-    const relCount = mtRelShown() ? (Number(r.mt_release)||0) : 0;
-    const noRelCount = mtNoRelShown() ? (Number(r.mt_no_release)||0) : 0;
-    cWithSidByWk[k]    = (cWithSidByWk[k]||0)    + (Number(r.tt_with_sid)||0);
-    cWithoutSidByWk[k] = (cWithoutSidByWk[k]||0) + (Number(r.tt_without_sid)||0);
-    cMtReleaseByWk[k]  = (cMtReleaseByWk[k]||0)  + relCount;
-    cMtNoReleaseByWk[k]= (cMtNoReleaseByWk[k]||0)+ noRelCount;
-  });
-
-  // ── Top ทีมปิด MT มากที่สุด (รวม + แยกตาม Region) — ใช้ field ที่มีอยู่แล้วใน week_team เคารพ Region/Week/Month filter เดียวกับหน้าอื่น ──
-  const teamAgg = {};
-  let wtRows = D.week_team || [];
-  if(selZone!=='ALL' && GRP_ORDER.includes(selZone)) wtRows = wtRows.filter(r=>regionGroupOf(r.NewZone)===selZone);
-  wtRows.forEach(r=>{
-    if(!inWeeksList(r.Year, r.WeekNum)) return;
-    const relCount = mtRelShown() ? (Number(r.mt_release)||0) : 0;
-    const noRelCount = mtNoRelShown() ? (Number(r.mt_no_release)||0) : 0;
-    const mt = relCount + noRelCount;
-    const tid = r.TeamID || '—';
-    if(!teamAgg[tid]) teamAgg[tid] = {
-      team:tid, region:regionGroupOf(r.NewZone), mtClosed:0, mtRelease:0, mtNoRelease:0,
-      tickets:0, arriveSum:0, arriveDays:0, pdtCount:0, workdays:0,
-    };
-    const a = teamAgg[tid];
-    a.mtClosed    += mt;
-    a.mtRelease   += relCount;
-    a.mtNoRelease += noRelCount;
-    a.tickets     += Number(r.tickets)||0;
-    a.arriveSum   += Number(r.arrive_sum)||0;
-    a.arriveDays  += Number(r.arrive_days)||0;
-    a.pdtCount    += Number(r.pdt_count)||0;
-    a.workdays    += Number(r.workdays)||0;
-  });
-  const allTeamsWithMT = Object.values(teamAgg).filter(t=>t.mtClosed>0);
-  const topTeams = allTeamsWithMT.slice().sort((a,b)=>b.mtClosed-a.mtClosed).slice(0,10);
-  const maxClosed = Math.max(1, ...topTeams.map(t=>t.mtClosed));
-  const totalMTClosedAll = allTeamsWithMT.reduce((a,b)=>a+b.mtClosed,0);
-  const topTeamsByRegion = {};
-  GRP_ORDER.forEach(rg=>{
-    topTeamsByRegion[rg] = allTeamsWithMT.filter(t=>t.region===rg).sort((a,b)=>b.mtClosed-a.mtClosed).slice(0,10);
-  });
-
-  // กลุ่ม Source Ticket ID ที่มี MT ซ้ำ (≥2 ใบ) — จาก D.mt_dup_groups
-  // field ของ backend: source_ticket_id, system_tickets:[{wo,team_id,team_name,region,skill,closed}], mt_tickets:[{wo,team_id,team_name,region,skill,wo_creator,closed,sub_root_cause}]
-  const dupGroups = (D.mt_dup_groups||[])
-    .filter(g=>Array.isArray(g.mt_tickets) && g.mt_tickets.length>=2)
-    .map(g=>{
-      const children = (g.mt_tickets||[]).filter(c=>{
-        if(selZone!=='ALL' && GRP_ORDER.includes(selZone) && c.region!==selZone) return false;
-        return dateInWeeksRange(c.closed, weeks);
-      });
-      return {...g, filteredChildren: children};
-    }).filter(g=>g.filteredChildren.length>=1)
-      .sort((a,b)=>b.filteredChildren.length-a.filteredChildren.length);
-
-
-
-  // ── ประกอบ HTML ──
-  const canvasId = 'mt-trend-chart';
-  queueMTChart(canvasId, chartWeekKeys,
-    chartWeekKeys.map(k=>cMtReleaseByWk[k]||0),
-    chartWeekKeys.map(k=>cMtNoReleaseByWk[k]||0),
-    chartWeekKeys.map(k=>(cWithSidByWk[k]||0)+(cWithoutSidByWk[k]||0))
-  );
-
-  const kpiCards = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
-    <div style="background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:12px 14px">
-      <div style="font-size:10.5px;color:var(--tm)">Total TT (ตั๋วปิดทั้งหมด)</div>
-      <div class="mono" style="font-size:20px;font-weight:700;color:#3b82f6">${totalTT.toLocaleString()}</div>
-    </div>
-    <div style="background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:12px 14px">
-      <div style="font-size:10.5px;color:var(--tm)">Total MT (Have Source Ticket ID)</div>
-      <div class="mono" style="font-size:20px;font-weight:700;color:#f97316">${totalMTRelease.toLocaleString()}</div>
-    </div>
-    <div style="background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:12px 14px">
-      <div style="font-size:10.5px;color:var(--tm)">Total MT (No release)</div>
-      <div class="mono" style="font-size:20px;font-weight:700;color:var(--crit)">${totalMTNoRelease.toLocaleString()}</div>
-    </div>
-  </div>`;
-
-  const chartHTML = `<div style="margin-bottom:20px">
-    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px">
-      <span style="font-size:13px;font-weight:700;color:var(--tx)">Trend — MT แยก RELATE / NO RELATE (เทียบ TT ทั้งหมด)</span>
-      <span style="font-size:10px;color:var(--tm)">${chartWeeks.length} สัปดาห์ (ทั้งหมด)</span>
-    </div>
-    <div style="background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:12px">
-      <canvas id="${canvasId}" height="280" style="width:100%;display:block"></canvas>
-      <div style="display:flex;gap:14px;margin-top:6px;flex-wrap:wrap">
-        <span style="font-size:10px;color:var(--tm)"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#22c55e;margin-right:4px;vertical-align:middle"></span>MT (RELATE) — แกนซ้าย</span>
-        <span style="font-size:10px;color:var(--tm)"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#ef4444;margin-right:4px;vertical-align:middle"></span>MT (NO RELATE) — แกนซ้าย</span>
-        <span style="font-size:10px;color:var(--tm)"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#3b82f6;margin-right:4px;vertical-align:middle"></span>TT ทั้งหมด — แกนขวา</span>
-      </div>
-    </div>
-  </div>`;
-
-  const teamNameOf = (tid) => { const r = rosterOf(tid); return r && r.Name ? r.Name : ''; };
-
-  const teamRowHTML = (t,i) => {
-    const wRelease = (t.mtRelease/maxClosed*100).toFixed(1);
-    const wNoRelease = (t.mtNoRelease/maxClosed*100).toFixed(1);
-    const col = teamColor(t.team);
-    const nm = teamNameOf(t.team);
-    const total = t.mtRelease + t.mtNoRelease;
-    return `<div style="margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--brd)">
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <span class="mono" style="width:20px;text-align:right;color:var(--tm);font-size:11px;flex:none">${i+1}</span>
-      <span style="min-width:220px;flex:none">
-        <span style="font-weight:700;font-size:12px;color:${col};white-space:nowrap">${escAttr(t.team)}</span>
-        ${nm?`<br><span style="font-size:10px;color:var(--tm)">${escAttr(nm)}</span>`:''}
-      </span>
-      <span style="width:44px;font-size:10px;color:${GC[t.region]||'var(--tm)'};font-weight:700;flex:none">${t.region}</span>
-      <div style="width:160px;flex:none;background:var(--surf3);border-radius:4px;height:16px;position:relative;overflow:hidden;display:flex">
-        <div style="width:${wRelease}%;height:100%;background:var(--ok)"></div>
-        <div style="width:${wNoRelease}%;height:100%;background:var(--crit)"></div>
-      </div>
-      <span class="mono" style="width:36px;text-align:right;font-size:11px;color:var(--ok);font-weight:700;flex:none">${t.mtRelease}</span>
-      <span class="mono" style="width:36px;text-align:right;font-size:11px;color:var(--crit);font-weight:700;flex:none">${t.mtNoRelease}</span>
-      <span class="mono" style="width:44px;text-align:right;font-size:11px;color:var(--tx);font-weight:800;flex:none">${total}</span>
-    </div>
-    <div style="margin-left:74px;margin-top:4px;font-size:10px;color:var(--tm)">🔧 Sub Root Cause (MT ทั้งหมด): <span id="mt-cause-${escAttr(t.team)}">⏳ กำลังโหลด...</span></div>
-    </div>`;
-  };
-  const topTeamsRows = topTeams.map(teamRowHTML).join('');
-
-  const topTeamsHTML = `<div style="margin-bottom:20px">
-    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-      <span style="font-size:13px;font-weight:700;color:var(--tx)">🏆 Most MT Top 10</span>
-      <span style="font-size:10px;color:var(--tm)"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--ok);margin-right:4px;vertical-align:middle"></span>RELATE
-        <span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--crit);margin:0 4px 0 10px;vertical-align:middle"></span>NO RELATE</span>
-      <button id="mt-top10-export-btn" onclick="exportMtTopTeamsToCSV()" style="margin-left:auto;font-size:11px;padding:5px 12px;border:1px solid var(--ok);color:var(--ok);border-radius:6px;background:transparent;cursor:pointer;font-weight:600;white-space:nowrap">📥 Export Excel</button>
-    </div>
-    <div style="background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:14px">
-      ${topTeamsRows || '<div style="font-size:11px;color:var(--tm)">ไม่มีข้อมูล MT ที่ปิดในช่วงที่เลือก</div>'}
-    </div>
-  </div>`;
-
-  const topTeamsByRegionHTML = `<div style="margin-bottom:20px">
-    <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:10px">🏆 Top 10 MT — Work Order Details BY REGION</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
-      ${GRP_ORDER.map(rg=>{
-        const col = GC[rg]||'#7a90a8';
-        const list = topTeamsByRegion[rg];
-        const maxRg = Math.max(1, ...list.map(t=>t.mtClosed));
-        return `<div style="background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:12px">
-          <div style="font-size:12px;font-weight:700;color:${col};margin-bottom:8px">${rg}</div>
-          ${list.length ? list.map((t,i)=>{
-            const w=(t.mtClosed/maxRg*100).toFixed(0);
-            const c2=teamColor(t.team);
-            const nm=teamNameOf(t.team);
-            return `<div style="margin-bottom:7px">
-              <div style="display:flex;align-items:center;gap:6px">
-                <span class="mono" style="font-size:10px;color:var(--tm);width:14px;flex:none">${i+1}</span>
-                <span style="font-size:11px;font-weight:700;color:${c2};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${escAttr(t.team)}</span>
-                <span class="mono" style="font-size:10.5px;color:var(--ok);font-weight:700;flex:none">${t.mtClosed}</span>
-              </div>
-              ${nm?`<div style="font-size:9.5px;color:var(--tm);margin-left:20px">${escAttr(nm)}</div>`:''}
-              <div style="margin-left:20px;margin-top:2px;background:var(--surf3);border-radius:3px;height:6px;overflow:hidden"><div style="width:${w}%;height:100%;background:${c2};opacity:.6"></div></div>
-            </div>`;
-          }).join('') : '<div style="font-size:10.5px;color:var(--tm)">ไม่มีข้อมูล</div>'}
-        </div>`;
-      }).join('')}
-    </div>
-  </div>`;
-
-  // ── ตาราง Create From: ใครเปิด WO มากที่สุด (ไม่รวม INOC) พร้อม TT หลักที่เกี่ยวข้อง (ขยาย/ย่อได้) ──
-  const isInocCreator = s => /INOC/i.test(String(s||''));
-  const creatorAgg = {};
-  (D.mt_dup_groups||[]).forEach(g=>{
-    (g.mt_tickets||[]).forEach(c=>{
-      if(selZone!=='ALL' && GRP_ORDER.includes(selZone) && c.region!==selZone) return;
-      if(!dateInWeeksRange(c.closed, weeks)) return;
-      const creator = String(c.wo_creator||'').trim();
-      if(!creator || isInocCreator(creator)) return;
-      if(!creatorAgg[creator]) creatorAgg[creator] = {creator, count:0, supCounts:{}, regions:new Set(), sourceTickets:new Set(), records:[]};
-      const a = creatorAgg[creator];
-      a.count++;
-      if(c.team_id){
-        const supN = resolveSupName(c.team_id);
-        a.supCounts[supN] = (a.supCounts[supN]||0) + 1;
-      }
-      if(c.region) a.regions.add(c.region);
-      if(g.source_ticket_id){
-        a.sourceTickets.add(g.source_ticket_id);
-        a.records.push({sourceTicketId:g.source_ticket_id, wo:c.wo, team:c.team_id, closed:c.closed||'', subRootCause:c.sub_root_cause||'', severity:c.severity||''});
-      }
-    });
-  });
-  const creatorRows = Object.values(creatorAgg).sort((a,b)=>b.count-a.count).slice(0,20);
-  const maxCreatorCount = Math.max(1, ...creatorRows.map(a=>a.count));
-  const fmtCreatorDT = s => { if(!s) return '—'; const d=new Date(s); if(isNaN(d)) return '—'; return d.toLocaleString('th-TH',{year:'2-digit',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}); };
-  const creatorTableRows = creatorRows.map((a,i)=>{
-    const cid = 'cf'+i;
-    const w = (a.count/maxCreatorCount*100).toFixed(0);
-    const detailRows = a.records.map(r=>{
-      const tNm = teamNameOf(r.team);
-      return `<tr>
-        <td class="mono" style="font-size:10.5px;padding:4px 8px">${escAttr(r.sourceTicketId)}</td>
-        <td class="mono" style="font-size:10.5px;padding:4px 8px">${escAttr(r.wo)}</td>
-        <td style="font-size:10.5px;padding:4px 8px;color:${teamColor(r.team)};font-weight:700">${escAttr(r.team)}${tNm?`<br><span style="font-size:9.5px;color:var(--tm);font-weight:400">${escAttr(tNm)}</span>`:''}</td>
-        <td style="font-size:10.5px;padding:4px 8px">${escAttr(resolveSupName(r.team))}</td>
-        <td style="font-size:10.5px;padding:4px 8px;max-width:260px">
-          <div style="max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${escAttr(r.subRootCause)||''}">${escAttr(r.subRootCause)||'—'}</div>
-        </td>
-        <td style="font-size:10.5px;padding:4px 8px;white-space:nowrap">${escAttr(r.severity)||'—'}</td>
-        <td class="mono" style="font-size:10px;padding:4px 8px">${fmtCreatorDT(r.closed)}</td>
-      </tr>`;
-    }).join('');
-    return `<tr onclick="toggleCreatorRow('${cid}')" style="cursor:pointer">
-      <td class="mono" style="text-align:center;padding:6px 8px;border:1px solid var(--brd);font-size:11px;color:var(--tm)">${i+1}</td>
-      <td style="padding:6px 8px;border:1px solid var(--brd);font-size:11px;font-weight:700;color:var(--crit)">
-        <span id="cf-arrow-${cid}" style="display:inline-block;width:12px;color:var(--acc2)">▸</span> ${escAttr(a.creator)}<span id="cf-name-${cfSafeId(a.creator)}"></span>
-      </td>
-      <td style="padding:6px 8px;border:1px solid var(--brd);font-size:11px">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="mono" style="font-weight:700;width:28px;text-align:right;flex:none">${a.count}</span>
-          <div style="flex:1;min-width:60px;background:var(--surf3);border-radius:3px;height:8px;overflow:hidden"><div style="width:${w}%;height:100%;background:var(--crit)"></div></div>
-        </div>
-      </td>
-      <td style="padding:6px 8px;border:1px solid var(--brd);font-size:10.5px">${[...a.regions].join(', ')||'—'}</td>
-      <td class="mono" style="text-align:center;padding:6px 8px;border:1px solid var(--brd);font-size:11px;font-weight:700">${a.sourceTickets.size}</td>
-    </tr>
-    <tr id="cf-detail-${cid}" style="display:none">
-      <td colspan="5" style="padding:0 10px 12px 34px;border:1px solid var(--brd);border-top:none">
-        <div style="font-size:10px;font-weight:700;color:var(--tm);margin:6px 0 4px">📌 TT หลัก (Source Ticket ID) ที่ ${escAttr(a.creator)} เปิด WO เข้าช่วย</div>
-        <div style="overflow-x:auto;border:1px solid var(--brd);border-radius:6px">
-          <table style="width:100%;border-collapse:collapse">
-            <thead><tr style="background:var(--surf3);color:var(--tm)">
-              <th style="text-align:left;padding:4px 8px;font-size:10px">Source Ticket ID (TT หลัก)</th>
-              <th style="text-align:left;padding:4px 8px;font-size:10px">Work Order ID</th>
-              <th style="text-align:left;padding:4px 8px;font-size:10px">Team</th>
-              <th style="text-align:left;padding:4px 8px;font-size:10px">Sup</th>
-              <th style="text-align:left;padding:4px 8px;font-size:10px;min-width:180px">Sub Root Cause ที่ปิด</th>
-              <th style="text-align:left;padding:4px 8px;font-size:10px">Severity</th>
-              <th style="text-align:left;padding:4px 8px;font-size:10px">Closed</th>
-            </tr></thead>
-            <tbody>${detailRows || `<tr><td colspan="7" style="padding:6px 8px;font-size:10.5px;color:var(--tm)">ไม่มีข้อมูล</td></tr>`}</tbody>
-          </table>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
-  const creatorHTML = `<div style="margin-bottom:20px">
-    <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:4px">👤 MT Creator — ใครเปิด WO มากที่สุด</div>
-    <div style="font-size:10.5px;color:var(--tm);margin-bottom:10px">นับเฉพาะ Create By ที่ไม่ใช่ INOC · ชื่อใต้ Code ดึงจากรายชื่อ Create By ที่มีในระบบ · คลิกแถวเพื่อดู TT หลักที่เปิด WO เข้าช่วย</div>
-    <div style="overflow-x:auto;border:1px solid var(--brd);border-radius:8px">
-      <table style="width:100%;border-collapse:collapse;font-size:11px">
-        <thead><tr style="background:var(--surf3);color:var(--tm)">
-          <th style="padding:6px 8px">#</th>
-          <th style="text-align:left;padding:6px 8px">Create By</th>
-          <th style="text-align:left;padding:6px 8px;min-width:120px">Total WO เปิด</th>
-          <th style="text-align:left;padding:6px 8px">Region</th>
-          <th style="padding:6px 8px;min-width:100px">TT หลัก (ใบ)</th>
-        </tr></thead>
-        <tbody>${creatorTableRows || `<tr><td colspan="5" style="padding:14px;text-align:center;color:var(--tm)">ไม่พบ WO ที่เปิดโดยบุคคล (นอกจาก INOC) ในช่วงที่เลือก</td></tr>`}</tbody>
-
-      </table>
-    </div>
-  </div>`;
-
-
-  const fmtDT = s => { if(!s) return '—'; const d=new Date(s); if(isNaN(d)) return '—'; return d.toLocaleString('th-TH',{year:'2-digit',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}); };
-  const isInoc = s => /INOC/i.test(String(s||''));
-  const dupRows = dupGroups.map((g,gi)=>{
-    const gid = 'g'+gi;
-    const parents = g.system_tickets||[];
-    const parentSummary = parents.length
-      ? parents.map(p=>`<span style="color:${teamColor(p.team_id)};font-weight:700">${escAttr(p.team_id)}</span> <span style="color:var(--tm)">(${escAttr(p.wo)})</span>`).join(', ')
-      : '<span style="color:var(--crit)">ไม่พบใบหลัก (System) ที่ตรงกับเลขนี้</span>';
-    const parentRows = parents.map(p=>`<tr>
-        <td class="mono" style="font-size:10.5px">${escAttr(p.wo)}</td>
-        <td style="font-size:10.5px">
-          <span style="font-weight:700;color:${teamColor(p.team_id)}">${escAttr(p.team_id)}</span>
-          ${p.team_name?`<br><span style="font-size:9.5px;color:var(--tm)">${escAttr(p.team_name)}</span>`:''}
-        </td>
-        <td style="font-size:10.5px">${escAttr(p.region)}</td>
-        <td style="font-size:10.5px">${escAttr(p.skill)}</td>
-        <td class="mono" style="font-size:10px">${fmtDT(p.closed)}</td>
-      </tr>`).join('');
-    const childRows = g.filteredChildren.map(c=>{
-      const inoc = isInoc(c.wo_creator);
-      return `<tr>
-        <td class="mono" style="font-size:10.5px">${escAttr(c.wo)}</td>
-        <td style="font-size:10.5px;font-weight:700;color:${teamColor(c.team_id)};background:${teamColor(c.team_id)}22;border-radius:4px;padding:2px 6px">
-          ${escAttr(c.team_id)}
-          ${c.team_name?`<br><span style="font-size:9.5px;font-weight:400;color:var(--tm);background:none">${escAttr(c.team_name)}</span>`:''}
-        </td>
-        <td style="font-size:10.5px">${escAttr(c.region)}</td>
-        <td style="font-size:10.5px">${escAttr(c.skill)}</td>
-        <td style="font-size:10.5px;color:var(--tm);max-width:220px">${escAttr(c.sub_root_cause)||'—'}</td>
-        <td style="font-size:10px;${inoc?'color:var(--tm)':'color:var(--crit);font-weight:700'}">${escAttr(c.wo_creator)||'—'}</td>
-        <td class="mono" style="font-size:10px">${fmtDT(c.closed)}</td>
-      </tr>`;
-    }).join('');
-    return `
-    <tr onclick="toggleMtGroup('${gid}')" style="cursor:pointer;background:var(--surf2)">
-      <td style="padding:8px 10px"><span id="mtgrp-arrow-${gid}" style="display:inline-block;width:14px;color:var(--acc2)">▸</span></td>
-      <td class="mono" style="padding:8px 10px;font-weight:700">${escAttr(g.source_ticket_id)}</td>
-      <td style="padding:8px 10px"><span style="background:rgba(249,115,22,.15);color:#f97316;font-weight:700;border-radius:10px;padding:2px 8px;font-size:11px">${g.filteredChildren.length} MT</span>${g.filteredChildren.length!==g.mt_tickets.length?` <span style="font-size:10px;color:var(--tm)">(ทั้งหมด ${g.mt_tickets.length})</span>`:''}</td>
-      <td style="padding:8px 10px;font-size:11px">${parentSummary}</td>
-    </tr>
-    <tr id="mtgrp-${gid}" style="display:none">
-      <td colspan="4" style="padding:0 10px 14px 34px">
-        <div style="font-size:10.5px;font-weight:700;color:var(--tm);margin:6px 0 4px">🔵 ใบหลัก (TT · WO Creator = System)</div>
-        <div style="overflow-x:auto;border:1px solid var(--brd);border-radius:6px;margin-bottom:8px">
-          <table style="width:100%;border-collapse:collapse">
-            <thead><tr style="background:var(--surf3);color:var(--tm)">
-              <th style="text-align:left;padding:4px 8px;font-size:10px">Work Order ID</th><th style="text-align:left;padding:4px 8px;font-size:10px">Team / Team Name</th>
-              <th style="text-align:left;padding:4px 8px;font-size:10px">Region</th><th style="text-align:left;padding:4px 8px;font-size:10px">Skill</th><th style="text-align:left;padding:4px 8px;font-size:10px">Closed</th>
-            </tr></thead>
-            <tbody>${parentRows || `<tr><td colspan="5" style="padding:6px 8px;font-size:10.5px;color:var(--crit)">ไม่พบใบหลัก</td></tr>`}</tbody>
-          </table>
-        </div>
-        <div style="font-size:10.5px;font-weight:700;color:var(--tm);margin:6px 0 4px">🟠 MT ที่เข้าช่วย (${g.filteredChildren.length} ใบ) <span style="font-weight:400">· 🔴 Create From ที่ไม่ใช่ INOC จะไฮไลต์แดง</span></div>
-        <div style="overflow-x:auto;border:1px solid var(--brd);border-radius:6px">
-          <table style="width:100%;border-collapse:collapse">
-            <thead><tr style="background:var(--surf3);color:var(--tm)">
-              <th style="text-align:left;padding:4px 8px;font-size:10px">Work Order ID</th><th style="text-align:left;padding:4px 8px;font-size:10px">Team / Team Name</th>
-              <th style="text-align:left;padding:4px 8px;font-size:10px">Region</th><th style="text-align:left;padding:4px 8px;font-size:10px">Skill</th>
-              <th style="text-align:left;padding:4px 8px;font-size:10px">Sub Root Cause ที่ปิด</th>
-              <th style="text-align:left;padding:4px 8px;font-size:10px">Create From</th><th style="text-align:left;padding:4px 8px;font-size:10px">Closed</th>
-            </tr></thead>
-            <tbody>${childRows}</tbody>
-          </table>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
-
-  const dupHTML = `<div>
-    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-      <span style="font-size:13px;font-weight:700;color:var(--tx)">🔗 MT Released: More than 1 Work Order</span>
-      <span style="font-size:10px;color:var(--tm)">${dupGroups.length} กลุ่ม · คลิกแถวเพื่อขยาย/ยุบ</span>
-      <button onclick="exportMtDupToCSV()" style="margin-left:auto;font-size:11px;padding:5px 12px;border:1px solid var(--ok);color:var(--ok);border-radius:6px;background:transparent;cursor:pointer;font-weight:600;white-space:nowrap">📥 Export Excel</button>
-    </div>
-    <div style="overflow-x:auto;border:1px solid var(--brd);border-radius:8px">
-      <table style="width:100%;border-collapse:collapse;font-size:11px">
-        <thead><tr style="background:var(--surf3);color:var(--tm)">
-          <th style="width:30px"></th>
-          <th style="text-align:left;padding:6px 10px">Source Ticket ID</th>
-          <th style="text-align:left;padding:6px 10px">จำนวน MT</th>
-          <th style="text-align:left;padding:6px 10px">ทีมใบหลัก (TT)</th>
-        </tr></thead>
-        <tbody>${dupRows || `<tr><td colspan="4" style="padding:14px;text-align:center;color:var(--tm)">ไม่พบ MT ที่ Source Ticket ID ซ้ำกันในช่วงที่เลือก</td></tr>`}</tbody>
-      </table>
-    </div>
-  </div>`;
-
-  body.innerHTML = kpiCards + chartHTML + topTeamsHTML + topTeamsByRegionHTML + creatorHTML + dupHTML;
-  flushMTChartQueue();
-  syncZoneTabsEverywhere();
-  loadAndRenderMtTopCauses(topTeams.map(t=>t.team), weeks); // โหลด Sub Root Cause จริง (ครอบคลุมทั้ง RELEASE/NO RELEASE) แบบ async ไม่บล็อกการ render หลัก
-  loadAndRenderCreatorNames(creatorRows.map(a=>a.creator)); // โหลดชื่อจริงของ Create By มาแปะข้าง Code
-}
-
+// MT Report helper and renderer removed.
 // ═══ TREND SUGGESTION (Week-over-Week Analysis) ══════════════════
 
 // คืน object สรุปการเปลี่ยนแปลง week ล่าสุด vs week ก่อนหน้า สำหรับ scope ที่กำหนด
