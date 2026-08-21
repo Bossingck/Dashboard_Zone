@@ -3288,7 +3288,7 @@ function setSuspTrendMode(mode, btn){
 
 function setSuspWeek(val){
   suspSelectedWeek = val;
-  renderSuspReasonTable();
+  setTimeout(renderSuspReasonTable,0);
 }
 
 // รวม sus_reason_counts_od + sus_reason_counts_ind ของแถวเดียวเป็น dict เดียว {reason: count}
@@ -5365,7 +5365,7 @@ const FAILLIST_SELECTED_WEEK = {NOD:null, OFC:null}; // null = ยังไม�
 
 function setFailListWeek(skill, val){
   FAILLIST_SELECTED_WEEK[skill] = val;
-  renderPDTReport();
+  setTimeout(renderPDTReport,0);
 }
 
 // รายชื่อทีมที่ PDT เฉลี่ยต่ำกว่า Target ในสัปดาห์ที่ระบุ (wk/yr) — เคารพ selZone ปัจจุบัน
@@ -6320,12 +6320,21 @@ function pdtUpdSkillOf(r){
   if(v.includes('OFC')) return 'OFC';
   return v;
 }
+let pdtUpdSourceRowsCache=null, pdtUpdSourceRowsCacheKey='';
 function pdtUpdSourceRows(){
   const pdt=Array.isArray(D.week_team_pdt)?D.week_team_pdt:[];
   const base=Array.isArray(D.week_team)?D.week_team:[];
+  if(pdtUpdSourceRowsCache && pdtUpdSourceRowsCacheKeyPdtRef===pdt && pdtUpdSourceRowsCacheKeyBaseRef===base){
+    return pdtUpdSourceRowsCache;
+  }
   const bm=new Map(base.map(r=>[`${r.Year}|${r.WeekNum}|${r.TeamID}`,r]));
-  return pdt.map(r=>({...r,_base:bm.get(`${r.Year}|${r.WeekNum}|${r.TeamID}`)||null}));
+  const result=pdt.map(r=>({...r,_base:bm.get(`${r.Year}|${r.WeekNum}|${r.TeamID}`)||null}));
+  pdtUpdSourceRowsCache=result;
+  pdtUpdSourceRowsCacheKeyPdtRef=pdt;
+  pdtUpdSourceRowsCacheKeyBaseRef=base;
+  return result;
 }
+let pdtUpdSourceRowsCacheKeyPdtRef=null, pdtUpdSourceRowsCacheKeyBaseRef=null;
 function pdtUpdAny(r, keys){
   const raw=r._pdtWeeklyRaw||r, base=r._base||{};
   for(const key of keys){
@@ -6693,7 +6702,11 @@ function pdtUpdStreakSummary(rows,historyWeeks,skill){
     <div class="pdtupd-cause-grid">${matrixHead}${matrixRows}${matrixTotal}</div>
   </div>`;
 }
-function pdtUpdActionKey(year,week,skill,teamId){ return `${year}|${week}|${skill}|${teamId}`; }
+function pdtUpdActionSkillKey(skill){
+  const s=String(skill||'').trim().toUpperCase();
+  return s==='NODE'?'NOD':(s||'OFC');
+}
+function pdtUpdActionKey(year,week,skill,teamId){ return `${year}|${week}|${pdtUpdActionSkillKey(skill)}|${String(teamId||'').trim()}`; }
 function pdtUpdTeamSkill(teamId, row){
   const direct=pdtUpdSkillOf(row||{TeamID:teamId});
   if(direct==='NOD'||direct==='OFC') return direct;
@@ -6727,7 +6740,7 @@ async function pdtUpdLoadActionsForWeek(year,week){
       ['week_no','eq.'+week]
     ]);
     (rows||[]).forEach(r=>{
-      pdtUpdActionCache[pdtUpdActionKey(r.week_year,r.week_no,r.skill,r.team_id)] = r.action_category || '';
+      pdtUpdActionCache[pdtUpdActionKey(r.week_year,r.week_no,pdtUpdActionSkillKey(r.skill),r.team_id)] = r.action_category || '';
     });
     window.pdtUpdActionCache=pdtUpdActionCache;
     renderPDTUpdate();
@@ -6736,11 +6749,19 @@ async function pdtUpdLoadActionsForWeek(year,week){
   }
 }
 async function setPdtUpdActionCategory(year,week,skill,teamId,region,manager,bucket,value){
+  skill=pdtUpdActionSkillKey(skill);
+  teamId=String(teamId||'').trim();
   const cacheKey=pdtUpdActionKey(year,week,skill,teamId);
   const prevValue=pdtUpdActionCache[cacheKey]||'';
   pdtUpdActionCache[cacheKey]=value;
   window.pdtUpdActionCache=pdtUpdActionCache;
-  renderPDTUpdate();
+  // NOTE: renderPDTUpdate() replaces root.innerHTML, which destroys this <select> node.
+  // Doing that synchronously inside the <select>'s own 'change' handler races with
+  // Chrome's native dropdown-popup close sequence and throws:
+  //   "Failed to execute 'setValueAndClosePopup' on 'PagePopupController': Unexpected end of input"
+  // which aborts this whole async function before the fetch() below ever runs.
+  // Deferring the render by one tick lets the popup finish closing first.
+  setTimeout(renderPDTUpdate,0);
   try{
     const res=await fetch(`${MT_RAW_SUPABASE_URL}/rest/v1/pdt_team_action_categories?on_conflict=week_year,week_no,skill,team_id`,{
       method:'POST',
@@ -6754,19 +6775,20 @@ async function setPdtUpdActionCategory(year,week,skill,teamId,region,manager,buc
     });
     if(!res.ok) throw new Error('HTTP '+res.status+': '+(await res.text()).slice(0,180));
     pdtUpdActionLoadKey='';
+    setTimeout(renderPDTUpdate,0);
   }catch(err){
     pdtUpdActionCache[cacheKey]=prevValue;
     window.pdtUpdActionCache=pdtUpdActionCache;
-    renderPDTUpdate();
+    setTimeout(renderPDTUpdate,0);
     console.error('[PDT Update] action category save failed',err);
     alert('บันทึกข้อมูลไม่สำเร็จ: '+(err.message||err));
   }
 }
-function pdtUpdActionPanel(historyWeeks){
+function pdtUpdActionPanel(historyWeeks,allRows){
   if(!pdtUpdSelectedBucket) return '';
   const latestWeek=historyWeeks.filter(Boolean).at(-1);
   if(!latestWeek) return '';
-  const allRows=pdtUpdRows('OFC').concat(pdtUpdRows('NOD'));
+  allRows=allRows||pdtUpdRows('OFC').concat(pdtUpdRows('NOD'));
   const latestRowMap=new Map(allRows.filter(r=>pdtUpdWeekKey(r)===latestWeek.key).map(r=>[String(r.TeamID||'').trim(),r]));
   const selectedCauseForTeam=(teamId)=>{
     const skill=pdtUpdTeamSkill(teamId,latestRowMap.get(teamId));
@@ -6827,8 +6849,12 @@ function pdtUpdAutoLoadRawTrend(){
   pdtUpdateRawTrendAutoStarted = true;
   pdtUpdLoadRawTrend().then(()=>{ if(pdtUpdateRawTrend) renderPDTUpdate(); });
 }
+let pdtUpdRowsCache={};
 function pdtUpdRows(skill){
-  return pdtUpdSourceRows().filter(r=>pdtUpdSkillOf(r)===skill).map(r=>{
+  const src=pdtUpdSourceRows();
+  const cached=pdtUpdRowsCache[skill];
+  if(cached && cached.src===src) return cached.rows;
+  const rows=src.filter(r=>pdtUpdSkillOf(r)===skill).map(r=>{
     const target=PDT_UPDATE_TARGET[skill], raw=r._pdtWeeklyRaw||{}, wd=Number(r.workdays)||0;
     const pdt=Number(raw.pdt_per_day??r.pdt_per_day??(wd?(r.pdt_count||0)/wd:0))||0;
     const mhVal=raw.man_hour_per_day??r.man_hour_avg??r.man_hour_per_day;
@@ -6836,6 +6862,8 @@ function pdtUpdRows(skill){
     const region=r.NewZone||r.Region||r.region||r.ZoneGroup||'ไม่ระบุ';
     return {...r,pdt,target,mh,region,pdtFail:pdt<target,mhFail:mh!=null&&mh<8};
   }).filter(r=>r.TeamID);
+  pdtUpdRowsCache[skill]={src,rows};
+  return rows;
 }
 function pdtUpdWeekKey(r){ return `${Number(r?.Year)||0}|${Number(r?.WeekNum)||0}`; }
 function pdtUpdWeekLabel(key){ const [y,w]=String(key||'').split('|').map(Number); return y&&w ? `W${String(w).padStart(2,'0')} / ${y}` : '—'; }
@@ -6937,7 +6965,7 @@ function setPdtUpdSkill(skill){
 function setPdtUpdWeek(value){
   pdtUpdSelectedWeek=String(value||'');
   window.pdtUpdSelectedWeek=pdtUpdSelectedWeek;
-  renderPDTUpdate();
+  setTimeout(renderPDTUpdate,0);
 }
 function renderPDTUpdate(){
   const root=document.getElementById('pdtupd-charts'), tabs=document.getElementById('pdtupd-skill-tabs'), tbl=document.getElementById('pdtupd-tables');
@@ -6960,7 +6988,7 @@ function renderPDTUpdate(){
     const nationwideRows=pdtUpdRows('OFC').concat(pdtUpdRows('NOD'));
     const latestHistoryWeek=historyWeeks.filter(Boolean).at(-1);
     if(latestHistoryWeek) pdtUpdLoadActionsForWeek(latestHistoryWeek.Year,latestHistoryWeek.WeekNum);
-    root.innerHTML=pdtUpdSummary(rows,pdtUpdSelectedWeek,skill)+pdtUpdChart(skill)+`<div class="pdtupd-insight-row">${pdtUpdNationwideChart()}${pdtUpdSuggestion(rows,pdtUpdSelectedWeek,skill)}</div>`+pdtUpdStreakSummary(nationwideRows,historyWeeks,'ALL')+pdtUpdActionPanel(historyWeeks);
+    root.innerHTML=pdtUpdSummary(rows,pdtUpdSelectedWeek,skill)+pdtUpdChart(skill)+`<div class="pdtupd-insight-row">${pdtUpdNationwideChart()}${pdtUpdSuggestion(rows,pdtUpdSelectedWeek,skill)}</div>`+pdtUpdStreakSummary(nationwideRows,historyWeeks,'ALL')+pdtUpdActionPanel(historyWeeks,nationwideRows);
     const weekSelect=`<div class="pdtupd-week-filter"><div class="pdtupd-week-heading"><span class="pdtupd-week-eyebrow">WEEK FILTER</span><label for="pdtupd-week-select">เลือกสัปดาห์ที่ต้องการดู</label></div><div class="pdtupd-week-control"><span class="pdtupd-week-icon">▣</span><select id="pdtupd-week-select" class="pdtupd-week-select" aria-label="เลือกสัปดาห์ที่ต้องการดู" onchange="setPdtUpdWeek(this.value)">${options.map(o=>`<option value="${pdtUpdEsc(o.key)}" ${o.key===selectedOpt.key?'selected':''}>${pdtUpdEsc(o.label)}</option>`).join('')}</select></div><div class="pdtupd-week-current"><span>กำลังแสดง</span><strong>${pdtUpdEsc(selectedOpt.label)}</strong></div><span class="pdtupd-week-note">คอลัมน์: ${historyWeeks.map(w=>w?`PDT W${String(w.WeekNum).padStart(2,'0')}`:'PDT —').join(' · ')}</span></div>`;
     const controls=`<div class="pdtupd-controls"><input class="pdtupd-search" value="${pdtUpdEsc(pdtUpdSearch)}" placeholder="ค้นหา Team / Manager / Region แล้วกด Enter" onkeydown="if(event.key==='Enter')setPdtUpdSearch(this.value)" onchange="setPdtUpdSearch(this.value)"><button type="button" class="pdtupd-filter-btn ${pdtUpdOnlyBoth?'active':''}" onclick="togglePdtUpdOnlyBoth()">เฉพาะ PDT + MH Risk</button></div>`;
     tbl.innerHTML=weekSelect+controls+pdtUpdTeamTable(rows,`รายชื่อทีม ${skill==='NOD'?'Node':'OFC'} ที่ไม่ผ่าน PDT${pdtUpdOnlyBoth?' และ Man Hour':''}`,pdtUpdOnlyBoth,pdtUpdSelectedWeek,historyWeeks);
