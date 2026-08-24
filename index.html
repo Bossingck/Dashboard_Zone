@@ -6679,7 +6679,7 @@ function pdtUpdStreakSummary(rows,historyWeeks,skill){
     const n=causeCount(cat,c.key);
     const tone=cat.key==='4wk'?'strong':(cat.key==='lt3wk'?'warn':'');
     const active=pdtUpdSelectedBucket===cat.key&&pdtUpdSelectedCause===c.key;
-    return `<button type="button" class="pdtupd-cause-cell ${active?'active':''}" onclick="togglePdtUpdCause(${pdtUpdJS(cat.key)},${pdtUpdJS(c.key)})"><span class="pdtupd-cause-pill ${tone}">${n.toLocaleString()} Team</span></button>`;
+    return `<button type="button" class="pdtupd-cause-cell ${active?'active':''}" onclick="togglePdtUpdCause(${pdtUpdEsc(pdtUpdJS(cat.key))},${pdtUpdEsc(pdtUpdJS(c.key))})"><span class="pdtupd-cause-pill ${tone}">${n.toLocaleString()} Team</span></button>`;
   }).join('')).join('');
   const matrixTotal=PDT_UPD_ACTION_MATRIX.map(c=>{
     const n=cats.reduce((s,cat)=>s+causeCount(cat,c.key),0);
@@ -6825,7 +6825,7 @@ function pdtUpdActionPanel(historyWeeks,allRows){
     const mhCells=weekCols.map(w=>metricCell(teamId,w,'mh')).join('');
     const departCells=latestCols.map(w=>metricCell(teamId,w,'depart')).join('');
     const completeCells=latestCols.map(w=>metricCell(teamId,w,'complete')).join('');
-    return `<tr><td><div class="mono" style="font-weight:800;color:var(--tx)">${pdtUpdEsc(teamId)}</div><div style="font-size:10.5px;color:var(--tm);margin-top:2px">${pdtUpdEsc(teamName)}</div></td><td class="pdtupd-region-cell">${pdtUpdEsc(t.region||'—')}</td>${pdtCells}${mhCells}${departCells}${completeCells}<td><select class="pdtupd-action-select" onchange="setPdtUpdActionCategory(${latestWeek.Year},${latestWeek.WeekNum},${pdtUpdJS(skill)},${pdtUpdJS(teamId)},${pdtUpdJS(t.region||'')},${pdtUpdJS(t.manager||'')},${pdtUpdJS(pdtUpdSelectedBucket)},this.value)">${opts}</select></td></tr>`;
+    return `<tr><td><div class="mono" style="font-weight:800;color:var(--tx)">${pdtUpdEsc(teamId)}</div><div style="font-size:10.5px;color:var(--tm);margin-top:2px">${pdtUpdEsc(teamName)}</div></td><td class="pdtupd-region-cell">${pdtUpdEsc(t.region||'—')}</td>${pdtCells}${mhCells}${departCells}${completeCells}<td><select class="pdtupd-action-select" onchange="setPdtUpdActionCategory(${latestWeek.Year},${latestWeek.WeekNum},${pdtUpdEsc(pdtUpdJS(skill))},${pdtUpdEsc(pdtUpdJS(teamId))},${pdtUpdEsc(pdtUpdJS(t.region||''))},${pdtUpdEsc(pdtUpdJS(t.manager||''))},${pdtUpdEsc(pdtUpdJS(pdtUpdSelectedBucket))},this.value)">${opts}</select></td></tr>`;
   }).join('')||`<tr><td colspan="${5+(weekCols.length*2)}" class="empty">ไม่มีทีมในกลุ่มนี้</td></tr>`;
   const weekHeads=label=>weekCols.map(w=>`<th>${label} W${String(w.WeekNum).padStart(2,'0')}</th>`).join('');
   const latestHead=label=>latestCols.map(w=>`<th>${label} W${String(w.WeekNum).padStart(2,'0')}</th>`).join('');
