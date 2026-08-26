@@ -425,14 +425,14 @@ body.day #tab-saover .saover-value-label{stroke:rgba(0,0,0,.68);stroke-width:.85
 #tab-pdtupdate .pdtupd-donut-pct{font:800 10.5px/1 'JetBrains Mono',monospace;fill:#05070c;paint-order:stroke;stroke:rgba(255,255,255,.55);stroke-width:3px;stroke-linejoin:round}
 #tab-pdtupdate .pdtupd-donut-center-main{font:800 19px/1 'JetBrains Mono',monospace;fill:var(--tx)}
 #tab-pdtupdate .pdtupd-donut-center-sub{font:700 10px/1 'Inter',sans-serif;fill:var(--tm)}
-#tab-pdtupdate .pdtupd-streak-title{font-size:15px;font-weight:850;color:var(--tx);margin-bottom:8px}
+#tab-pdtupdate .pdtupd-streak-title{font-size:13px;font-weight:800;color:var(--tx);margin-bottom:8px;font-family:'Inter',sans-serif}
 #tab-pdtupdate .pdtupd-streak-rows{display:grid;gap:8px}
-#tab-pdtupdate .pdtupd-streak-row{display:grid;grid-template-columns:minmax(180px,1fr) 108px 84px;gap:10px;align-items:center;border:1px solid color-mix(in srgb,var(--brd) 70%,transparent);background:var(--surf);border-radius:999px;padding:9px 12px;font-size:12.5px;font-weight:850}
+#tab-pdtupdate .pdtupd-streak-row{display:grid;grid-template-columns:minmax(180px,1fr) 108px 84px;gap:10px;align-items:center;border:1px solid color-mix(in srgb,var(--brd) 70%,transparent);background:var(--surf);border-radius:999px;padding:9px 12px;font-size:12px;font-weight:750;font-family:'Inter',sans-serif}
 #tab-pdtupdate .pdtupd-streak-row{cursor:pointer;transition:.15s ease}
 #tab-pdtupdate .pdtupd-streak-row:hover,#tab-pdtupdate .pdtupd-streak-row.active{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 10%,transparent)}
-#tab-pdtupdate .pdtupd-streak-row strong{font-family:'JetBrains Mono',monospace;color:var(--tx)}
+#tab-pdtupdate .pdtupd-streak-row strong{font-family:'JetBrains Mono',monospace;color:var(--tx);font-weight:650}
 #tab-pdtupdate .pdtupd-streak-dot{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:7px;vertical-align:-1px}
-#tab-pdtupdate .pdtupd-streak-pct{text-align:right;color:var(--tm)}
+#tab-pdtupdate .pdtupd-streak-pct{text-align:right;color:var(--tm);font-family:'JetBrains Mono',monospace;font-weight:600}
 #tab-pdtupdate .pdtupd-cause-grid{display:grid;grid-template-columns:repeat(5,minmax(58px,1fr));border:1px solid var(--brd);border-radius:8px;overflow:hidden;background:var(--surf);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--accent) 10%,transparent)}
 #tab-pdtupdate .pdtupd-cause-head,#tab-pdtupdate .pdtupd-cause-cell,#tab-pdtupdate .pdtupd-cause-total{min-width:0;text-align:center;border-left:1px solid var(--brd);padding:8px 7px;font-size:12px;font-weight:850}
 #tab-pdtupdate .pdtupd-cause-head:first-child,#tab-pdtupdate .pdtupd-cause-cell:first-child,#tab-pdtupdate .pdtupd-cause-total:first-child{border-left:0}
@@ -460,6 +460,10 @@ body.day #tab-pdtupdate .pdtupd-action-select option{background:#fff;color:#1a25
 #tab-pdtupdate .pdtupd-action-table th.pdtupd-avg-head{background:color-mix(in srgb,var(--accent) 22%,var(--surf2));color:var(--tx);font-weight:800}
 #tab-pdtupdate .pdtupd-action-table td.pdtupd-avg-cell{background:color-mix(in srgb,var(--accent) 8%,transparent);font-weight:700;text-align:center}
 #tab-pdtupdate .pdtupd-action-table th:nth-child(n+3),#tab-pdtupdate .pdtupd-action-table td:nth-child(n+3){white-space:nowrap}
+#tab-pdtreport .pdtrpt-fail-cell{font-weight:800;text-align:center;color:#fecaca}
+#tab-pdtreport .pdtrpt-ok-cell{font-weight:800;text-align:center;color:var(--ok)}
+body.day #tab-pdtreport .pdtrpt-fail-cell{color:#7f1d1d;font-weight:850}
+body.day #tab-pdtreport .pdtrpt-ok-cell{color:#047857;font-weight:850}
 @media(max-width:900px){#tab-pdtupdate .pdtupd-summary{grid-template-columns:repeat(2,minmax(130px,1fr))}}
 @media(max-width:980px){#tab-pdtupdate .pdtupd-streak-card{grid-template-columns:1fr}#tab-pdtupdate .pdtupd-donut{margin:auto}#tab-pdtupdate .pdtupd-cause-grid{overflow-x:auto}}
 @media(max-width:560px){#tab-pdtupdate .pdtupd-summary{grid-template-columns:1fr}#tab-pdtupdate .pdtupd-search{min-width:100%}}
@@ -6016,10 +6020,10 @@ function buildRegionFailCountTableHTML(skill, accentColor){
       const cnt = c.type==='month' ? (monthValues[c.key].fail[rg]||0) : (matrix[rg][c.key]||0);
       const total = c.type==='month' ? (monthValues[c.key].total[rg]||0) : (totalTeams[rg][c.key]||0);
       if(total===0) return `<td class="mono" style="color:var(--tm);text-align:center">—</td>`;
-      const alpha = cnt===0 ? 0 : Math.min(.65, .15+ (cnt/maxCount)*.5);
+      const alpha = cnt===0 ? 0 : Math.min(.82, .26+ (cnt/maxCount)*.56);
       const bg = cnt===0 ? 'rgba(16,185,129,.18)' : `rgba(239,68,68,${alpha})`;
-      const fg = cnt===0 ? 'var(--ok)' : '#fecaca';
-      return `<td class="mono" style="background:${bg};color:${fg};font-weight:700;text-align:center">${cnt}</td>`;
+      const cls = cnt===0 ? 'pdtrpt-ok-cell' : 'pdtrpt-fail-cell';
+      return `<td class="mono ${cls}" style="background:${bg}">${cnt}</td>`;
     }).join('');
     return `<tr><td style="font-weight:700;color:${GC[rg]};position:sticky;left:0;background:var(--surf)">${rg}</td>${cells}</tr>`;
   }).join('');
@@ -6618,7 +6622,7 @@ function pdtUpdNationwideChart(){
   const points=data.map((d,i)=>`${x(i).toFixed(1)},${y(d.count).toFixed(1)}`).join(' ');
   const fitPoints=data.map((_,i)=>`${x(i).toFixed(1)},${y(fit(i)).toFixed(1)}`).join(' ');
   const labels=data.map((d,i)=>`<text x="${x(i).toFixed(1)}" y="${H-12}" text-anchor="middle" fill="${textCol}" font-size="11.5" font-family="sans-serif">W${String(d.WeekNum).padStart(2,'0')}</text>`).join('');
-  const valueLabels=data.map((d,i)=>`<text class="pdtupd-chart-value" x="${x(i).toFixed(1)}" y="${Math.max(T+18,y(d.count)-12).toFixed(1)}" text-anchor="middle" fill="${col}" font-size="15" font-weight="850" font-family="sans-serif">${d.count}</text>`).join('');
+  const valueLabels=data.map((d,i)=>`<text class="pdtupd-chart-value" x="${x(i).toFixed(1)}" y="${Math.max(T+18,y(d.count)-12).toFixed(1)}" text-anchor="middle" fill="${col}" font-size="15" font-weight="550" font-family="sans-serif">${d.count}</text>`).join('');
   const dots=data.map((d,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(d.count).toFixed(1)}" r="4" fill="${col}" stroke="${surf}" stroke-width="1.5"><title>Nationwide W${String(d.WeekNum).padStart(2,'0')}: ${d.count} teams</title></circle>`).join('');
   const legend=`<span class="pdtupd-legend-item"><i class="pdtupd-legend-dot" style="background:${col}"></i>Nationwide <b style="color:${col}">${ys[ys.length-1]}</b></span><span class="pdtupd-legend-item"><i style="display:inline-block;width:18px;border-top:3px dashed ${trendCol}"></i>Linear ( Nationwide )</span>`;
   return `<div class="pdtupd-chart-card"><div class="pdtupd-chart-title"><span>PDT NOT PASS TARGET</span><span class="pdtupd-chart-sub">Nationwide · OFC + NODE · จำนวนทีมที่ PDT ไม่ผ่านราย Week</span></div><div class="pdtupd-chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="PDT NOT PASS TARGET Nationwide trend" preserveAspectRatio="xMidYMid meet"><line x1="${L}" y1="${T}" x2="${L}" y2="${T+ch}" stroke="${textCol}" opacity=".65"/><line x1="${L}" y1="${T+ch}" x2="${L+cw}" y2="${T+ch}" stroke="${textCol}" opacity=".65"/>${grid}<polyline points="${fitPoints}" fill="none" stroke="${trendCol}" stroke-width="2.8" stroke-dasharray="8 5" stroke-linecap="round"/><polyline points="${points}" fill="none" stroke="${col}" stroke-width="4.2" stroke-linejoin="round" stroke-linecap="round"/>${dots}${valueLabels}${labels}<text x="${L}" y="${T-8}" fill="${textCol}" font-size="11.5" font-family="sans-serif">Teams</text></svg></div><div class="pdtupd-legend">${legend}</div></div>`;
