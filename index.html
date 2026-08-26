@@ -364,9 +364,9 @@ body.day #tab-pdtupdate .pdtupd-week-select option:checked{background:#1d4ed8;co
 #tab-saover .saover-chart-card{background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:12px 14px;margin:0 0 14px;box-shadow:0 1px 2px rgba(15,23,42,.08)}
 #tab-saover .saover-chart-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px;color:var(--tx);font-size:13px}
 #tab-saover .saover-chart-head span{font-size:11px;color:var(--tm);font-weight:500}
-#tab-saover .saover-chart-wrap{overflow:auto;border:1px solid var(--brd);border-radius:7px;background:var(--surf);padding:12px 14px;min-height:430px}
+#tab-saover .saover-chart-wrap{overflow:auto;border:1px solid var(--brd);border-radius:7px;background:var(--surf);padding:12px 14px;min-height:520px}
 #tab-saover .saover-chart-wrap svg{display:block;width:100%;height:auto;max-height:420px}
-#tab-saover .saover-chart-wrap svg.saover-daily-svg{height:auto;max-height:none;min-width:100%}
+#tab-saover .saover-chart-wrap svg.saover-daily-svg{width:auto;height:auto;max-width:none;max-height:none;min-width:100%}
 #tab-saover .saover-legend{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:8px 2px 0;font-size:11.5px;color:var(--tm)}
 #tab-saover .saover-legend span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 #tab-saover .saover-legend i{width:18px;height:8px;border-radius:2px;display:inline-block}
@@ -398,19 +398,18 @@ body.day #tab-pdtupdate .pdtupd-week-select option:checked{background:#1d4ed8;co
 #tab-pdtupdate .pdtupd-filter-btn{appearance:none;border:1px solid var(--brd);background:var(--surf);color:var(--tm);border-radius:7px;padding:7px 10px;font:750 11px/1.2 sans-serif;cursor:pointer}
 #tab-pdtupdate .pdtupd-filter-btn:hover{border-color:var(--accent);color:var(--tx)}
 #tab-pdtupdate .pdtupd-filter-btn.active{background:color-mix(in srgb,var(--crit) 14%,var(--surf));border-color:var(--crit);color:var(--crit)}
-body.day #tab-pdtupdate .pdtupd-chart-value,
-body.day #tab-pdtupdate .pdtupd-chart-label,
-body.day #tab-saover .saover-value-label{
+#tab-pdtupdate .pdtupd-chart-value,
+#tab-pdtupdate .pdtupd-chart-label,
+#tab-saover .saover-value-label{
   paint-order:stroke;
-  stroke:rgba(0,0,0,.48);
-  stroke-width:.7px;
+  stroke:rgba(0,0,0,.55);
+  stroke-width:.75px;
   stroke-linejoin:round;
 }
+body.day #tab-pdtupdate .pdtupd-chart-value,
+body.day #tab-pdtupdate .pdtupd-chart-label,
+body.day #tab-saover .saover-value-label{stroke:rgba(0,0,0,.68);stroke-width:.85px}
 #tab-pdtupdate .pdtupd-raw-note{font-size:10.5px;color:var(--tm);margin-left:auto}
-#tab-pdtupdate .pdtupd-insight-row{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:12px;align-items:stretch}
-#tab-pdtupdate .pdtupd-insight-row .pdtupd-chart-card{height:100%;display:flex;flex-direction:column}
-#tab-pdtupdate .pdtupd-insight-row .pdtupd-chart-wrap{flex:1;min-height:250px}
-#tab-pdtupdate .pdtupd-insight-row .pdtupd-chart-wrap svg{height:100%;max-height:none}
 #tab-pdtupdate .pdtupd-suggest-card{background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:12px;box-shadow:0 1px 2px rgba(15,23,42,.08);min-width:0}
 #tab-pdtupdate .pdtupd-suggest-title{font-size:12.5px;font-weight:800;color:var(--tx);margin-bottom:4px}
 #tab-pdtupdate .pdtupd-suggest-sub{font-size:10.5px;color:var(--tm);margin-bottom:8px}
@@ -462,7 +461,6 @@ body.day #tab-pdtupdate .pdtupd-action-select option{background:#fff;color:#1a25
 #tab-pdtupdate .pdtupd-action-table td.pdtupd-avg-cell{background:color-mix(in srgb,var(--accent) 8%,transparent);font-weight:700;text-align:center}
 #tab-pdtupdate .pdtupd-action-table th:nth-child(n+3),#tab-pdtupdate .pdtupd-action-table td:nth-child(n+3){white-space:nowrap}
 @media(max-width:900px){#tab-pdtupdate .pdtupd-summary{grid-template-columns:repeat(2,minmax(130px,1fr))}}
-@media(max-width:1100px){#tab-pdtupdate .pdtupd-insight-row{grid-template-columns:1fr}}
 @media(max-width:980px){#tab-pdtupdate .pdtupd-streak-card{grid-template-columns:1fr}#tab-pdtupdate .pdtupd-donut{margin:auto}#tab-pdtupdate .pdtupd-cause-grid{overflow-x:auto}}
 @media(max-width:560px){#tab-pdtupdate .pdtupd-summary{grid-template-columns:1fr}#tab-pdtupdate .pdtupd-search{min-width:100%}}
 </style>
@@ -6620,7 +6618,7 @@ function pdtUpdNationwideChart(){
   const points=data.map((d,i)=>`${x(i).toFixed(1)},${y(d.count).toFixed(1)}`).join(' ');
   const fitPoints=data.map((_,i)=>`${x(i).toFixed(1)},${y(fit(i)).toFixed(1)}`).join(' ');
   const labels=data.map((d,i)=>`<text x="${x(i).toFixed(1)}" y="${H-12}" text-anchor="middle" fill="${textCol}" font-size="11.5" font-family="sans-serif">W${String(d.WeekNum).padStart(2,'0')}</text>`).join('');
-  const valueLabels=data.map((d,i)=>`<text class="pdtupd-chart-value" x="${x(i).toFixed(1)}" y="${Math.max(T+14,y(d.count)-10).toFixed(1)}" text-anchor="middle" fill="${col}" font-size="11.5" font-weight="600" font-family="sans-serif">${d.count}</text>`).join('');
+  const valueLabels=data.map((d,i)=>`<text class="pdtupd-chart-value" x="${x(i).toFixed(1)}" y="${Math.max(T+18,y(d.count)-12).toFixed(1)}" text-anchor="middle" fill="${col}" font-size="15" font-weight="850" font-family="sans-serif">${d.count}</text>`).join('');
   const dots=data.map((d,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(d.count).toFixed(1)}" r="4" fill="${col}" stroke="${surf}" stroke-width="1.5"><title>Nationwide W${String(d.WeekNum).padStart(2,'0')}: ${d.count} teams</title></circle>`).join('');
   const legend=`<span class="pdtupd-legend-item"><i class="pdtupd-legend-dot" style="background:${col}"></i>Nationwide <b style="color:${col}">${ys[ys.length-1]}</b></span><span class="pdtupd-legend-item"><i style="display:inline-block;width:18px;border-top:3px dashed ${trendCol}"></i>Linear ( Nationwide )</span>`;
   return `<div class="pdtupd-chart-card"><div class="pdtupd-chart-title"><span>PDT NOT PASS TARGET</span><span class="pdtupd-chart-sub">Nationwide · OFC + NODE · จำนวนทีมที่ PDT ไม่ผ่านราย Week</span></div><div class="pdtupd-chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="PDT NOT PASS TARGET Nationwide trend" preserveAspectRatio="xMidYMid meet"><line x1="${L}" y1="${T}" x2="${L}" y2="${T+ch}" stroke="${textCol}" opacity=".65"/><line x1="${L}" y1="${T+ch}" x2="${L+cw}" y2="${T+ch}" stroke="${textCol}" opacity=".65"/>${grid}<polyline points="${fitPoints}" fill="none" stroke="${trendCol}" stroke-width="2.8" stroke-dasharray="8 5" stroke-linecap="round"/><polyline points="${points}" fill="none" stroke="${col}" stroke-width="4.2" stroke-linejoin="round" stroke-linecap="round"/>${dots}${valueLabels}${labels}<text x="${L}" y="${T-8}" fill="${textCol}" font-size="11.5" font-family="sans-serif">Teams</text></svg></div><div class="pdtupd-legend">${legend}</div></div>`;
@@ -7228,8 +7226,7 @@ function renderPDTUpdate(){
     const latestHistoryWeek=historyWeeks.filter(Boolean).at(-1);
     if(latestHistoryWeek) pdtUpdLoadActionsForWeek(latestHistoryWeek.Year,latestHistoryWeek.WeekNum);
     const skillCharts=activeSkills.map(s=>pdtUpdChart(s)).join('');
-    const suggestSkill=skill==='ALL'?'ALL':skill;
-    root.innerHTML=pdtUpdSummary(rows,pdtUpdSelectedWeek,skill)+skillCharts+`<div class="pdtupd-insight-row">${pdtUpdNationwideChart()}${pdtUpdSuggestion(rows,pdtUpdSelectedWeek,suggestSkill)}</div>`+pdtUpdStreakSummary(nationwideRows,historyWeeks,'ALL')+pdtUpdActionPanel(historyWeeks,nationwideRows);
+    root.innerHTML=pdtUpdSummary(rows,pdtUpdSelectedWeek,skill)+skillCharts+pdtUpdNationwideChart()+pdtUpdStreakSummary(nationwideRows,historyWeeks,'ALL')+pdtUpdActionPanel(historyWeeks,nationwideRows);
     const weekSelect=`<div class="pdtupd-week-filter"><div class="pdtupd-week-heading"><span class="pdtupd-week-eyebrow">WEEK FILTER</span><label for="pdtupd-week-select">เลือกสัปดาห์ที่ต้องการดู</label></div><div class="pdtupd-week-control"><span class="pdtupd-week-icon">▣</span><select id="pdtupd-week-select" class="pdtupd-week-select" aria-label="เลือกสัปดาห์ที่ต้องการดู" onchange="setPdtUpdWeek(this.value)">${options.map(o=>`<option value="${pdtUpdEsc(o.key)}" ${o.key===selectedOpt.key?'selected':''}>${pdtUpdEsc(o.label)}</option>`).join('')}</select></div><div class="pdtupd-week-current"><span>กำลังแสดง</span><strong>${pdtUpdEsc(selectedOpt.label)}</strong></div><span class="pdtupd-week-note">คอลัมน์: ${historyWeeks.map(w=>w?`PDT W${String(w.WeekNum).padStart(2,'0')}`:'PDT —').join(' · ')}</span></div>`;
     const controls=`<div class="pdtupd-controls"><input class="pdtupd-search" value="${pdtUpdEsc(pdtUpdSearch)}" placeholder="ค้นหา Team / Manager / Region แล้วกด Enter" onkeydown="if(event.key==='Enter')setPdtUpdSearch(this.value)" onchange="setPdtUpdSearch(this.value)"><button type="button" class="pdtupd-filter-btn ${pdtUpdOnlyBoth?'active':''}" onclick="togglePdtUpdOnlyBoth()">เฉพาะ PDT + MH Risk</button><button type="button" class="pdtupd-filter-btn" onclick="pdtUpdExportCurrentTable()">Export ตารางนี้</button></div>`;
     const skillTitle=skill==='ALL'?'OFC + NODE':(skill==='NOD'?'Node':'OFC');
@@ -7713,9 +7710,9 @@ function saOverChart(series){
   const el=document.getElementById('saover-chart');
   if(!el) return;
   if(!series.length){ el.innerHTML='<div class="empty">ไม่พบข้อมูล SA ตามตัวกรอง</div>'; return; }
-  const h=440;
-  const boxW=Math.max(980,Math.floor((el.clientWidth||el.parentElement?.clientWidth||1200)-24));
-  const naturalW=Math.min(2600,series.length*68+150);
+  const h=520;
+  const boxW=Math.max(980,Math.floor((el.clientWidth||el.parentElement?.clientWidth||1200)-28));
+  const naturalW=Math.min(2600,series.length*44+170);
   const w=Math.max(boxW,naturalW);
   const padL=84, padR=54, padT=42, padB=78, plotW=w-padL-padR, plotH=h-padT-padB;
   const maxTotal=Math.max(5,...series.map(d=>d.total));
