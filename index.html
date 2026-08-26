@@ -7114,7 +7114,10 @@ function pdtUpdDownloadXlsx(filename, rows, styles){
       alignment:{horizontal:'center',vertical:'center'},
       border:baseBorder
     };
-    if(st.numFmt) ws[addr].z=st.numFmt;
+    if(st.numFmt){
+      ws[addr].z=st.numFmt;
+      if(typeof ws[addr].v === 'number') ws[addr].t='n';
+    }
   });
   ws['!cols']=Array.from({length:range.e.c+1},(_,c)=>{
     const max=Math.min(36,Math.max(10,...rows.map(r=>String(r[c]??'').length+2)));
@@ -7163,6 +7166,10 @@ function pdtUpdExportCurrentTable(){
   });
   const teamWeeks=new Map(rows.map(r=>[`${r.TeamID}||${pdtUpdWeekKey(r)}`,r]));
   const weekLabel=w=>w?`W${String(w.WeekNum).padStart(2,'0')}`:'—';
+  const round2=v=>{
+    const n=Number(v);
+    return Number.isFinite(n)?Math.round(n*100)/100:'';
+  };
   const header=['Team','Region','Manager','Province',...historyWeeks.map(w=>`PDT ${weekLabel(w)}`),...historyWeeks.map(w=>`MH ${weekLabel(w)}`),'Target','เทียบ Region','Selected Week'];
   const out=[header];
   const styles=[];
@@ -7177,8 +7184,8 @@ function pdtUpdExportCurrentTable(){
       r.region||'',
       r.Manager||'',
       r.Province||r.province||'',
-      ...historyWeeks.map(w=>{const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null; return hr&&hr.pdt!=null?Number(Number(hr.pdt).toFixed(2)):'';}),
-      ...historyWeeks.map(w=>{const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null; return hr&&hr.mh!=null?Number(Number(hr.mh).toFixed(2)):'';}),
+      ...historyWeeks.map(w=>{const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null; return hr&&hr.pdt!=null?round2(hr.pdt):'';}),
+      ...historyWeeks.map(w=>{const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null; return hr&&hr.mh!=null?round2(hr.mh):'';}),
       r.target!=null?Number(r.target).toFixed(1):'',
       r.pdt<avgOf(r)?'แย่กว่า':'ไม่แย่กว่า',
       pdtUpdWeekLabel(selectedKey)
