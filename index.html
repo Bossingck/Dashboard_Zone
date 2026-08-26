@@ -409,6 +409,8 @@ body.day #tab-pdtupdate .pdtupd-week-select option:checked{background:#1d4ed8;co
 body.day #tab-pdtupdate .pdtupd-chart-value,
 body.day #tab-pdtupdate .pdtupd-chart-label,
 body.day #tab-saover .saover-value-label{stroke:rgba(0,0,0,.68);stroke-width:.85px}
+#tab-pdtupdate .pdtupd-np-value{paint-order:normal!important;stroke:none!important;stroke-width:0!important;font-weight:400!important;text-shadow:none!important}
+body.day #tab-pdtupdate .pdtupd-np-value{stroke:none!important;stroke-width:0!important;font-weight:400!important;text-shadow:none!important}
 #tab-pdtupdate .pdtupd-raw-note{font-size:10.5px;color:var(--tm);margin-left:auto}
 #tab-pdtupdate .pdtupd-suggest-card{background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:12px;box-shadow:0 1px 2px rgba(15,23,42,.08);min-width:0}
 #tab-pdtupdate .pdtupd-suggest-title{font-size:12.5px;font-weight:800;color:var(--tx);margin-bottom:4px}
@@ -434,18 +436,18 @@ body.day #tab-saover .saover-value-label{stroke:rgba(0,0,0,.68);stroke-width:.85
 #tab-pdtupdate .pdtupd-streak-dot{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:7px;vertical-align:-1px}
 #tab-pdtupdate .pdtupd-streak-pct{text-align:right;color:var(--tm);font-family:'JetBrains Mono',monospace;font-weight:600}
 #tab-pdtupdate .pdtupd-cause-grid{display:grid;grid-template-columns:repeat(5,minmax(58px,1fr));border:1px solid var(--brd);border-radius:8px;overflow:hidden;background:var(--surf);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--accent) 10%,transparent)}
-#tab-pdtupdate .pdtupd-cause-head,#tab-pdtupdate .pdtupd-cause-cell,#tab-pdtupdate .pdtupd-cause-total{min-width:0;text-align:center;border-left:1px solid var(--brd);padding:8px 7px;font-size:12px;font-weight:850}
+#tab-pdtupdate .pdtupd-cause-head,#tab-pdtupdate .pdtupd-cause-cell,#tab-pdtupdate .pdtupd-cause-total{min-width:0;text-align:center;border-left:1px solid var(--brd);padding:8px 7px;font-size:12px;font-weight:550;font-family:'Inter',sans-serif}
 #tab-pdtupdate .pdtupd-cause-head:first-child,#tab-pdtupdate .pdtupd-cause-cell:first-child,#tab-pdtupdate .pdtupd-cause-total:first-child{border-left:0}
 #tab-pdtupdate .pdtupd-cause-head{min-height:82px;display:flex;flex-direction:column;gap:5px;align-items:center;justify-content:center;border-bottom:1px solid var(--brd);color:var(--tx);line-height:1.18;background:color-mix(in srgb,var(--surf2) 88%,var(--accent) 12%)}
 #tab-pdtupdate .pdtupd-cause-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:50%;background:color-mix(in srgb,var(--surf) 70%,var(--accent) 30%);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 28%,transparent);font-size:22px;line-height:1}
-#tab-pdtupdate .pdtupd-cause-label{font-size:11.5px;line-height:1.18;max-width:96px;color:var(--tx)}
+#tab-pdtupdate .pdtupd-cause-label{font-size:11.5px;line-height:1.18;max-width:96px;color:var(--tx);font-weight:550;font-family:'Inter',sans-serif}
 #tab-pdtupdate .pdtupd-cause-cell{appearance:none;background:var(--surf);color:inherit;border-top:0;border-right:0;border-bottom:0;display:flex;align-items:center;justify-content:center;min-height:48px;cursor:pointer}
 #tab-pdtupdate .pdtupd-cause-cell:hover,#tab-pdtupdate .pdtupd-cause-cell.active{background:color-mix(in srgb,var(--accent) 9%,var(--surf));box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--accent) 70%,transparent)}
-#tab-pdtupdate .pdtupd-cause-pill{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:#ff9aa2;color:#b91c1c;min-width:68px;padding:8px 11px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:850}
+#tab-pdtupdate .pdtupd-cause-pill{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:#ff9aa2;color:#b91c1c;min-width:68px;padding:8px 11px;font-family:'Inter',sans-serif;font-size:12px;font-weight:550}
 #tab-pdtupdate .pdtupd-cause-pill.strong{background:var(--crit);color:#fff}
 #tab-pdtupdate .pdtupd-cause-pill.warn{background:#f6b800;color:#8a3d00}
-#tab-pdtupdate .pdtupd-cause-total{border-top:1px solid var(--brd);background:color-mix(in srgb,var(--surf2) 82%,var(--accent) 18%);color:var(--accent);font-family:'Inter',sans-serif;font-size:12.5px;font-weight:850;letter-spacing:0;text-decoration:none}
-#tab-pdtupdate .pdtupd-cause-total b{font-family:'JetBrains Mono',monospace;font-size:16px;color:var(--tx);margin-right:4px}
+#tab-pdtupdate .pdtupd-cause-total{border-top:1px solid var(--brd);background:color-mix(in srgb,var(--surf2) 82%,var(--accent) 18%);color:var(--accent);font-family:'Inter',sans-serif;font-size:12.5px;font-weight:550;letter-spacing:0;text-decoration:none}
+#tab-pdtupdate .pdtupd-cause-total b{font-family:'Inter',sans-serif;font-size:16px;color:var(--tx);margin-right:4px;font-weight:550}
 #tab-pdtupdate .pdtupd-action-panel{background:var(--surf2);border:1px solid var(--brd);border-radius:8px;margin:-2px 0 14px;overflow:hidden}
 #tab-pdtupdate .pdtupd-action-head{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--brd);background:var(--surf2)}
 #tab-pdtupdate .pdtupd-action-head strong{font-size:12px;color:var(--tx)}
@@ -762,7 +764,7 @@ body.day #tab-pdtreport .pdtrpt-ok-cell{color:#047857;font-weight:850}
     <div class="saover-chart-card">
       <div class="saover-chart-head">
         <strong id="saover-chart-title">SA Over Trend</strong>
-        <span>รายวัน · แท่งซ้อน = Within SLA + Over SLA</span>
+        <span>รายวัน · เลือก Severity ได้หลายตัว · แสดง 45 วันล่าสุด</span>
       </div>
       <div id="saover-chart" class="saover-chart-wrap">⏳ กำลังโหลด...</div>
       <div class="saover-legend">
@@ -5003,8 +5005,11 @@ function renderMultiLineFrame(canvas, hoverIdx, clickedAlertKey){
     canvas._chartMeta = null;
     return null;
   }
-  const maxV = Math.max(...allVals, target)*1.12;
-  const minV = Math.min(0, Math.min(...allVals)*0.9);
+  const rawMin = Math.min(...allVals, target);
+  const rawMax = Math.max(...allVals, target);
+  const rawSpan = Math.max(rawMax-rawMin, opts.focusYMinSpan || .45);
+  const maxV = opts.focusY ? rawMax + rawSpan*.22 : Math.max(...allVals, target)*1.12;
+  const minV = opts.focusY ? Math.max(0, rawMin - rawSpan*.22) : Math.min(0, Math.min(...allVals)*0.9);
   const px = i => padL + (colKeys.length>1 ? iw*(i/(colKeys.length-1)) : iw/2);
   const py = v => padT + ih*(1-(v-minV)/(maxV-minV||1));
   const isDark = !document.body.classList.contains('day');
@@ -5016,7 +5021,7 @@ function renderMultiLineFrame(canvas, hoverIdx, clickedAlertKey){
   ctx.font='14px JetBrains Mono, monospace';
   for(let i=0;i<=4;i++){
     const v = minV+(maxV-minV)*i/4, y=py(v);
-    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(padL+iw,y); ctx.stroke();
+    if(!opts.hideGrid){ ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(padL+iw,y); ctx.stroke(); }
     ctx.fillStyle=textC; ctx.textAlign='right'; ctx.fillText(v.toFixed(1), padL-6, y+3);
   }
   // x labels (เว้นช่วงถ้าคอลัมน์เยอะ กันตัวเลขทับกัน)
@@ -5026,11 +5031,12 @@ function renderMultiLineFrame(canvas, hoverIdx, clickedAlertKey){
   colKeys.forEach((k,i)=>{ if(i%xStep===0) ctx.fillText(k, px(i), H-padB+14); });
   // target dashed line
   const ty = py(target);
+  const targetC = isDark ? 'rgba(248,113,113,.82)' : 'rgba(220,38,38,.9)';
   ctx.save();
-  ctx.strokeStyle=textC; ctx.lineWidth=1.2; ctx.setLineDash([4,3]);
+  ctx.strokeStyle=targetC; ctx.lineWidth=isDark?1.3:1.8; ctx.setLineDash([6,4]);
   ctx.beginPath(); ctx.moveTo(padL,ty); ctx.lineTo(padL+iw,ty); ctx.stroke();
   ctx.restore();
-  ctx.beginPath(); ctx.arc(padL+iw+5, ty, 2.3, 0, Math.PI*2); ctx.fillStyle=textC; ctx.fill();
+  ctx.beginPath(); ctx.arc(padL+iw+5, ty, isDark?2.4:3, 0, Math.PI*2); ctx.fillStyle=targetC; ctx.fill();
 
   // ═══ Crosshair แนวตั้งตามเมาส์ ═══
   if(hoverIdx!=null){
@@ -5405,7 +5411,7 @@ function buildPdtRegionChartSVG(skill, weeks, matrix, regions){
   const weekKeys = weeks.map(w=>'W'+w.WeekNum);
   const rowDefs = regions.map(rg=>({key:rg, color:GC[rg]}));
   const canvasId = 'pdt-chart-region-'+skill;
-  queuePdtChart(canvasId, rowDefs, weekKeys, (rg,k)=>matrix[rg][k], {target:pdtTargetOf(skill), h:240, highlightWeeks: compareWeeks.map(c=>'W'+c.wkNum)});
+  queuePdtChart(canvasId, rowDefs, weekKeys, (rg,k)=>matrix[rg][k], {target:pdtTargetOf(skill), h:240, highlightWeeks: compareWeeks.map(c=>'W'+c.wkNum), focusY:true, focusYMinSpan:.5, hideGrid:true});
   return {svg:`<canvas id="${canvasId}" height="240" style="width:100%;display:block"></canvas>`};
 }
 
@@ -6337,7 +6343,7 @@ function renderMgrSkillBlock(skill, label, accentColor){
   const canvasId = 'pdt-chart-mgr-'+skill;
   queuePdtChart(canvasId, rowDefs, colLabelsFull, (mgr,lbl)=>{
     const idx = colLabelsFull.indexOf(lbl); return full.matrix[mgr][full.cols[idx].key];
-  }, {target, h:240, highlightWeeks: full.mode==='week' ? compareWeeks.map(c=>'W'+c.wkNum) : []});
+  }, {target, h:240, highlightWeeks: full.mode==='week' ? compareWeeks.map(c=>'W'+c.wkNum) : [], focusY:true, focusYMinSpan:.5, hideGrid:true});
   return `
   <div style="margin-bottom:10px;min-width:0">
     <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px">
@@ -6622,7 +6628,7 @@ function pdtUpdNationwideChart(){
   const points=data.map((d,i)=>`${x(i).toFixed(1)},${y(d.count).toFixed(1)}`).join(' ');
   const fitPoints=data.map((_,i)=>`${x(i).toFixed(1)},${y(fit(i)).toFixed(1)}`).join(' ');
   const labels=data.map((d,i)=>`<text x="${x(i).toFixed(1)}" y="${H-12}" text-anchor="middle" fill="${textCol}" font-size="11.5" font-family="sans-serif">W${String(d.WeekNum).padStart(2,'0')}</text>`).join('');
-  const valueLabels=data.map((d,i)=>`<text class="pdtupd-chart-value" x="${x(i).toFixed(1)}" y="${Math.max(T+18,y(d.count)-12).toFixed(1)}" text-anchor="middle" fill="${col}" font-size="15" font-weight="550" font-family="sans-serif">${d.count}</text>`).join('');
+  const valueLabels=data.map((d,i)=>`<text class="pdtupd-np-value" x="${x(i).toFixed(1)}" y="${Math.max(T+20,y(d.count)-13).toFixed(1)}" text-anchor="middle" fill="#b91c1c" stroke="none" stroke-width="0" paint-order="normal" font-size="15" font-weight="400" font-family="Arial, sans-serif" style="font-weight:400;stroke:none;stroke-width:0;paint-order:normal;text-shadow:none">${d.count}</text>`).join('');
   const dots=data.map((d,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(d.count).toFixed(1)}" r="4" fill="${col}" stroke="${surf}" stroke-width="1.5"><title>Nationwide W${String(d.WeekNum).padStart(2,'0')}: ${d.count} teams</title></circle>`).join('');
   const legend=`<span class="pdtupd-legend-item"><i class="pdtupd-legend-dot" style="background:${col}"></i>Nationwide <b style="color:${col}">${ys[ys.length-1]}</b></span><span class="pdtupd-legend-item"><i style="display:inline-block;width:18px;border-top:3px dashed ${trendCol}"></i>Linear ( Nationwide )</span>`;
   return `<div class="pdtupd-chart-card"><div class="pdtupd-chart-title"><span>PDT NOT PASS TARGET</span><span class="pdtupd-chart-sub">Nationwide · OFC + NODE · จำนวนทีมที่ PDT ไม่ผ่านราย Week</span></div><div class="pdtupd-chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="PDT NOT PASS TARGET Nationwide trend" preserveAspectRatio="xMidYMid meet"><line x1="${L}" y1="${T}" x2="${L}" y2="${T+ch}" stroke="${textCol}" opacity=".65"/><line x1="${L}" y1="${T+ch}" x2="${L+cw}" y2="${T+ch}" stroke="${textCol}" opacity=".65"/>${grid}<polyline points="${fitPoints}" fill="none" stroke="${trendCol}" stroke-width="2.8" stroke-dasharray="8 5" stroke-linecap="round"/><polyline points="${points}" fill="none" stroke="${col}" stroke-width="4.2" stroke-linejoin="round" stroke-linecap="round"/>${dots}${valueLabels}${labels}<text x="${L}" y="${T-8}" fill="${textCol}" font-size="11.5" font-family="sans-serif">Teams</text></svg></div><div class="pdtupd-legend">${legend}</div></div>`;
@@ -7045,7 +7051,7 @@ function pdtUpdDownloadCsv(filename, rows){
   a.click();
   setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},0);
 }
-function pdtUpdDownloadXlsx(filename, rows){
+function pdtUpdDownloadXlsx(filename, rows, styles){
   if(!window.XLSX || !XLSX.utils || !XLSX.writeFile){
     alert('ไม่พบ Excel export library');
     return;
@@ -7053,12 +7059,28 @@ function pdtUpdDownloadXlsx(filename, rows){
   const wb=XLSX.utils.book_new();
   const ws=XLSX.utils.aoa_to_sheet(rows);
   const range=XLSX.utils.decode_range(ws['!ref']||'A1');
+  const headerStyle={font:{bold:true,color:{rgb:'1F2937'}},fill:{fgColor:{rgb:'D9EAF7'}},alignment:{horizontal:'center',vertical:'center'},border:{top:{style:'thin',color:{rgb:'CBD5E1'}},bottom:{style:'thin',color:{rgb:'CBD5E1'}},left:{style:'thin',color:{rgb:'CBD5E1'}},right:{style:'thin',color:{rgb:'CBD5E1'}}}};
+  const baseBorder={top:{style:'thin',color:{rgb:'E2E8F0'}},bottom:{style:'thin',color:{rgb:'E2E8F0'}},left:{style:'thin',color:{rgb:'E2E8F0'}},right:{style:'thin',color:{rgb:'E2E8F0'}}};
+  for(let c=range.s.c;c<=range.e.c;c++){
+    const addr=XLSX.utils.encode_cell({r:0,c});
+    if(ws[addr]) ws[addr].s=headerStyle;
+  }
+  (styles||[]).forEach(st=>{
+    const addr=XLSX.utils.encode_cell({r:st.r,c:st.c});
+    if(!ws[addr]) return;
+    ws[addr].s={
+      fill:{fgColor:{rgb:st.bg}},
+      font:{color:{rgb:st.fg||'1F2937'},bold:false},
+      alignment:{horizontal:'center',vertical:'center'},
+      border:baseBorder
+    };
+  });
   ws['!cols']=Array.from({length:range.e.c+1},(_,c)=>{
     const max=Math.min(36,Math.max(10,...rows.map(r=>String(r[c]??'').length+2)));
     return {wch:max};
   });
   XLSX.utils.book_append_sheet(wb,ws,'PDT Update');
-  XLSX.writeFile(wb,filename);
+  XLSX.writeFile(wb,filename,{cellStyles:true});
 }
 function pdtUpdExportCurrentTable(){
   const skill=pdtUpdCurrentSkill();
@@ -7102,25 +7124,42 @@ function pdtUpdExportCurrentTable(){
   const weekLabel=w=>w?`W${String(w.WeekNum).padStart(2,'0')}`:'—';
   const header=['Team','Region','Manager','Province',...historyWeeks.map(w=>`PDT ${weekLabel(w)}`),...historyWeeks.map(w=>`MH ${weekLabel(w)}`),'Target','เทียบ Region','Selected Week'];
   const out=[header];
+  const styles=[];
+  const pdtStart=4;
+  const mhStart=pdtStart+historyWeeks.length;
+  const redBg='FCE4D6', redFg='9C0006', greenBg='E2F0D9', greenFg='006100';
   sortedShown.forEach(r=>{
     const teamCode=String(r.TeamID||r.team||r.Team||'').trim();
     const name=teamNameOf(teamCode)||r.Name||r.TeamName||r['Team Name']||'';
-    out.push([
+    const row=[
       name?`${teamCode} (${name})`:teamCode,
       r.region||'',
       r.Manager||'',
       r.Province||r.province||'',
-      ...historyWeeks.map(w=>{const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null; return hr&&hr.pdt!=null?Number(hr.pdt).toFixed(2):'';}),
-      ...historyWeeks.map(w=>{const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null; return hr&&hr.mh!=null?Number(hr.mh).toFixed(2):'';}),
+      ...historyWeeks.map(w=>{const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null; return hr&&hr.pdt!=null?Number(hr.pdt):'';}),
+      ...historyWeeks.map(w=>{const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null; return hr&&hr.mh!=null?Number(hr.mh):'';}),
       r.target!=null?Number(r.target).toFixed(1):'',
       r.pdt<avgOf(r)?'แย่กว่า':'ไม่แย่กว่า',
       pdtUpdWeekLabel(selectedKey)
-    ]);
+    ];
+    out.push(row);
+    const excelR=out.length-1;
+    historyWeeks.forEach((w,i)=>{
+      const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null;
+      if(hr&&hr.pdt!=null){
+        const fail=Number(hr.pdt)<Number(r.target);
+        styles.push({r:excelR,c:pdtStart+i,bg:fail?redBg:greenBg,fg:fail?redFg:greenFg});
+      }
+      if(hr&&hr.mh!=null){
+        const fail=Number(hr.mh)<8;
+        styles.push({r:excelR,c:mhStart+i,bg:fail?redBg:greenBg,fg:fail?redFg:greenFg});
+      }
+    });
   });
   const nameSkill=skill==='ALL'?'ALL':(skill==='NOD'?'NODE':'OFC');
   const nameWeek=pdtUpdWeekLabel(selectedKey).replace(/[^\w]+/g,'_').replace(/^_+|_+$/g,'');
   const mode=pdtUpdOnlyBoth?'PDT_MH_Risk':'PDT_Not_Pass';
-  pdtUpdDownloadXlsx(`${mode}_${nameSkill}_${nameWeek||'Week'}.xlsx`,out);
+  pdtUpdDownloadXlsx(`${mode}_${nameSkill}_${nameWeek||'Week'}.xlsx`,out,styles);
 }
 function pdtUpdTeamTable(rows,title,onlyBoth=false,selectedKey='',historyWeeks=[]){
   const selectedRows=rows.filter(r=>pdtUpdWeekKey(r)===selectedKey);
@@ -7171,7 +7210,14 @@ function pdtUpdTeamTable(rows,title,onlyBoth=false,selectedKey='',historyWeeks=[
     const rc=(ZC[r.region]||GC[r.region]||'var(--accent)');
     const diff=r.pdt-r.target, intensity=Math.min(.34,.08+Math.abs(diff)*.16);
     const heat=diff<0?`color-mix(in srgb,var(--crit) ${Math.round(intensity*100)}%,var(--surf))`:`color-mix(in srgb,var(--ok) ${Math.round(intensity*100)}%,var(--surf))`;
-    const hist=historyWeeks.map((w,i)=>{const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null; const val=hr?Number(hr.pdt):null; const cls=i===historyWeeks.length-1?'pdtupd-heat ':''; const style=i===historyWeeks.length-1?`background:${heat};color:${diff<0?'var(--crit)':'var(--ok)'}`:''; return `<td class="mono ${cls}" style="${style}">${val==null?'—':val.toFixed(2)}</td>`;}).join('');
+    const hist=historyWeeks.map((w)=>{
+      const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null;
+      const val=hr?Number(hr.pdt):null;
+      if(val==null) return `<td class="mono">—</td>`;
+      const wkDiff=val-r.target, wkIntensity=Math.min(.34,.08+Math.abs(wkDiff)*.16);
+      const wkHeat=wkDiff<0?`color-mix(in srgb,var(--crit) ${Math.round(wkIntensity*100)}%,var(--surf))`:`color-mix(in srgb,var(--ok) ${Math.round(wkIntensity*100)}%,var(--surf))`;
+      return `<td class="mono pdtupd-heat" style="background:${wkHeat};color:${wkDiff<0?'var(--crit)':'var(--ok)'}">${val.toFixed(2)}</td>`;
+    }).join('');
     const mhHist=historyWeeks.map((w,i)=>{const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null; const val=hr&&hr.mh!=null?Number(hr.mh):null; const fail=val!=null&&val<8; const cls=i===historyWeeks.length-1&&fail?'pdtupd-mh-fail ':''; return `<td class="mono ${cls}">${val==null?'—':val.toFixed(2)}</td>`;}).join('');
     const teamCode=String(r.TeamID||r.team||r.Team||'—').trim();
     const teamName=teamNameOf(teamCode)||r.Name||r.TeamName||r['Team Name']||'—';
@@ -7295,11 +7341,12 @@ async function fetchSupabaseTable(table, pairs){
 async function fetchTicketsREST(pairs){ return fetchSupabaseTable('tickets', pairs); }
 
 // ═══ SA OVER TREND — Severity SA1-6, Over by Closed > Require Finish Time ═══
-let saOverSeverity = 'ALL';
+let saOverSeverity = window.saOverSeverity || 'ALL';
 let saOverSkill = 'ALL';
 let saOverRegion = 'ALL';
 let saOverStartDate = window.saOverStartDate || '2026-01-01';
 let saOverEndDate = window.saOverEndDate || '2026-12-31';
+let _saOverAutoRange = !window.saOverStartDate && !window.saOverEndDate;
 let _saOverRows = [];
 let _saOverAggRows = [];
 let _saOverMatrixRows = [];
@@ -7310,10 +7357,25 @@ let _saOverProvKey = '';
 let saOverSelectedProvince = '';
 let _saOverFetchKey = '';
 let _saOverLoading = false;
+let _saOverLastSeries = [];
+let _saOverResizeTimer = null;
 const SA_OVER_SEVERITIES = ['SA1','SA2','SA3','SA4','SA5','SA6'];
 const SA_OVER_REGIONS = ['BMA','CW','EAS','SOU'];
 
 function saOverEsc(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function saOverSelectedSeverities(){
+  if(Array.isArray(saOverSeverity)) return saOverSeverity.filter(s=>SA_OVER_SEVERITIES.includes(s));
+  if(saOverSeverity instanceof Set) return [...saOverSeverity].filter(s=>SA_OVER_SEVERITIES.includes(s));
+  const s=String(saOverSeverity||'ALL').toUpperCase();
+  return s==='ALL' ? [...SA_OVER_SEVERITIES] : s.split(',').map(x=>x.trim()).filter(x=>SA_OVER_SEVERITIES.includes(x));
+}
+function saOverSeverityLabel(){
+  const selected=saOverSelectedSeverities();
+  return selected.length===SA_OVER_SEVERITIES.length ? 'SA1-SA6' : selected.join('+');
+}
+function saOverSeverityMatches(sev){
+  return saOverSelectedSeverities().includes(String(sev||'').toUpperCase());
+}
 function saOverDate(v){ const d=v?new Date(v):null; return d && !isNaN(d) ? d : null; }
 function saOverSeverityOf(r){
   const s = String(r['Severity']||'').toUpperCase().trim();
@@ -7380,6 +7442,22 @@ function saOverFetchRange(){
   const end = !isNaN(endDate) ? endDate.toISOString().slice(0,10) : '2027-01-01';
   return {start, end, endInclusive, label:`${start} ถึง ${endInclusive}`};
 }
+function saOverApplyAutoRangeFromRows(rows){
+  if(!_saOverAutoRange || !(rows||[]).length) return false;
+  const latest = (rows||[]).map(r=>String(r.closed_date||'')).filter(Boolean).sort().at(-1);
+  if(!latest) return false;
+  const end = new Date(latest+'T00:00:00');
+  const start = new Date(end);
+  start.setDate(start.getDate()-45);
+  saOverStartDate = start.toISOString().slice(0,10);
+  saOverEndDate = latest;
+  window.saOverStartDate = saOverStartDate;
+  window.saOverEndDate = saOverEndDate;
+  _saOverAutoRange = false;
+  _saOverMatrixKey = '';
+  _saOverProvKey = '';
+  return true;
+}
 function saOverFetchSlices(range){
   const start = new Date(range.start+'T00:00:00');
   const end = new Date(range.end+'T00:00:00');
@@ -7399,7 +7477,7 @@ function saOverFilterRows(rows){
   return (rows||[]).filter(r=>{
     const sev = saOverSeverityOf(r);
     if(!sev) return false;
-    if(saOverSeverity!=='ALL' && sev!==saOverSeverity) return false;
+    if(!saOverSeverityMatches(sev)) return false;
     if(saOverSkill!=='ALL' && saOverSkillOf(r)!==saOverSkill) return false;
     if(saOverRegion!=='ALL' && saOverRegionOf(r)!==saOverRegion) return false;
     return true;
@@ -7411,7 +7489,11 @@ function saOverBuildButtons(){
   const regionEl=document.getElementById('saover-region-buttons');
   if(sevEl){
     sevEl.dataset.label='Severity';
-    sevEl.innerHTML=['ALL',...SA_OVER_SEVERITIES].map(v=>`<button type="button" class="fb ${saOverSeverity===v?'active':''}" onclick="setSaOverSeverity('${v}')">${v==='ALL'?'ทั้งหมด':v}</button>`).join('');
+    const selected=saOverSelectedSeverities();
+    sevEl.innerHTML=['ALL',...SA_OVER_SEVERITIES].map(v=>{
+      const active = v==='ALL' ? selected.length===SA_OVER_SEVERITIES.length : selected.includes(v);
+      return `<button type="button" class="fb ${active?'active':''}" onclick="setSaOverSeverity('${v}')">${v==='ALL'?'ทั้งหมด':v}</button>`;
+    }).join('');
   }
   if(skillEl){
     skillEl.dataset.label='Skill';
@@ -7431,7 +7513,18 @@ function saOverBuildButtons(){
   if(sd && sd.value!==saOverStartDate) sd.value=saOverStartDate;
   if(ed && ed.value!==saOverEndDate) ed.value=saOverEndDate;
 }
-function setSaOverSeverity(v){ saOverSeverity=v; renderSaOverTab(false); }
+function setSaOverSeverity(v){
+  if(v==='ALL'){
+    saOverSeverity='ALL';
+  }else{
+    const selected=new Set(saOverSelectedSeverities());
+    if(selected.size===SA_OVER_SEVERITIES.length) selected.clear();
+    if(selected.has(v)) selected.delete(v); else selected.add(v);
+    saOverSeverity = selected.size===0 || selected.size===SA_OVER_SEVERITIES.length ? 'ALL' : [...selected].join(',');
+  }
+  window.saOverSeverity=saOverSeverity;
+  renderSaOverTab(false);
+}
 function setSaOverSkill(v){ saOverSkill=v; renderSaOverTab(false); }
 function setSaOverRegion(v){ saOverRegion=v; saOverSelectedProvince=''; renderSaOverTab(false); }
 function setSaOverDateRange(){
@@ -7441,6 +7534,7 @@ function setSaOverDateRange(){
   if(start>end){ const tmp=start; start=end; end=tmp; }
   saOverStartDate=start; saOverEndDate=end;
   window.saOverStartDate=start; window.saOverEndDate=end;
+  _saOverAutoRange=false;
   saOverSelectedProvince='';
   renderSaOverTab(false);
 }
@@ -7477,7 +7571,7 @@ function saOverFilterAggMatrix(rows){
     const sev=String(r.severity||'').toUpperCase();
     const skill=String(r.skill||'').toUpperCase();
     const region=saOverRegionGroup(r.region);
-    if(saOverSeverity!=='ALL' && sev!==saOverSeverity) return;
+    if(!saOverSeverityMatches(sev)) return;
     if(saOverSkill!=='ALL' && skill!==saOverSkill) return;
     if(saOverRegion!=='ALL' && region!==saOverRegion) return;
     const day=String(r.closed_date||'');
@@ -7508,7 +7602,7 @@ function saOverFilterProvinceRows(rows){
     const sev=String(r.severity||'').toUpperCase();
     const skill=String(r.skill||'').toUpperCase();
     const region=saOverRegionGroup(r.region);
-    if(saOverSeverity!=='ALL' && sev!==saOverSeverity) return false;
+    if(!saOverSeverityMatches(sev)) return false;
     if(saOverSkill!=='ALL' && skill!==saOverSkill) return false;
     if(saOverRegion!=='ALL' && region!==saOverRegion) return false;
     return true;
@@ -7704,7 +7798,7 @@ function saOverRenderKpis(rows, series){
   const el=document.getElementById('saover-kpis');
   if(!el) return;
   el.innerHTML=[
-    ['Total SA', fmt(total), `${saOverSeverity==='ALL'?'SA1-SA6':saOverSeverity} · ${saOverSkill==='ALL'?'All Skill':saOverSkill}`],
+    ['Total SA', fmt(total), `${saOverSeverityLabel()} · ${saOverSkill==='ALL'?'All Skill':saOverSkill}`],
     ['Over', fmt(over), `Closed > Require Finish Time`],
     ['Over Rate', rate.toFixed(1)+'%', `จากใบงานที่มี Closed/Require Finish`],
     ['Latest Day', latest?`${latest.label}: ${fmt(latest.over)}/${fmt(latest.total)}`:'-', `Top Over ${topSev.s} ${fmt(topSev.over)} ใบ`],
@@ -7713,22 +7807,23 @@ function saOverRenderKpis(rows, series){
 function saOverChart(series){
   const el=document.getElementById('saover-chart');
   if(!el) return;
+  _saOverLastSeries = series || [];
   if(!series.length){ el.innerHTML='<div class="empty">ไม่พบข้อมูล SA ตามตัวกรอง</div>'; return; }
-  const h=520;
+  const h=500;
   const boxW=Math.max(980,Math.floor((el.clientWidth||el.parentElement?.clientWidth||1200)-28));
-  const naturalW=Math.min(2600,series.length*44+170);
+  const naturalW=series.length*52+190;
   const w=Math.max(boxW,naturalW);
-  const padL=84, padR=54, padT=42, padB=78, plotW=w-padL-padR, plotH=h-padT-padB;
+  const padL=86, padR=70, padT=46, padB=86, plotW=w-padL-padR, plotH=h-padT-padB;
   const maxTotal=Math.max(5,...series.map(d=>d.total));
   const yMax=Math.ceil(maxTotal*1.15/10)*10;
   const barGroup=plotW/Math.max(series.length,1);
-  const barW=Math.max(14,Math.min(38,barGroup*.44));
+  const barW=Math.max(12,Math.min(34,barGroup*.38));
   const x=i=>padL+barGroup*i+barGroup/2;
   const y=v=>padT+plotH-(v/yMax)*plotH;
   const rateY=v=>padT+plotH-(Math.min(100,v)/100)*plotH;
   const tx='var(--tx)', tm='var(--tm)', labelStroke='var(--surf)';
   let svg=`<svg class="saover-daily-svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">`;
-  svg+=`<text x="${padL}" y="25" fill="${tx}" font-size="15" font-weight="850">Tickets</text>`;
+  svg+=`<text x="${padL}" y="27" fill="${tx}" font-size="15" font-weight="850">Tickets</text>`;
   svg+=`<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT+plotH}" stroke="var(--tm)" stroke-width="1.1" opacity=".56"/>`;
   svg+=`<line x1="${padL}" y1="${padT+plotH}" x2="${w-padR}" y2="${padT+plotH}" stroke="var(--tm)" stroke-width="1.3" opacity=".62"/>`;
   for(let i=0;i<=4;i++){
@@ -7748,7 +7843,7 @@ function saOverChart(series){
     else svg+=`<text class="saover-value-label" x="${(cx-barW/2-7).toFixed(1)}" y="${(withinY+5).toFixed(1)}" text-anchor="end" fill="#047857" stroke="${labelStroke}" stroke-width="1.5" paint-order="stroke" font-size="13.5" font-weight="850">${fmt(within)}</text>`;
     if(overH>28) svg+=`<text class="saover-value-label" x="${cx.toFixed(1)}" y="${(overY+Math.min(overH-8,20)).toFixed(1)}" text-anchor="middle" fill="#fff" stroke="rgba(0,0,0,.26)" stroke-width=".7" paint-order="stroke" font-size="14" font-weight="850">${fmt(d.over)}</text>`;
     else svg+=`<text class="saover-value-label" x="${cx.toFixed(1)}" y="${Math.max(padT+15,overY-8).toFixed(1)}" text-anchor="middle" fill="#b91c1c" stroke="${labelStroke}" stroke-width="1.5" paint-order="stroke" font-size="13.5" font-weight="850">${fmt(d.over)}</text>`;
-    svg+=`<text x="${cx.toFixed(1)}" y="${h-22}" text-anchor="middle" fill="${tx}" font-size="14" font-weight="750">${d.label}</text>`;
+    svg+=`<text x="${cx.toFixed(1)}" y="${h-24}" text-anchor="middle" fill="${tx}" font-size="13.5" font-weight="750">${d.label}</text>`;
     const py=rateY(rate), px=cx;
     ratePath+=(ratePath?' L':'M')+px.toFixed(1)+' '+py.toFixed(1);
   });
@@ -7761,6 +7856,11 @@ function saOverChart(series){
   svg+='</svg>';
   el.innerHTML=svg;
 }
+window.addEventListener('resize', ()=>{
+  if(!document.getElementById('tab-saover')?.classList.contains('active')) return;
+  clearTimeout(_saOverResizeTimer);
+  _saOverResizeTimer=setTimeout(()=>{ if(_saOverLastSeries.length) saOverChart(_saOverLastSeries); },120);
+});
 function saOverRenderTable(series){
   const el=document.getElementById('saover-table');
   if(!el) return;
@@ -7788,6 +7888,10 @@ async function renderSaOverTab(force){
     let usedFallback = false;
     try{
       aggRows = await saOverLoadAgg(force);
+      if(saOverApplyAutoRangeFromRows(_saOverMatrixRows)){
+        saOverBuildButtons();
+        aggRows = await saOverLoadAgg(true);
+      }
     }catch(rpcErr){
       console.warn('SA Over RPC failed; fallback to paged raw fetch', rpcErr);
       usedFallback = true;
@@ -7795,7 +7899,7 @@ async function renderSaOverTab(force){
       aggRows = null;
       const rows = saOverFilterRows(allRows);
       const series = saOverAggregate(rows);
-      if(chartTitle) chartTitle.textContent=`SA Over Daily Trend — ${saOverSeverity==='ALL'?'SA1-SA6':saOverSeverity} · ${saOverSkill==='ALL'?'All Skill':saOverSkill} · ${saOverRegion==='ALL'?'All Region':saOverRegion}`;
+      if(chartTitle) chartTitle.textContent=`SA Over Daily Trend — ${saOverSeverityLabel()} · ${saOverSkill==='ALL'?'All Skill':saOverSkill} · ${saOverRegion==='ALL'?'All Region':saOverRegion}`;
       saOverRenderKpis(rows,series);
       saOverChart(series);
       saOverRenderTable(series);
@@ -7805,7 +7909,7 @@ async function renderSaOverTab(force){
     saOverBuildButtons();
     const series=saOverSeriesFromAgg(aggRows);
     const provRows=await saOverLoadProvince(force);
-    if(chartTitle) chartTitle.textContent=`SA Over Daily Trend — ${saOverSeverity==='ALL'?'SA1-SA6':saOverSeverity} · ${saOverSkill==='ALL'?'All Skill':saOverSkill} · ${saOverRegion==='ALL'?'All Region':saOverRegion}`;
+    if(chartTitle) chartTitle.textContent=`SA Over Daily Trend — ${saOverSeverityLabel()} · ${saOverSkill==='ALL'?'All Skill':saOverSkill} · ${saOverRegion==='ALL'?'All Region':saOverRegion}`;
     saOverRenderKpis(aggRows,series);
     saOverChart(series);
     saOverRenderTable(series);
