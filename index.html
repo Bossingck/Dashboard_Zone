@@ -470,7 +470,7 @@ body.day #tab-pdtreport .pdtrpt-ok-cell{color:#047857;font-weight:850}
 @media(max-width:980px){#tab-pdtupdate .pdtupd-streak-card{grid-template-columns:1fr}#tab-pdtupdate .pdtupd-donut{margin:auto}#tab-pdtupdate .pdtupd-cause-grid{overflow-x:auto}}
 @media(max-width:560px){#tab-pdtupdate .pdtupd-summary{grid-template-columns:1fr}#tab-pdtupdate .pdtupd-search{min-width:100%}}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 </head>
 <body>
 
@@ -1405,7 +1405,47 @@ const PDT_TEAMS = [{"TeamID":"EX-EA-RYG-OFC-010","Name":"Watcharin_OF_RYG_WW","T
 const TEAM_ROSTER = {};
 PDT_TEAMS.forEach(r=>{ if(r.TeamID && !isExcludedTeamCode(r.TeamID)) TEAM_ROSTER[r.TeamID]=r; });
 function rosterOf(teamId){ return TEAM_ROSTER[teamId] || null; }
-function teamNameOf(teamId){ const r = rosterOf(teamId); return r ? (r.Name||'') : ''; }
+function pdtWeeklyTeamInfoOf(teamId){
+  const id = String(teamId||'').trim();
+  if(!id || typeof D === 'undefined') return null;
+  const src = Array.isArray(D.week_team_pdt) && D.week_team_pdt.length ? D.week_team_pdt : (Array.isArray(D.pdt_weekly) ? D.pdt_weekly : []);
+  let best = null, bestRank = -1;
+  src.forEach(r=>{
+    const raw = r && (r._pdtWeeklyRaw || r);
+    const rawTeam = String(raw.team || r.TeamID || '').trim();
+    const code = String(r.TeamID || rawTeam.split(' (')[0] || '').trim();
+    if(code !== id) return;
+    const year = Number(r.Year) || (raw.loaded_at ? new Date(raw.loaded_at).getUTCFullYear() : 0);
+    const week = Number(r.WeekNum || raw.week_no) || 0;
+    const loaded = raw.loaded_at ? new Date(raw.loaded_at).getTime() : 0;
+    const rank = year * 100000 + week * 1000 + Math.floor(loaded / 86400000);
+    if(rank >= bestRank){ best = raw; bestRank = rank; }
+  });
+  if(!best) return null;
+  const rawTeam = String(best.team || '').trim();
+  const inside = (rawTeam.match(/\((.*)\)/) || [,''])[1].trim();
+  const telMatch = inside.match(/\bTel\.?\s*([^\s_()]+)/i);
+  const ctMatch = inside.match(/_([A-Z]\d{2}(?:_[A-Z]+)?)\s*$/i);
+  const name = (best.team_name || best.TeamName || best['Team Name'] || inside.replace(/\bTel\.?.*$/i,'').trim()).trim();
+  return {
+    Name: name,
+    Tel: best.tel || best.Tel || (telMatch ? telMatch[1] : ''),
+    CT: best.ct || best.CT || (ctMatch ? ctMatch[1] : ''),
+    raw: best
+  };
+}
+function teamNameOf(teamId){
+  const weekly = pdtWeeklyTeamInfoOf(teamId);
+  if(weekly && weekly.Name) return weekly.Name;
+  const r = rosterOf(teamId);
+  return r ? (r.Name||'') : '';
+}
+function teamTelOf(teamId){
+  const weekly = pdtWeeklyTeamInfoOf(teamId);
+  if(weekly && weekly.Tel) return weekly.Tel;
+  const r = rosterOf(teamId);
+  return r ? (r.Tel||'') : '';
+}
 
 // แผนที่ Region (Roster) → ZoneGroup (Dashboard) สำหรับใช้สี/badge เดิม
 const REGION_TO_GRP = {BMAE:'BMA', BMAW:'BMA', CW:'C&W', EAS:'EAS', SOU:'SOU'};
@@ -7074,6 +7114,7 @@ function pdtUpdDownloadXlsx(filename, rows, styles){
       alignment:{horizontal:'center',vertical:'center'},
       border:baseBorder
     };
+    if(st.numFmt) ws[addr].z=st.numFmt;
   });
   ws['!cols']=Array.from({length:range.e.c+1},(_,c)=>{
     const max=Math.min(36,Math.max(10,...rows.map(r=>String(r[c]??'').length+2)));
@@ -7136,8 +7177,8 @@ function pdtUpdExportCurrentTable(){
       r.region||'',
       r.Manager||'',
       r.Province||r.province||'',
-      ...historyWeeks.map(w=>{const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null; return hr&&hr.pdt!=null?Number(hr.pdt):'';}),
-      ...historyWeeks.map(w=>{const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null; return hr&&hr.mh!=null?Number(hr.mh):'';}),
+      ...historyWeeks.map(w=>{const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null; return hr&&hr.pdt!=null?Number(Number(hr.pdt).toFixed(2)):'';}),
+      ...historyWeeks.map(w=>{const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null; return hr&&hr.mh!=null?Number(Number(hr.mh).toFixed(2)):'';}),
       r.target!=null?Number(r.target).toFixed(1):'',
       r.pdt<avgOf(r)?'แย่กว่า':'ไม่แย่กว่า',
       pdtUpdWeekLabel(selectedKey)
@@ -7148,11 +7189,11 @@ function pdtUpdExportCurrentTable(){
       const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null;
       if(hr&&hr.pdt!=null){
         const fail=Number(hr.pdt)<Number(r.target);
-        styles.push({r:excelR,c:pdtStart+i,bg:fail?redBg:greenBg,fg:fail?redFg:greenFg});
+        styles.push({r:excelR,c:pdtStart+i,bg:fail?redBg:greenBg,fg:fail?redFg:greenFg,numFmt:'0.00'});
       }
       if(hr&&hr.mh!=null){
         const fail=Number(hr.mh)<8;
-        styles.push({r:excelR,c:mhStart+i,bg:fail?redBg:greenBg,fg:fail?redFg:greenFg});
+        styles.push({r:excelR,c:mhStart+i,bg:fail?redBg:greenBg,fg:fail?redFg:greenFg,numFmt:'0.00'});
       }
     });
   });
@@ -7214,8 +7255,8 @@ function pdtUpdTeamTable(rows,title,onlyBoth=false,selectedKey='',historyWeeks=[
       const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null;
       const val=hr?Number(hr.pdt):null;
       if(val==null) return `<td class="mono">—</td>`;
-      const wkDiff=val-r.target, wkIntensity=Math.min(.34,.08+Math.abs(wkDiff)*.16);
-      const wkHeat=wkDiff<0?`color-mix(in srgb,var(--crit) ${Math.round(wkIntensity*100)}%,var(--surf))`:`color-mix(in srgb,var(--ok) ${Math.round(wkIntensity*100)}%,var(--surf))`;
+      const wkDiff=val-r.target;
+      const wkHeat=wkDiff<0?'#fce4e4':'#e2f0d9';
       return `<td class="mono pdtupd-heat" style="background:${wkHeat};color:${wkDiff<0?'var(--crit)':'var(--ok)'}">${val.toFixed(2)}</td>`;
     }).join('');
     const mhHist=historyWeeks.map((w,i)=>{const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null; const val=hr&&hr.mh!=null?Number(hr.mh):null; const fail=val!=null&&val<8; const cls=i===historyWeeks.length-1&&fail?'pdtupd-mh-fail ':''; return `<td class="mono ${cls}">${val==null?'—':val.toFixed(2)}</td>`;}).join('');
