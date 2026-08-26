@@ -6720,11 +6720,20 @@ function pdtUpdChart(skill){
     const lower=[...data].reverse().map((d,i)=>`L ${x(data.length-1-i).toFixed(1)} ${ticketY(d[lowerKey]).toFixed(1)}`).join(' ');
     return `${upper} ${lower} Z`;
   };
+  const areaLayers=[
+    {key:'tickets',fill:mountainColors.openFill,line:mountainColors.openLine,label:sourceLabel},
+    {key:'total',fill:mountainColors.closedFill,line:mountainColors.closedLine,label:'Ticket Closed'}
+  ].sort((a,b)=>{
+    const av=data.reduce((s,d)=>s+(Number(d[a.key])||0),0)/(data.length||1);
+    const bv=data.reduce((s,d)=>s+(Number(d[b.key])||0),0)/(data.length||1);
+    return bv-av; // ค่ามากวาดก่อนให้อยู่ด้านหลัง, ค่าน้อยวาดทีหลังอยู่ด้านหน้า
+  });
   const workMountains=`
-    <path d="${makeAreaPath('total')}" fill="${mountainColors.closedFill}" opacity=".38" stroke="none"/>
-    <path d="${makeBandPath('tickets','total')}" fill="${mountainColors.gapFill}" opacity=".44" stroke="none"/>
-    <polyline points="${makeLinePoints('tickets')}" fill="none" stroke="${mountainColors.openLine}" stroke-width="4.8" stroke-linejoin="round" stroke-linecap="round"/>
-    <polyline points="${makeLinePoints('total')}" fill="none" stroke="${mountainColors.closedLine}" stroke-width="4.8" stroke-linejoin="round" stroke-linecap="round"/>
+    ${areaLayers.map(l=>`<path d="${makeAreaPath(l.key)}" fill="${l.fill}" opacity=".48" stroke="none"><title>${pdtUpdEsc(l.label)}</title></path>`).join('')}
+    <polyline points="${makeLinePoints('tickets')}" fill="none" stroke="${colors.surf}" stroke-width="5.8" stroke-opacity=".68" stroke-linejoin="round" stroke-linecap="round"/>
+    <polyline points="${makeLinePoints('total')}" fill="none" stroke="${colors.surf}" stroke-width="5.8" stroke-opacity=".68" stroke-linejoin="round" stroke-linecap="round"/>
+    <polyline points="${makeLinePoints('tickets')}" fill="none" stroke="${mountainColors.openLine}" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
+    <polyline points="${makeLinePoints('total')}" fill="none" stroke="${mountainColors.closedLine}" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
     ${data.map((d,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${ticketY(d.tickets).toFixed(1)}" r="4.3" fill="${mountainColors.openLine}" stroke="${colors.surf}" stroke-width="1.5"><title>Ticket Open: ${fmtWhole(d.tickets)}</title></circle><circle cx="${x(i).toFixed(1)}" cy="${ticketY(d.total).toFixed(1)}" r="4.3" fill="${mountainColors.closedLine}" stroke="${colors.surf}" stroke-width="1.5"><title>Ticket Closed: ${fmtWhole(d.total)}</title></circle>`).join('')}
   `;
   const workLabels=data.map((d,i)=>{
