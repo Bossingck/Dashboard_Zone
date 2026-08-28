@@ -828,7 +828,7 @@ body.day #tab-pdtreport .pdtrpt-ok-cell{color:#047857;font-weight:850}
 <div id="tab-plkd" class="tab" style="display:none">
   <div style="padding:16px">
     <div style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:2px">🏭 PLKD Dashboard — Site ปลวกแดง</div>
-    <div style="font-size:11px;color:var(--tm);margin-bottom:12px">ครอบคลุม 168 Site Code (PLKD) — ดึง TT (WO Creator = System) จากตาราง tickets โดยจับคู่กับ Site ID โดยตรง · กรองตาม <b>Closed</b> เฉพาะเดือนนี้</div>
+    <div style="font-size:11px;color:var(--tm);margin-bottom:12px">ครอบคลุม 168 Site Code (PLKD) — ดึง TT (WO Creator = System) จากตาราง tickets โดยจับคู่จาก Site ID หรือ Subject · กรองตาม <b>Closed</b> เฉพาะเดือนนี้</div>
 
     <div id="plkd-day-filter" class="mw-bar" style="margin-bottom:12px;flex-wrap:wrap;gap:4px"></div>
 
@@ -7406,7 +7406,7 @@ function goTab(name,btn){
 const MT_RAW_SUPABASE_URL = 'https://pqnvdtxfgbhijsbdsngg.supabase.co';
 const MT_RAW_ANON_KEY = 'sb_publishable_pfiDwO41HClof585G1_E0w_JaKzwLJq';
 // ═══ PLKD (ปลวกแดง) — 168 Site Code จาก Site_Code_PKD.xlsx ═══════════════════
-// จับคู่ตรงกับคอลัมน์ "Site ID" ในตาราง tickets (Supabase project pqnvdtxfgbhijsbdsngg) — ไม่ต้อง parse Subject เพราะ Site ID สะอาดและตรงอยู่แล้ว
+// จับคู่ PLKD จาก Site ID หรือ site code ที่อยู่ใน Subject เพื่อให้เงื่อนไขตรงกับ Fault PLKD
 // TT = แถวที่ "WO Creator" = 'System' (ใบหลัก ตามนิยามเดียวกับส่วน MT Report ด้านบน)
 const PLKD_SITE_CODES = ['CBR0020','CBR0415','CBR0663','CBR0885','CBR0916','CBR0971','CBR1263','CBR1311','CBR1350','CBR1365','CBR1414','CBR1861','CBR1867','CBR3005','CBR4028','CBR5895','CBR5926','CBR5939','CBR5945','CBR5946','CBR5951','CBR5954','CBR6472','CBR6796','CBR6797','CBR7119','CBR7148','CBR7181','CBR7193','CBR7347','CBR7450','CBR7469','CBR7929','CBR7930','CBR8790','CBR8814','CBR8841','CBRA441','CBRA516','CBRA517','CBRA518','CBRC058','CBRC096','CBRC110','RYG0041','RYG0073','RYG0164','RYG0204','RYG0216','RYG0232','RYG0308','RYG0327','RYG0354','RYG0355','RYG0356','RYG0394','RYG0395','RYG0396','RYG0397','RYG0399','RYG0400','RYG0401','RYG0402','RYG0416','RYG0417','RYG0418','RYG0506','RYG0539','RYG0571','RYG0583','RYG0624','RYG0626','RYG0627','RYG0641','RYG0649','RYG0650','RYG0651','RYG0652','RYG0653','RYG0654','RYG0655','RYG0656','RYG0657','RYG0673','RYG0707','RYG0710','RYG0715','RYG0716','RYG0719','RYG0723','RYG0739','RYG0744','RYG0757','RYG0760','RYG1316','RYG1380','RYG1637','RYG1830','RYG2113','RYG4002','RYG4003','RYG6007','RYG6040','RYG6403','RYG6407','RYG6409','RYG6412','RYG6414','RYG6422','RYG6706','RYG6707','RYG6751','RYG6754','RYG6755','RYG6766','RYG7100','RYG7113','RYG7132','RYG7141','RYG7144','RYG7146','RYG7195','RYG7196','RYG7209','RYG7227','RYG7231','RYG7232','RYG7235','RYG7248','RYG7254','RYG7255','RYG7256','RYG7265','RYG7266','RYG7267','RYG7271','RYG7273','RYG7279','RYG7283','RYG7284','RYG7290','RYG7297','RYG7315','RYG7347','RYG7402','RYG7611','RYG7614','RYG7620','RYG7629','RYG7634','RYG7649','RYG7917','RYG7935','RYG7958','RYG7981','RYG7984','RYG7997','RYG8517','RYG8547','RYG8548','RYG8550','RYG8596','RYGC043','RYGC045','RYGC069','RYG7348','RYG7349','RYG7350'];
 const PLKD_TEAM_CODES = ['SY-EA-RYG-NOD-001','SY-EA-RYG-MUF-010','SY-EA-RYG-MUF-011','SY-EA-RYG-OFC-017','EX-EA-RYG-OFC-001','SY-EA-RYG-OFC-005'];
@@ -7423,6 +7423,22 @@ function plkdQS(pairs){
 }
 function plkdSaSeverityOrClause(){
   return '(' + PLKD_SA_SEVERITY_LEVELS.map(l=>`Severity.like.${l}*`).join(',') + ')';
+}
+const PLKD_SITE_CODE_SET = new Set(PLKD_SITE_CODES.map(s=>String(s).trim().toUpperCase()).filter(Boolean));
+const PLKD_SITE_CODE_REGEX = new RegExp('\\b(?:' + PLKD_SITE_CODES.map(s=>String(s).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).sort((a,b)=>b.length-a.length).join('|') + ')\\b', 'i');
+function plkdRowMatchesSiteScope(r){
+  const site = String(r?.['Site ID'] || '').trim().toUpperCase();
+  if(site && PLKD_SITE_CODE_SET.has(site)) return true;
+  return PLKD_SITE_CODE_REGEX.test(String(r?.Subject || ''));
+}
+async function fetchTicketsRESTPages(pairs, pageSize=1000){
+  const rows = [];
+  for(let offset=0;; offset+=pageSize){
+    const page = await fetchTicketsREST([...pairs, ['limit', String(pageSize)], ['offset', String(offset)]]);
+    rows.push(...page);
+    if(!Array.isArray(page) || page.length < pageSize) break;
+  }
+  return rows;
 }
 function plkdCloseDescKey(desc){
   if(desc == null) return null;
@@ -7457,6 +7473,8 @@ let saOverSelectedProvince = '';
 let _saOverFetchKey = '';
 let _saOverSiteRows = [];
 let _saOverSiteFetchKey = '';
+let _saOverSiteAggRows = [];
+let _saOverSiteAggKey = '';
 let saOverSiteScope = 'ALL';
 let _saOverLoading = false;
 let _saOverLastSeries = [];
@@ -8116,7 +8134,7 @@ function saOverSiteCodeOf(r){
 }
 function saOverSiteSet(kind){
   if(kind==='EEC') return new Set((window.SA_OVER_EEC_SITE_CODES||[]).map(s=>String(s).trim().toUpperCase()).filter(Boolean));
-  if(kind==='PLKD') return new Set((window.SA_OVER_PLKD_SITE_CODES||window.PLKD_SITE_CODES||[]).map(s=>String(s).trim().toUpperCase()).filter(Boolean));
+  if(kind==='PLKD') return new Set((window.SA_OVER_PLKD_SITE_CODES||window.PLKD_SITE_CODES||PLKD_SITE_CODES||[]).map(s=>String(s).trim().toUpperCase()).filter(Boolean));
   return new Set();
 }
 function saOverClosedInSelectedRange(r){
@@ -8138,6 +8156,41 @@ function saOverSiteScopeSet(){
   if(saOverSiteScope==='EEC') return saOverSiteSet('EEC');
   if(saOverSiteScope==='PLKD') return saOverSiteSet('PLKD');
   return null;
+}
+function saOverSiteScopeLabelForRpc(){
+  return saOverRegion==='EAS' && saOverSiteScope!=='ALL' ? saOverSiteScope : 'ALL';
+}
+async function saOverLoadSiteAgg(force, siteSet){
+  const range = saOverFetchRange();
+  const selectedSeverities = saOverSelectedSeverities();
+  const siteIds = [...(siteSet||new Set())].filter(Boolean).sort();
+  if(!siteIds.length) return [];
+  const key = JSON.stringify({range,mode:'site-daily-rpc-chunked-v1',severity:selectedSeverities,skill:saOverSkill,region:saOverRegion,scope:saOverSiteScopeLabelForRpc(),siteCount:siteIds.length});
+  if(!force && _saOverSiteAggKey===key && _saOverSiteAggRows.length) return _saOverSiteAggRows;
+  const chunkSize = 450;
+  const chunks = [];
+  for(let i=0;i<siteIds.length;i+=chunkSize) chunks.push(siteIds.slice(i,i+chunkSize));
+  const merged = new Map();
+  for(const chunk of chunks){
+    const rows = await fetchSupabaseRpc('sa_over_site_daily_trend_filtered', {
+      p_start: range.start,
+      p_end: range.end,
+      p_severities: selectedSeverities,
+      p_skill: saOverSkill,
+      p_region: saOverRegion,
+      p_site_ids: chunk,
+    });
+    (rows||[]).forEach(r=>{
+      const id = `${r.closed_date}|${r.year}|${r.week}|${r.severity}`;
+      if(!merged.has(id)) merged.set(id,{closed_date:r.closed_date,year:r.year,week:r.week,severity:r.severity,total:0,over:0});
+      const x = merged.get(id);
+      x.total += Number(r.total)||0;
+      x.over += Number(r.over)||0;
+    });
+  }
+  _saOverSiteAggRows = [...merged.values()].sort((a,b)=>String(a.closed_date).localeCompare(String(b.closed_date))||String(a.severity).localeCompare(String(b.severity)));
+  _saOverSiteAggKey = key;
+  return _saOverSiteAggRows;
 }
 function saOverRenderMiniTrend(containerId, title, subTitle, series, opts={}){
   const el=document.getElementById(containerId);
@@ -8233,6 +8286,8 @@ async function renderSaOverTab(force){
       _saOverProvKey='';
       _saOverSiteRows=[];
       _saOverSiteFetchKey='';
+      _saOverSiteAggRows=[];
+      _saOverSiteAggKey='';
       _saOverFetchKey='';
     }
     saOverBuildButtons();
@@ -8261,11 +8316,11 @@ async function renderSaOverTab(force){
     let sourceLabel='RPC summary';
     const scopeSet = saOverRegion==='EAS' ? saOverSiteScopeSet() : null;
     if(scopeSet){
-      siteRowsForRender = await saOverLoadSiteRows(force);
+      siteRowsForRender = await saOverLoadSiteAgg(force, scopeSet);
       if(!alive()) return;
-      series = saOverSiteSeries(siteRowsForRender, scopeSet);
-      kpiRows=[];
-      sourceLabel='site raw';
+      series = saOverSeriesFromAgg(siteRowsForRender);
+      kpiRows=siteRowsForRender;
+      sourceLabel='site RPC summary';
     }
     if(chartTitle) chartTitle.textContent=`SA Over Daily Trend — ${saOverSeverityLabel()} · ${saOverSkill==='ALL'?'All Skill':saOverSkill} · ${saOverRegion==='ALL'?'All Region':saOverRegion}${saOverRegion==='EAS'?' · '+saOverSiteScopeLabel():''}`;
     saOverRenderKpis(kpiRows,series);
@@ -8282,7 +8337,7 @@ async function renderSaOverTab(force){
       return;
     }
     const provPromise=saOverLoadProvince(force);
-    const sitePromise=scopeSet ? (siteRowsForRender ? Promise.resolve(siteRowsForRender) : saOverLoadSiteRows(force)) : Promise.resolve(null);
+    const sitePromise=scopeSet ? (siteRowsForRender ? Promise.resolve(siteRowsForRender) : saOverLoadSiteAgg(force, scopeSet)) : Promise.resolve(null);
     Promise.all([provPromise,sitePromise]).then(([provRows,siteRows])=>{
       if(!alive()) return;
       saOverRenderSiteTrends([]);
@@ -8461,23 +8516,19 @@ async function renderPlkdTab(force){
   const plkdTeamCodesForFetch = [...PLKD_TEAM_CODES, ...Object.keys(PLKD_TEAM_CODE_ALIASES)];
   const orClause = '(' + plkdTeamCodesForFetch.map(t=>`Team.like.${t}*`).join(',') + ')';
   const [saResult, teamResult, pdtResult] = await Promise.allSettled([
-    fetchTicketsREST([
+    fetchTicketsRESTPages([
       ['select', 'Site ID,Work Order ID,Team,Severity,Root Cause,Sub Root Cause,Close Description,Subject,Alarm Description,Departed,Arrived,Completed,Created Time,Closed'],
       ['WO Creator', 'eq.System'],
       ['or', plkdSaSeverityOrClause()],
-      ['Site ID', `in.(${PLKD_SITE_CODES.join(',')})`],
       ...closedRange,
       ['order', 'Closed.desc'],
-      ['limit', '3000'],
-    ]),
-    fetchTicketsREST([
-      ['select', 'Site ID,Work Order ID,Team,Severity,SLA,Root Cause,Sub Root Cause,Close Description,Departed,Arrived,Completed,Created Time,Closed'],
+    ]).then(rows=>rows.filter(plkdRowMatchesSiteScope)),
+    fetchTicketsRESTPages([
+      ['select', 'Site ID,Work Order ID,Team,Severity,SLA,Root Cause,Sub Root Cause,Close Description,Subject,Departed,Arrived,Completed,Created Time,Closed'],
       ['WO Creator', 'eq.System'],
-      ['Site ID', `in.(${PLKD_SITE_CODES.join(',')})`],
       ['or', orClause],
       ...closedRange,
-      ['limit', '3000'],
-    ]),
+    ]).then(rows=>rows.filter(plkdRowMatchesSiteScope)),
     fetchPlkdPdtWeekly(),
   ]);
   if(myGen !== _plkdLoadGen) return;
