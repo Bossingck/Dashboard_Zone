@@ -384,14 +384,14 @@ body.day #tab-pdtupdate .pdtupd-week-select option:checked{background:#1d4ed8;co
 #tab-saover .saover-lg-total{background:#16a34a}
 #tab-saover .saover-lg-over{background:#dc2626}
 #tab-saover .saover-lg-ticket{background:#8b5cf6;height:3px!important}
-#tab-saover .saover-lg-rate{background:#f97316;height:3px!important}
+#tab-saover .saover-lg-rate{background:var(--saover-rate,#f97316);height:3px!important}
 #tab-saover .saover-table-scroll{overflow:auto;max-height:720px}
 #tab-saover table.saover-table{min-width:980px}
 #tab-saover table.saover-table th,#tab-saover table.saover-table td{font-size:12px;padding:8px 10px}
 #tab-saover .saover-over-cell{color:var(--crit);font-weight:850}
 #tab-saover table.saover-table td.saover-over-cell{color:var(--crit)}
 #tab-saover .saover-rate-cell{font-family:'JetBrains Mono',monospace;font-weight:800}
-body.day #tab-saover{--tx:#0f172a;--tm:#334155;--brd:#b8c7dc;--surf:#ffffff;--surf2:#eef4fb}
+body.day #tab-saover{--tx:#0f172a;--tm:#334155;--brd:#b8c7dc;--surf:#ffffff;--surf2:#eef4fb;--saover-rate:#7c3aed}
 body.day #tab-saover .saover-note{color:#475569;font-weight:650}
 body.day #tab-saover .saover-filter-row,
 body.day #tab-saover .saover-kpi,
@@ -816,7 +816,7 @@ window.SA_OVER_PLKD_SITE_CODES = ["CBR0020","CBR0415","CBR0663","CBR0885","CBR09
       <div class="saover-legend">
         <span><i class="saover-lg-total"></i>Within SLA</span>
         <span><i class="saover-lg-over"></i>Over SLA</span>
-        <span><i class="saover-lg-ticket"></i>Total Ticket</span>
+        <span><i class="saover-lg-rate"></i>Over %</span>
       </div>
     </div>
     <div id="saover-site-trends"></div>
@@ -8175,7 +8175,7 @@ function saOverChart(series){
   const x=i=>padL+barGroup*i+barGroup/2;
   const y=v=>padT+plotH-(v/yMax)*plotH;
   const clampLabelY=yy=>Math.max(padT+14,Math.min(padT+plotH-6,yy));
-  const tx='var(--tx)', tm='var(--tm)', labelStroke='var(--surf)';
+  const tx='var(--tx)', tm='var(--tm)', labelStroke='var(--surf)', rateCol='var(--saover-rate,#f97316)';
   let svg=`<svg class="saover-daily-svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">`;
   svg+=`<text x="${padL}" y="27" fill="${tx}" font-size="15" font-weight="850">Tickets</text>`;
   svg+=`<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT+plotH}" stroke="var(--tm)" stroke-width="1.1" opacity=".56"/>`;
@@ -8185,7 +8185,10 @@ function saOverChart(series){
     svg+=`<line x1="${padL}" y1="${yy.toFixed(1)}" x2="${w-padR}" y2="${yy.toFixed(1)}" stroke="var(--brd)" stroke-width="1" opacity=".32"/>`;
     svg+=`<text x="${padL-12}" y="${yy+5}" text-anchor="end" fill="${tm}" font-size="13.5" font-weight="700">${fmt(val)}</text>`;
   }
-  let totalPath='';
+  const maxRate=Math.max(10,...series.map(d=>d.total ? (d.over/d.total*100) : 0));
+  const rateMax=Math.min(100,Math.max(10,Math.ceil(maxRate*1.25/5)*5));
+  const rateY=pct=>padT+plotH-(Math.min(rateMax,Math.max(0,Number(pct)||0))/rateMax)*plotH;
+  let ratePath='';
   series.forEach((d,i)=>{
     const cx=x(i), within=Math.max(0,(Number(d.total)||0)-(Number(d.over)||0));
     const totalH=padT+plotH-y(d.total), withinH=(within/yMax)*plotH, overH=(d.over/yMax)*plotH;
@@ -8201,12 +8204,14 @@ function saOverChart(series){
       svg+=`<text class="saover-value-label" x="${cx.toFixed(1)}" y="${clampLabelY(overY+overH/2+4).toFixed(1)}" text-anchor="middle" fill="#fff" stroke="rgba(0,0,0,.32)" stroke-width=".8" paint-order="stroke" font-size="${fs}" font-weight="850">${fmt(d.over)}</text>`;
     }
     svg+=saOverXAxisLabel(d.label,cx,padT+plotH+13,series.length,i);
-    totalPath+=(totalPath?' L':'M')+cx.toFixed(1)+' '+y(d.total).toFixed(1);
+    const rate=d.total ? d.over/d.total*100 : 0;
+    ratePath+=(ratePath?' L':'M')+cx.toFixed(1)+' '+rateY(rate).toFixed(1);
   });
-  if(totalPath) svg+=`<path d="${totalPath}" fill="none" stroke="#8b5cf6" stroke-width="3" opacity=".96"/>`;
+  if(ratePath) svg+=`<path d="${ratePath}" fill="none" stroke="${rateCol}" stroke-width="3" opacity=".98"/>`;
   series.forEach((d,i)=>{
-    const cx=x(i), totalY=y(d.total);
-    svg+=`<text class="saover-value-label" x="${cx.toFixed(1)}" y="${clampLabelY(totalY-10).toFixed(1)}" text-anchor="middle" fill="#7c3aed" stroke="${labelStroke}" stroke-width="1.2" paint-order="stroke" font-size="13.5" font-weight="850">${fmt(d.total)}</text>`;
+    const cx=x(i), rate=d.total ? d.over/d.total*100 : 0, yy=rateY(rate);
+    svg+=`<circle cx="${cx.toFixed(1)}" cy="${yy.toFixed(1)}" r="3.8" fill="${rateCol}" stroke="${labelStroke}" stroke-width="1.4"><title>${d.label} Over ${rate.toFixed(1)}%</title></circle>`;
+    svg+=`<text class="saover-value-label" x="${cx.toFixed(1)}" y="${clampLabelY(yy-10).toFixed(1)}" text-anchor="middle" fill="${rateCol}" stroke="${labelStroke}" stroke-width="1.1" paint-order="stroke" font-size="12.5" font-weight="850">${rate.toFixed(1)}%</text>`;
   });
   svg+='</svg>';
   el.innerHTML=svg;
@@ -8303,6 +8308,7 @@ function saOverRenderMiniTrend(containerId, title, subTitle, series, opts={}){
   const x=i=>padL+groupW*i+groupW/2;
   const y=v=>padT+plotH-(v/yMax)*plotH;
   const clampLabelY=yy=>Math.max(padT+13,Math.min(padT+plotH-6,yy));
+  const rateCol='var(--saover-rate,#f97316)';
   let svg=`<svg class="saover-daily-svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">`;
   svg+=`<text x="${padL}" y="22" fill="var(--tx)" font-size="13.5" font-weight="850">${saOverEsc(title)}</text>`;
   svg+=`<text x="${w-padR}" y="22" fill="var(--tm)" font-size="11.5" font-weight="750" text-anchor="end">${saOverEsc(subTitle||'')}</text>`;
@@ -8313,7 +8319,10 @@ function saOverRenderMiniTrend(containerId, title, subTitle, series, opts={}){
     svg+=`<line x1="${padL}" y1="${yy.toFixed(1)}" x2="${w-padR}" y2="${yy.toFixed(1)}" stroke="var(--brd)" stroke-width="1" opacity=".28"/>`;
     svg+=`<text x="${padL-10}" y="${yy+4}" text-anchor="end" fill="var(--tm)" font-size="12" font-weight="700">${fmt(val)}</text>`;
   }
-  let totalPath='';
+  const maxRate=Math.max(10,...series.map(d=>d.total ? (d.over/d.total*100) : 0));
+  const rateMax=Math.min(100,Math.max(10,Math.ceil(maxRate*1.25/5)*5));
+  const rateY=pct=>padT+plotH-(Math.min(rateMax,Math.max(0,Number(pct)||0))/rateMax)*plotH;
+  let ratePath='';
   series.forEach((d,i)=>{
     const cx=x(i), within=Math.max(0,(Number(d.total)||0)-(Number(d.over)||0));
     const withinH=(within/yMax)*plotH, overH=(d.over/yMax)*plotH, base=padT+plotH;
@@ -8329,12 +8338,14 @@ function saOverRenderMiniTrend(containerId, title, subTitle, series, opts={}){
       svg+=`<text class="saover-value-label" x="${cx.toFixed(1)}" y="${clampLabelY(overY+overH/2+4).toFixed(1)}" text-anchor="middle" fill="#fff" stroke="rgba(0,0,0,.42)" stroke-width=".9" paint-order="stroke" font-size="${fs}" font-weight="850">${fmt(d.over)}</text>`;
     }
     svg+=saOverXAxisLabel(d.label,cx,padT+plotH+13,series.length,i);
-    totalPath+=(totalPath?' L':'M')+cx.toFixed(1)+' '+y(d.total).toFixed(1);
+    const rate=d.total ? d.over/d.total*100 : 0;
+    ratePath+=(ratePath?' L':'M')+cx.toFixed(1)+' '+rateY(rate).toFixed(1);
   });
-  if(totalPath) svg+=`<path d="${totalPath}" fill="none" stroke="#8b5cf6" stroke-width="2.4" opacity=".96"/>`;
+  if(ratePath) svg+=`<path d="${ratePath}" fill="none" stroke="${rateCol}" stroke-width="2.4" opacity=".98"/>`;
   series.forEach((d,i)=>{
-    const cx=x(i), totalY=y(d.total);
-    svg+=`<text class="saover-value-label" x="${cx.toFixed(1)}" y="${clampLabelY(totalY-9).toFixed(1)}" text-anchor="middle" fill="#7c3aed" stroke="rgba(0,0,0,.55)" stroke-width=".9" paint-order="stroke" font-size="12.5" font-weight="850">${fmt(d.total)}</text>`;
+    const cx=x(i), rate=d.total ? d.over/d.total*100 : 0, yy=rateY(rate);
+    svg+=`<circle cx="${cx.toFixed(1)}" cy="${yy.toFixed(1)}" r="3.2" fill="${rateCol}" stroke="var(--surf)" stroke-width="1.2"><title>${d.label} Over ${rate.toFixed(1)}%</title></circle>`;
+    svg+=`<text class="saover-value-label" x="${cx.toFixed(1)}" y="${clampLabelY(yy-9).toFixed(1)}" text-anchor="middle" fill="${rateCol}" stroke="var(--surf)" stroke-width=".9" paint-order="stroke" font-size="11.5" font-weight="850">${rate.toFixed(1)}%</text>`;
   });
   svg+='</svg>';
   el.innerHTML=svg;
