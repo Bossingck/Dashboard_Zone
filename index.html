@@ -391,7 +391,7 @@ body.day #tab-pdtupdate .pdtupd-week-select option:checked{background:#1d4ed8;co
 #tab-saover .saover-over-cell{color:var(--crit);font-weight:850}
 #tab-saover table.saover-table td.saover-over-cell{color:var(--crit)}
 #tab-saover .saover-rate-cell{font-family:'JetBrains Mono',monospace;font-weight:800}
-body.day #tab-saover{--tx:#0f172a;--tm:#334155;--brd:#b8c7dc;--surf:#ffffff;--surf2:#eef4fb;--saover-rate:#7c3aed}
+body.day #tab-saover{--tx:#0f172a;--tm:#334155;--brd:#b8c7dc;--surf:#ffffff;--surf2:#eef4fb;--saover-rate:#facc15;--saover-rate-stroke:#111827}
 body.day #tab-saover .saover-note{color:#475569;font-weight:650}
 body.day #tab-saover .saover-filter-row,
 body.day #tab-saover .saover-kpi,
@@ -7226,23 +7226,24 @@ function pdtUpdExportCurrentTable(){
     const n=Number(v);
     return Number.isFinite(n)?Math.round(n*100)/100:'';
   };
-  const header=['Team','Region','Manager','Province',...historyWeeks.map(w=>`PDT ${weekLabel(w)}`),...historyWeeks.map(w=>`MH ${weekLabel(w)}`),'Target','เทียบ Region','Selected Week'];
+  const header=['Province','Team Code','Skill','Region','Target',...historyWeeks.map(w=>`${weekLabel(w)} PDT`),...historyWeeks.map(w=>`${weekLabel(w)} MH`),'Manager','เทียบ Region','Selected Week'];
   const out=[header];
   const styles=[];
-  const pdtStart=4;
+  const pdtStart=5;
   const mhStart=pdtStart+historyWeeks.length;
   const redBg='FCE4D6', redFg='9C0006', greenBg='E2F0D9', greenFg='006100';
   sortedShown.forEach(r=>{
     const teamCode=String(r.TeamID||r.team||r.Team||'').trim();
     const name=teamNameOf(teamCode)||r.Name||r.TeamName||r['Team Name']||'';
     const row=[
-      name?`${teamCode} (${name})`:teamCode,
-      r.region||'',
-      r.Manager||'',
       r.Province||r.province||'',
+      name?`${teamCode} (${name})`:teamCode,
+      pdtUpdSkillOf(r)||'',
+      r.region||'',
+      r.target!=null?Number(r.target).toFixed(1):'',
       ...historyWeeks.map(w=>{const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null; return hr&&hr.pdt!=null?round2(hr.pdt):'';}),
       ...historyWeeks.map(w=>{const hr=w?teamWeeks.get(`${r.TeamID}||${w.key}`):null; return hr&&hr.mh!=null?round2(hr.mh):'';}),
-      r.target!=null?Number(r.target).toFixed(1):'',
+      r.Manager||'',
       r.pdt<avgOf(r)?'แย่กว่า':'ไม่แย่กว่า',
       pdtUpdWeekLabel(selectedKey)
     ];
@@ -7540,10 +7541,11 @@ async function fetchPlkdFaultTable(pairs){
 let saOverSeverity = window.saOverSeverity || 'ALL';
 let saOverSkill = 'ALL';
 let saOverRegion = 'ALL';
-let _saOverDateRangeTouched = true;
+let _saOverDateRangeTouched = false;
 let saOverStartDate = '2026-07-01';
-let saOverEndDate = '2026-08-23';
+let saOverEndDate = '2026-08-30';
 let _saOverAutoRange = false;
+let _saOverDbRangeReady = false;
 let _saOverRows = [];
 let _saOverAggRows = [];
 let _saOverMatrixRows = [];
@@ -7812,6 +7814,30 @@ async function fetchSupabaseRpc(fn, payload){
   });
   if(!res.ok) throw new Error('RPC '+fn+' HTTP '+res.status+' '+(await res.text().catch(()=>'')));
   return res.json();
+}
+async function saOverLoadLatestClosedDate(){
+  const url = `${MT_RAW_SUPABASE_URL}/rest/v1/sa_over_daily_matrix_system_mv?select=closed_date&order=closed_date.desc&limit=1`;
+  const res = await fetch(url, {
+    cache:'no-store',
+    headers:{
+      'apikey': MT_RAW_ANON_KEY,
+      'Authorization':'Bearer '+MT_RAW_ANON_KEY,
+      'Cache-Control':'no-cache',
+      'Pragma':'no-cache',
+    }
+  });
+  if(!res.ok) throw new Error('โหลดวันที่ล่าสุดจาก Database ไม่สำเร็จ: HTTP '+res.status+' '+(await res.text().catch(()=>'')));
+  const rows = await res.json();
+  return String(rows?.[0]?.closed_date || '').slice(0,10);
+}
+async function saOverEnsureDbDefaultRange(force=false){
+  if(_saOverDateRangeTouched) return;
+  if(_saOverDbRangeReady && !force) return;
+  const latest = await saOverLoadLatestClosedDate();
+  if(!latest) return;
+  saOverEndDate = latest;
+  window.saOverEndDate = latest;
+  _saOverDbRangeReady = true;
 }
 async function saOverLoadAgg(force){
   const range = saOverFetchRange();
@@ -8175,7 +8201,7 @@ function saOverChart(series){
   const x=i=>padL+barGroup*i+barGroup/2;
   const y=v=>padT+plotH-(v/yMax)*plotH;
   const clampLabelY=yy=>Math.max(padT+14,Math.min(padT+plotH-6,yy));
-  const tx='var(--tx)', tm='var(--tm)', labelStroke='var(--surf)', rateCol='var(--saover-rate,#f97316)';
+  const tx='var(--tx)', tm='var(--tm)', labelStroke='var(--surf)', rateCol='var(--saover-rate,#f97316)', rateStroke='var(--saover-rate-stroke,var(--surf))';
   let svg=`<svg class="saover-daily-svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">`;
   svg+=`<text x="${padL}" y="27" fill="${tx}" font-size="15" font-weight="850">Tickets</text>`;
   svg+=`<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT+plotH}" stroke="var(--tm)" stroke-width="1.1" opacity=".56"/>`;
@@ -8207,11 +8233,12 @@ function saOverChart(series){
     const rate=d.total ? d.over/d.total*100 : 0;
     ratePath+=(ratePath?' L':'M')+cx.toFixed(1)+' '+rateY(rate).toFixed(1);
   });
-  if(ratePath) svg+=`<path d="${ratePath}" fill="none" stroke="${rateCol}" stroke-width="3" opacity=".98"/>`;
+  if(ratePath) svg+=`<path d="${ratePath}" fill="none" stroke="${rateStroke}" stroke-width="4.8" opacity=".9" stroke-linejoin="round" stroke-linecap="round"/>`;
+  if(ratePath) svg+=`<path d="${ratePath}" fill="none" stroke="${rateCol}" stroke-width="3" opacity=".98" stroke-linejoin="round" stroke-linecap="round"/>`;
   series.forEach((d,i)=>{
     const cx=x(i), rate=d.total ? d.over/d.total*100 : 0, yy=rateY(rate);
-    svg+=`<circle cx="${cx.toFixed(1)}" cy="${yy.toFixed(1)}" r="3.8" fill="${rateCol}" stroke="${labelStroke}" stroke-width="1.4"><title>${d.label} Over ${rate.toFixed(1)}%</title></circle>`;
-    svg+=`<text class="saover-value-label" x="${cx.toFixed(1)}" y="${clampLabelY(yy-10).toFixed(1)}" text-anchor="middle" fill="${rateCol}" stroke="${labelStroke}" stroke-width="1.1" paint-order="stroke" font-size="12.5" font-weight="850">${rate.toFixed(1)}%</text>`;
+    svg+=`<circle cx="${cx.toFixed(1)}" cy="${yy.toFixed(1)}" r="3.8" fill="${rateCol}" stroke="${rateStroke}" stroke-width="1.5"><title>${d.label} Over ${rate.toFixed(1)}%</title></circle>`;
+    svg+=`<text class="saover-value-label" x="${cx.toFixed(1)}" y="${clampLabelY(yy-10).toFixed(1)}" text-anchor="middle" fill="${rateCol}" stroke="${rateStroke}" stroke-width=".9" paint-order="stroke" font-size="12.5" font-weight="850">${rate.toFixed(1)}%</text>`;
   });
   svg+='</svg>';
   el.innerHTML=svg;
@@ -8308,7 +8335,7 @@ function saOverRenderMiniTrend(containerId, title, subTitle, series, opts={}){
   const x=i=>padL+groupW*i+groupW/2;
   const y=v=>padT+plotH-(v/yMax)*plotH;
   const clampLabelY=yy=>Math.max(padT+13,Math.min(padT+plotH-6,yy));
-  const rateCol='var(--saover-rate,#f97316)';
+  const rateCol='var(--saover-rate,#f97316)', rateStroke='var(--saover-rate-stroke,var(--surf))';
   let svg=`<svg class="saover-daily-svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">`;
   svg+=`<text x="${padL}" y="22" fill="var(--tx)" font-size="13.5" font-weight="850">${saOverEsc(title)}</text>`;
   svg+=`<text x="${w-padR}" y="22" fill="var(--tm)" font-size="11.5" font-weight="750" text-anchor="end">${saOverEsc(subTitle||'')}</text>`;
@@ -8341,11 +8368,12 @@ function saOverRenderMiniTrend(containerId, title, subTitle, series, opts={}){
     const rate=d.total ? d.over/d.total*100 : 0;
     ratePath+=(ratePath?' L':'M')+cx.toFixed(1)+' '+rateY(rate).toFixed(1);
   });
-  if(ratePath) svg+=`<path d="${ratePath}" fill="none" stroke="${rateCol}" stroke-width="2.4" opacity=".98"/>`;
+  if(ratePath) svg+=`<path d="${ratePath}" fill="none" stroke="${rateStroke}" stroke-width="4.1" opacity=".9" stroke-linejoin="round" stroke-linecap="round"/>`;
+  if(ratePath) svg+=`<path d="${ratePath}" fill="none" stroke="${rateCol}" stroke-width="2.4" opacity=".98" stroke-linejoin="round" stroke-linecap="round"/>`;
   series.forEach((d,i)=>{
     const cx=x(i), rate=d.total ? d.over/d.total*100 : 0, yy=rateY(rate);
-    svg+=`<circle cx="${cx.toFixed(1)}" cy="${yy.toFixed(1)}" r="3.2" fill="${rateCol}" stroke="var(--surf)" stroke-width="1.2"><title>${d.label} Over ${rate.toFixed(1)}%</title></circle>`;
-    svg+=`<text class="saover-value-label" x="${cx.toFixed(1)}" y="${clampLabelY(yy-9).toFixed(1)}" text-anchor="middle" fill="${rateCol}" stroke="var(--surf)" stroke-width=".9" paint-order="stroke" font-size="11.5" font-weight="850">${rate.toFixed(1)}%</text>`;
+    svg+=`<circle cx="${cx.toFixed(1)}" cy="${yy.toFixed(1)}" r="3.2" fill="${rateCol}" stroke="${rateStroke}" stroke-width="1.3"><title>${d.label} Over ${rate.toFixed(1)}%</title></circle>`;
+    svg+=`<text class="saover-value-label" x="${cx.toFixed(1)}" y="${clampLabelY(yy-9).toFixed(1)}" text-anchor="middle" fill="${rateCol}" stroke="${rateStroke}" stroke-width=".8" paint-order="stroke" font-size="11.5" font-weight="850">${rate.toFixed(1)}%</text>`;
   });
   svg+='</svg>';
   el.innerHTML=svg;
@@ -8383,6 +8411,7 @@ async function renderSaOverTab(force){
   const info=document.getElementById('saover-info');
   const chartTitle=document.getElementById('saover-chart-title');
   try{
+    await saOverEnsureDbDefaultRange(force);
     const range = saOverFetchRange();
     if(force){
       _saOverMatrixRows=[];
